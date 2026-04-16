@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SVG Pro Studio | Kusursuz CMS V41 (Sıfır Hata)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700;800&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--accent:#10b981;--bg:#0f172a;--panel:#1e293b;--border:#334155;--handle-move:#3b82f6;--handle-rotate:#f59e0b;--handle-radius:#ec4899}
+        *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:#fff;font-family:'Inter',sans-serif;overscroll-behavior-y:none}
+        
+        #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10000}
+        .login-card{background:var(--panel);padding:40px;border-radius:20px;width:340px;text-align:center;border:1px solid var(--border);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+        .login-card input{width:100%;padding:14px;margin-bottom:15px;border-radius:10px;border:1px solid var(--border);background:#000;color:#fff;text-align:center;outline:none;font-size:14px}
+        .login-card button{width:100%;padding:14px;background:var(--accent);border:none;color:#fff;font-weight:700;border-radius:10px;cursor:pointer;transition:.2s;font-size:14px}
+        .login-card button:hover{opacity:.9}
+        
+        #app-container{display:none;height:100%;width:100%;flex-direction:row}
+        #sidebar{width:480px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100%;z-index:100;position:relative}
+        
+        .sidebar-scroll-area{flex-shrink:0;max-height:60%;overflow-y:auto;background:#111827;padding:15px;border-bottom:2px solid var(--border)}
+        #editor-fields{flex:1;min-height:0;overflow-y:auto;padding:20px;background:rgba(0,0,0,.2);padding-bottom:80px}
+        
+        #layers-wrapper{background:#0f172a;border-bottom:2px solid var(--border);flex-shrink:0;display:flex;flex-direction:column}
+        #layers-wrapper[open]{height:35%}
+        #layers-wrapper:not([open]){height:auto}
+        #layers-header{padding:12px 15px;font-size:11px;font-weight:700;color:var(--accent);background:#111827;cursor:pointer;text-transform:uppercase;letter-spacing:1px;outline:none;user-select:none}
+        #layers-list{flex:1;overflow-y:auto}
+        
+        .layer-item{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px;transition:.2s;background:#1e293b;color:#cbd5e1}
+        .layer-item:hover{background:#334155}
+        .layer-item.active{border-left:4px solid var(--accent);background:rgba(16,185,129,.15);color:#fff;font-weight:700}
+        .layer-actions{display:flex;gap:10px;align-items:center}
+        .layer-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;transition:.2s}
+        .layer-btn:hover{color:#fff;transform:scale(1.2)}
+        
+        #main-view{flex:1;background:#020617;overflow:hidden;position:relative;height:calc(100% - 25px);display:flex}
+        #zoom-container{flex:1;display:flex;align-items:center;justify-content:center;transform-origin:center center;transition:transform .2s ease-out;position:relative; margin-left: 20px; margin-top: 20px; width: calc(100% - 20px); height: calc(100% - 20px);}
+        #svg-wrapper{position:relative;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px #000;touch-action:none;transition:transform .1s}
+        #canvas-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+        #canvas-inner svg{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;overflow:visible}
+        
+        .draw-mode{cursor:crosshair!important}
+        .pan-mode{cursor:grab!important}
+        .panning{cursor:grabbing!important}
+        
+        .ruler{position:absolute;background:#111827;border:1px solid var(--border);z-index:40;pointer-events:none;overflow:hidden}
+        .ruler-h{top:0;left:20px;right:0;height:20px;border-left:none}
+        .ruler-v{top:20px;left:0;bottom:0;width:20px;border-top:none}
+        .ruler svg{position:absolute;top:0;left:0}
+        
+        .floating-tools{position:fixed;bottom:45px;left:40px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px;display:flex;gap:8px;box-shadow:0 10px 25px rgba(0,0,0,.5);z-index:500;align-items:center}
+        .tool-btn{background:#0f172a;color:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;transition:.2s}
+        .tool-btn:hover{background:var(--accent);border-color:var(--accent)}
+        
+        .duzenlenebilir{cursor:move;pointer-events:all}
+        .locked{cursor:not-allowed!important}
+        #control-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50;overflow:visible}
+        .handle{fill:#fff;stroke-width:2;pointer-events:all;transition:fill .2s,stroke-width .2s}
+        .handle:hover{fill:var(--accent);stroke-width:4}
+        .handle-resize{stroke:var(--handle-move);cursor:nwse-resize}
+        .handle-rotate{stroke:var(--handle-rotate);cursor:crosshair;fill:var(--handle-rotate)}
+        .handle-radius{stroke:var(--handle-radius);cursor:ns-resize;fill:var(--handle-radius)}
+        .snap-line{stroke:#ec4899;stroke-width:1.5;stroke-dasharray:4,4;pointer-events:none;z-index:60}
+        .guide-line{stroke:#06b6d4;stroke-width:3;stroke-dasharray:8,4;cursor:grab;pointer-events:all}
+        
+        input[type="range"]{width:100%;accent-color:var(--accent);height:6px;cursor:pointer;margin:0}
+        input[type="text"],input[type="number"],textarea{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:#000;color:#fff;outline:none;font-size:13px}
+        input[type="text"]:focus,input[type="number"]:focus,textarea:focus{border-color:var(--accent)}
+        .font-select{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:#000;color:#fff;margin-bottom:5px;outline:none;font-size:13px;cursor:pointer}
+        
+        .action-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+        .action-btn{flex:1;background:#334155;color:#fff;border:none;border-radius:8px;padding:10px 15px;font-size:12px;font-weight:700;cursor:pointer;text-align:center}
+        .action-btn:hover{background:#475569}
+        .action-btn.active{background:var(--accent);color:#fff}
+        .action-btn.danger{background:#991b1b}
+        .action-btn.special{background:#0284c7}
+        
+        .group-box{background:rgba(0,0,0,.2);padding:12px;border-radius:10px;border:1px solid #1e293b;margin-top:10px;margin-bottom:15px}
+        .property-details{background:rgba(0,0,0,.25);padding:12px 18px;border-radius:12px;border:1px solid var(--border);margin-bottom:12px}
+        .property-details summary{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;margin-bottom:5px}
+        
+        .label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;width:100%}
+        .label-text{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+        .value-badge{background:#000;color:var(--accent);font-size:11px;padding:3px 6px;border-radius:4px;font-family:monospace;font-weight:700}
+        
+        #context-menu{display:none;position:absolute;background:#1e293b;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.7);border-radius:8px;padding:5px;z-index:20000;min-width:180px}
+        .ctx-item{padding:10px 15px;font-size:13px;cursor:pointer;color:#e2e8f0;border-radius:4px;display:flex;justify-content:space-between;align-items:center}
+        .ctx-item:hover{background:var(--accent);color:#fff}
+        .ctx-item.danger:hover{background:#ef4444}
+        
+        #status-bar{position:absolute;bottom:0;left:0;width:100%;height:25px;background:#0f172a;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:11px;color:#94a3b8;z-index:400;font-family:monospace}
+        
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:30000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+        .modal-content{background:#1e293b;border:1px solid var(--border);padding:30px;border-radius:16px;width:450px;box-shadow:0 25px 50px rgba(0,0,0,.5);position:relative;max-height:90vh;display:flex;flex-direction:column}
+        
+        .close-modal{position:absolute;top:15px;right:15px;cursor:pointer;color:#94a3b8;font-size:24px;font-weight:700;line-height:1}
+        .close-modal:hover{color:#fff}
+        .shortcut-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+        .kbd{background:#0f172a;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--accent);font-family:monospace}
+        
+        .swatch-container{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+        .color-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:1px solid var(--border);transition:transform .1s}
+        .color-swatch:hover{transform:scale(1.2);border-color:#fff}
+        
+        #status-info{position:fixed;top:0;width:100%;background:var(--accent);text-align:center;padding:10px;z-index:11000;display:none;font-weight:700;letter-spacing:1px}
+        @media (max-width:1023px){#app-container{flex-direction:column}#sidebar{width:100%;height:50%;border-top:1px solid var(--border);border-left:none;order:2}#main-view{width:100%;height:50%;order:1;padding-left:0;padding-top:0;}#zoom-container{margin:0;width:100%;height:100%;}.floating-tools{bottom:auto;top:10px;left:50%;transform:translateX(-50%)}}
+    </style>
+</head>
+<body>
+
+<div id="status-info">İşlem Yapılıyor...</div>
+
+<div id="context-menu">
+    <div class="ctx-item" onclick="if(selectedEl) window.cloneElement(selectedEl.id); window.closeCtx();"><span>⧉ Kopyala</span><span class="kbd">Alt+Sürükle</span></div>
+    <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 1); window.closeCtx();"><span>▲ Öne Getir</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, -1); window.closeCtx();"><span>▼ Arkaya Gönder</span></div>
+    <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.toggleLock(selectedEl.id); window.closeCtx();"><span id="ctx-lock-text">🔒 Kilitle</span></div>
+    <div class="ctx-item danger" onclick="if(selectedEl && confirm('Silinecek?')){ selectedEl.remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; } window.closeCtx();"><span>🗑️ Sil</span><span class="kbd">Del</span></div>
+</div>
+
+<div id="hotkey-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('hotkey-modal').style.display='none'">×</span>
+        <h3 style="margin-top:0; color:var(--accent);">⌨️ Kısayol Haritası</h3>
+        <div class="shortcut-row"><span>Gezinme (El Aracı)</span><span class="kbd">Space + Sürükle</span></div>
+        <div class="shortcut-row"><span>Hızlı Kopyalama</span><span class="kbd">Alt + Sürükle</span></div>
+        <div class="shortcut-row"><span>Hassas Taşıma</span><span class="kbd">Ok Tuşları</span></div>
+        <div class="shortcut-row"><span>Hızlı Taşıma</span><span class="kbd">Shift + Ok Tuşları</span></div>
+        <div class="shortcut-row"><span>Geri Al</span><span class="kbd">Ctrl + Z</span></div>
+        <div class="shortcut-row"><span>İleri Al</span><span class="kbd">Ctrl + Y</span></div>
+        <div class="shortcut-row"><span>Kopyala</span><span class="kbd">Ctrl + C</span></div>
+        <div class="shortcut-row"><span>Yapıştır</span><span class="kbd">Ctrl + V</span></div>
+        <div class="shortcut-row" style="border:none;"><span>Sil</span><span class="kbd">Del / Backspace</span></div>
+    </div>
+</div>
+
+<div id="export-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('export-modal').style.display='none'">×</span>
+        <h3 style="margin-top:0; color:var(--accent);">📥 İndirme Seçenekleri</h3>
+        <input type="hidden" id="export-format" value="png">
+        <div class="input-group" style="margin-bottom:15px;">
+            <span class="label-text">ÇÖZÜNÜRLÜK (KALİTE)</span>
+            <select id="export-scale" class="font-select">
+                <option value="1">1x (Normal - Orijinal Boyut)</option>
+                <option value="2">2x (Yüksek Kalite)</option>
+                <option value="3">3x (Ultra Kalite)</option>
+            </select>
+        </div>
+        <div class="input-group" style="margin-bottom:20px;">
+            <span class="label-text">KAPSAM</span>
+            <select id="export-scope" class="font-select">
+                <option value="all">Tüm Tuvali İndir (Arka Plan Dahil)</option>
+                <option value="selected">Sadece Seçili Nesne (Şeffaf)</option>
+            </select>
+        </div>
+        <button class="action-btn active" style="width:100%; padding:15px; font-size:14px;" onclick="window.executeExport()">İNDİRMEYİ BAŞLAT</button>
+    </div>
+</div>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h2 style="margin-top:0; color:white;">Pro Studio V40</h2>
+        <div style="font-size:12px; color:#94a3b8; margin-bottom:20px;">Lütfen Cloudflare Worker şifrenizi girin.</div>
+        <input type="password" id="passInput" placeholder="Sunucu Şifresi">
+        <button id="loginBtn" onclick="window.login()">Sunucuya Bağlan</button>
+    </div>
+</div>
+
+<div id="app-container">
+    <div id="main-view">
+        <div id="horizontal-ruler" class="ruler ruler-h"></div>
+        <div id="vertical-ruler" class="ruler ruler-v"></div>
+
+        <div class="floating-tools">
+            <button class="tool-btn" id="btn-undo" onclick="window.undo()" title="Geri Al (Ctrl+Z)">↩ Geri</button>
+            <button class="tool-btn" id="btn-redo" onclick="window.redo()" title="İleri Al (Ctrl+Y)">İleri ↪</button>
+            <div style="width: 1px; background: var(--border); margin: 0 5px; height: 20px;"></div>
+            <button class="tool-btn" onclick="window.changeZoom(-0.1)" title="Uzaklaştır">-</button>
+            <button class="tool-btn" id="zoom-val" onclick="window.resetZoom()" title="Sıfırla">100%</button>
+            <button class="tool-btn" onclick="window.changeZoom(0.1)" title="Yakınlaştır">+</button>
+            <div style="width: 1px; background: var(--border); margin: 0 5px; height: 20px;"></div>
+            <button class="tool-btn" onclick="document.getElementById('hotkey-modal').style.display='flex'" title="Kısayol Haritası">⌨️</button>
+        </div>
+
+        <div id="zoom-container">
+            <div id="svg-wrapper">
+                <div id="canvas-inner"></div>
+                <svg id="control-layer"></svg>
+            </div>
+        </div>
+        <div id="status-bar">
+            <div id="status-count">Nesne Sayısı: 0</div>
+            <div>SVG Pro Studio Ultimate V40</div>
+            <div id="status-time">Son Kayıt: Bekleniyor...</div>
+        </div>
+    </div>
+    
+    <div id="sidebar">
+        <div class="sidebar-scroll-area">
+            <div style="display:flex; gap:5px; margin-bottom: 10px;">
+                <button onclick="window.saveData()" class="action-btn active" style="flex:2; font-size:12px;">💾 KAYDET</button>
+                <button onclick="window.openExport('png')" class="action-btn special" style="flex:1; background:#0284c7;">📥 PNG</button>
+                <button onclick="window.openExport('svg')" class="action-btn svg" style="flex:1; background:#ea580c;">📥 SVG</button>
+            </div>
+            
+            <select id="file-selector" style="width:100%; padding:10px; background:#000; color:#fff; border-radius:8px; margin-bottom:10px; border:1px solid #334155; outline:none;">
+                <option value="slayt.svg">Ana Slayt (slayt.svg)</option>
+                <option value="kampanya.svg">Kampanya (kampanya.svg)</option>
+                <option value="duyuru.svg">Duyuru (duyuru.svg)</option>
+            </select>
+            
+            <details style="margin-bottom: 10px;">
+                <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px;">🎬 SEÇİLİ SLAYT AYARLARI (JSON)</summary>
+                <div class="group-box" style="margin-top:5px;">
+                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Değişiklikler doğrudan settings.json dosyasına işlenir.</div>
+                    <div class="input-group" style="margin-bottom:10px;">
+                        <span class="label-text">BU SLAYTIN EKRANDA KALMA SÜRESİ (ms)</span>
+                        <input type="number" id="slide-time" value="5000">
+                    </div>
+                    <div class="input-group" style="margin-bottom:10px;">
+                        <span class="label-text">BU SLAYT İÇİN GEÇİŞ EFEKTİ</span>
+                        <select id="slide-effect" class="font-select">
+                            <option value="fade">Fade (Yumuşak Geçiş)</option>
+                            <option value="slide">Slide (Kaydırma)</option>
+                            <option value="zoom">Zoom (Yakınlaştırma)</option>
+                            <option value="cube">Cube (3D Küp)</option>
+                            <option value="coverflow">Coverflow (3D Galeri)</option>
+                            <option value="flip">Flip (Kart Çevirme)</option>
+                            <option value="none">Efektsiz</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()">💾 AYARLARI KAYDET (JSON)</button>
+                </div>
+            </details>
+
+            <details style="margin-bottom: 10px;">
+                <summary style="font-size:11px; font-weight:bold; color:var(--accent); cursor:pointer; margin-bottom:5px;">📐 TUVAL AYARLARI</summary>
+                <div class="group-box" style="margin-top:5px;">
+                    <div style="display:flex; gap:10px; align-items: center; margin-bottom:10px;">
+                        <input type="number" id="canvas-w" placeholder="Genişlik" onchange="window.updateCanvasSize()">
+                        <span style="color:#64748b;">X</span>
+                        <input type="number" id="canvas-h" placeholder="Yükseklik" onchange="window.updateCanvasSize()">
+                        <input type="color" id="canvas-bg-color" title="Arka Plan Rengi" oninput="window.updateCanvasBg()" style="width:40px; height:35px; cursor:pointer; border:none; background:none;">
+                    </div>
+                    <div class="action-row" style="margin:0;">
+                        <button onclick="window.addGuide('h')" class="action-btn" style="background:#06b6d4; font-size:11px;">+ YATAY KILAVUZ</button>
+                        <button onclick="window.addGuide('v')" class="action-btn" style="background:#06b6d4; font-size:11px;">+ DİKEY KILAVUZ</button>
+                        <button onclick="window.clearGuides()" class="action-btn" style="background:#ef4444; font-size:11px;">TEMİZLE</button>
+                    </div>
+                </div>
+            </details>
+            
+            <details style="margin-bottom: 10px;" open>
+                <summary style="font-size:11px; font-weight:bold; color:#8b5cf6; cursor:pointer; margin-bottom:5px;">🎨 NESNE EKLE & ARAÇLAR</summary>
+                <div class="group-box" style="margin-top:5px; margin-bottom:5px;">
+                    <div class="action-row" style="margin-bottom:0;">
+                        <button onclick="window.addNewText()" class="action-btn" style="background:#475569;">+ YAZI</button>
+                        <button onclick="document.getElementById('img-in').click()" class="action-btn" style="background:#475569;" title="Sürükle-Bırak da Yapabilirsiniz">+ RESİM</button>
+                        <button onclick="window.addShape('rect')" class="action-btn" style="background:#475569;">+ KARE</button>
+                        <button id="btn-draw" onclick="window.toggleDrawMode()" class="action-btn draw" style="background:#8b5cf6;" title="Fırça Aracı">🖌️ ÇİZİM</button>
+                    </div>
+                </div>
+            </details>
+
+            <details style="margin-bottom: 5px;" open>
+                <summary style="font-size:11px; font-weight:bold; color:#06b6d4; cursor:pointer; margin-bottom:5px;">📑 KATMANLAR</summary>
+                <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 0; overflow: hidden; border: 1px solid var(--border);">
+                    <div id="layers-list" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </details>
+
+            <input type="file" id="img-in" accept="image/*" hidden>
+        </div>
+
+        <div id="editor-fields">
+            <div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">
+                👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const WORKER_URL = "https://githubtoken.tafbilgiislem.workers.dev"; 
+    
+    let SHA_KEY = "", SESSION_PASS = "", settingsData = [], settingsSha = "";
+
+    window.setD = function(el, key, val) { if(el) el.setAttribute('data-' + key, val); };
+    window.getD = function(el, key) { return el ? el.getAttribute('data-' + key) : null; };
+
+    let recentColors = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#ffffff'];
+    window.addRecentColor = function(c) { 
+        if(!recentColors.includes(c)) { 
+            recentColors.unshift(c); 
+            if(recentColors.length > 10) recentColors.pop(); 
+            if(selectedEl) window.renderProperties(); 
+        } 
+    };
+
+    function safeColor(c) { if(!c) return "#ffffff"; if(c.length === 4 && c.startsWith('#')) return "#" + c[1] + c[1] + c[2] + c[2] + c[3] + c[3]; return c.startsWith('#') && c.length === 7 ? c : "#ffffff"; }
+
+    let selectedEl = null, resizingEl = null, rotatingEl = null, radiusingEl = null, activeHandle = null, offset = {x:0, y:0}, startP = {x:0, y:0}, startData = {}, isModified = false;
+    let clipboard = null, currentZoom = 1, panX = 0, panY = 0, historyStack = [], historyIndex = -1;
+    let isDrawingMode = false, isDrawing = false, currentPath = null, pathData = "", isDraggingGuide = false, currentGuide = null, isDraggingElement = false, isSpacePressed = false, isPanning = false, panStart = {x:0, y:0}, panOffsetStart = {x:0, y:0};
+
+    window.updateEditorUI = null;
+
+    const googleFonts = [{ name: "Varsayılan", val: "sans-serif" }, { name: "Roboto", val: "'Roboto', sans-serif" }, { name: "Montserrat", val: "'Montserrat', sans-serif" }, { name: "Poppins", val: "'Poppins', sans-serif" }, { name: "Open Sans", val: "'Open Sans', sans-serif" }, { name: "Lato", val: "'Lato', sans-serif" }];
+
+    window.getCanvasCenter = function() {
+        const svg = document.querySelector('#canvas-inner svg');
+        if(!svg) return { cx: 960, cy: 540 };
+        let w = 1920, h = 1080;
+        if (svg.hasAttribute('viewBox')) { const vb = svg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
+        return { cx: w / 2, cy: h / 2 };
+    };
+
+    window.login = async function() {
+        if (WORKER_URL === "") { alert("Lütfen kodun içindeki WORKER_URL kısmına Worker linkinizi yazın!"); return; }
+        const passVal = document.getElementById('passInput').value;
+        if(!passVal) { alert("Lütfen Worker şifrenizi girin!"); return; }
+        SESSION_PASS = passVal; 
+        await window.loadSettings();
+        await window.loadSlide();    
+    };
+    
+    document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.login(); });
+    document.getElementById('file-selector').addEventListener('change', async () => { await window.loadSlide(); window.updateSettingsUI(); });
+
+    window.loadSettings = async function() {
+        try {
+            const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json"} });
+            if (res.ok) {
+                const data = await res.json();
+                settingsSha = data.sha || (data.content && data.content.sha) || "";
+                settingsData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+            } else { settingsData = [ {file: "slayt.svg", effect: "fade", duration: 5000} ]; }
+            window.updateSettingsUI();
+        } catch (e) { settingsData = []; window.updateSettingsUI(); }
+    };
+
+    window.updateSettingsUI = function() {
+        const currentFile = document.getElementById('file-selector').value;
+        const slideConfig = settingsData.find(s => s.file === currentFile);
+        if (slideConfig) { document.getElementById('slide-time').value = slideConfig.duration || 3000; document.getElementById('slide-effect').value = slideConfig.effect || 'fade'; } 
+        else { document.getElementById('slide-time').value = 3000; document.getElementById('slide-effect').value = 'fade'; }
+    };
+
+    window.saveSlideSettings = async function() {
+        if (!WORKER_URL || WORKER_URL === "") { alert("Worker URL eksik!"); return; }
+        const st = document.getElementById('status-info'); st.innerText = "AYARLAR (JSON) GÜNCELLENİYOR..."; st.style.display = "block";
+        try {
+            const currentFile = document.getElementById('file-selector').value;
+            const timeVal = parseInt(document.getElementById('slide-time').value) || 3000;
+            const effectVal = document.getElementById('slide-effect').value;
+
+            let slideConfig = settingsData.find(s => s.file === currentFile);
+            if (slideConfig) { slideConfig.duration = timeVal; slideConfig.effect = effectVal; } 
+            else { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
+
+            const newContent = JSON.stringify(settingsData, null, 2);
+            const b64 = btoa(unescape(encodeURIComponent(newContent)));
+
+            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı", content: b64, sha: settingsSha}) });
+            if(putRes.ok) { 
+                try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
+                st.innerText = "AYARLAR KAYDEDİLDİ!"; 
+            } else { st.innerText = "KAYIT HATASI!"; }
+            setTimeout(() => st.style.display="none", 2000);
+        } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
+    };
+
+    window.loadSlide = async function() {
+        const file = document.getElementById('file-selector').value;
+        const st = document.getElementById('status-info'); st.innerText = "YÜKLENİYOR..."; st.style.display = "block";
+        try {
+            const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": file} });
+            if (res.status === 401) { alert("Şifre Hatalı!"); st.style.display="none"; document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; return; }
+            document.getElementById('login-screen').style.display = "none"; document.getElementById('app-container').style.display = "flex";
+            if (res.status === 404) {
+                SHA_KEY = ""; document.getElementById('canvas-inner').innerHTML = `<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg"><rect id="canvas-background" x="0" y="0" width="1920" height="1080" fill="#ffffff"></rect><g id="guides-group"></g></svg>`;
+            } else {
+                const data = await res.json(); SHA_KEY = data.sha || "";
+                document.getElementById('canvas-inner').innerHTML = decodeURIComponent(escape(atob(data.content)));
+            }
+            historyStack = []; historyIndex = -1;
+            setTimeout(() => { window.setupLayers(); window.initCanvasSettings(); window.resetZoom(); window.saveState(); }, 200);
+            st.style.display = "none";
+        } catch(e) { alert("Bağlantı Hatası!"); st.style.display="none"; document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
+    };
+
+    // ====== KAYDET, YAZI EKLE, KARE EKLE BUTONLARI (Kusursuz ve Eksiksiz) ======
+    window.saveData = async function() {
+        if (!WORKER_URL || WORKER_URL === "") { alert("Lütfen kodun içindeki WORKER_URL kısmına kendi linkinizi yazın!"); return; }
+        const st = document.getElementById('status-info'); st.innerText = "KAYDEDİLİYOR..."; st.style.display = "block";
+        
+        try {
+            document.getElementById('control-layer').innerHTML = ""; window.hideGuides(true);
+            const svgText = new XMLSerializer().serializeToString(document.querySelector('#canvas-inner svg')); 
+            const b64 = btoa(unescape(encodeURIComponent(svgText)));
+            window.hideGuides(false);
+            
+            const fileName = document.getElementById('file-selector').value;
+            const res = await fetch(WORKER_URL, { 
+                method: "PUT", 
+                headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": fileName }, 
+                body: JSON.stringify({message: "Pro Studio Ultimate Fix V40", content: b64, sha: SHA_KEY}) 
+            });
+            
+            if(res.ok) { 
+                try {
+                    const data = await res.json();
+                    SHA_KEY = data.content?.sha || data.sha || SHA_KEY;
+                } catch(err) {}
+                st.innerText = "BAŞARIYLA KAYDEDİLDİ!"; 
+                const now = new Date(); document.getElementById('status-time').innerText = `Son Kayıt: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`; 
+            } else { st.innerText = "KAYIT HATASI!"; }
+            setTimeout(() => st.style.display="none", 2000);
+            if(selectedEl && window.updateEditorUI) window.updateEditorUI(selectedEl);
+        } catch(e) { alert("Kayıt Hatası: Sunucu bağlantısı kurulamadı."); st.style.display="none"; }
+    };
+
+    window.addNewText = function() {
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; 
+        const center = window.getCanvasCenter();
+        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t.id = "txt_" + Date.now(); t.setAttribute("class", "duzenlenebilir"); 
+        t.setAttribute("x", center.cx); t.setAttribute("y", center.cy); 
+        t.setAttribute("text-anchor", "middle"); t.setAttribute("dominant-baseline", "central"); 
+        window.setD(t, 'base-font-size', "80"); window.setD(t, 'raw-text', "YENİ METİN"); 
+        window.setD(t, 'solid-color', "#000000"); t.setAttribute("fill", "#000000"); 
+        t.setAttribute("font-size", "80"); t.setAttribute("font-family", "sans-serif"); t.textContent = "YENİ METİN";
+        svg.appendChild(t); selectedEl = t; window.saveState(); window.setupLayers(); window.updateEditorUI(t); window.renderEditor();
+    };
+    
+    window.addShape = function(type) {
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; 
+        const center = window.getCanvasCenter();
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.id = "shp_" + Date.now(); rect.setAttribute("class", "duzenlenebilir"); 
+        rect.setAttribute("x", center.cx - 100); rect.setAttribute("y", center.cy - 100); 
+        rect.setAttribute("width", 200); rect.setAttribute("height", 200); 
+        window.setD(rect, 'solid-color', "#10b981"); rect.setAttribute("fill", "#10b981"); window.setD(rect, 'mask-shape', "none");
+        svg.appendChild(rect); selectedEl = rect; window.saveState(); window.setupLayers(); window.updateEditorUI(rect); window.renderEditor();
+    };
+
+    // ======= GÜVENLİ VE HIZLI KAYDIRICI (SLIDER) MOTORU =======
+    window.changeProp = function(id, prop, val, elUI) {
+        const el = document.getElementById(id); if(!el) return;
+        if(prop === 'x') el.setAttribute('x', val);
+        if(prop === 'y') el.setAttribute('y', val);
+        if(prop === 'w') {
+            if(el.tagName === 'text') {
+                if(val > 10) {
+                    el.setAttribute('textLength', val); el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+                    const tp = el.querySelector('textPath');
+                    if (tp) { tp.setAttribute('textLength', val); tp.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+                } else {
+                    el.removeAttribute('textLength'); el.removeAttribute('lengthAdjust');
+                    const tp = el.querySelector('textPath');
+                    if (tp) { tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust'); }
+                }
+            } else { el.setAttribute('width', val); }
+        }
+        if(prop === 'h') {
+            if(el.tagName === 'text') { window.setD(el, 'base-font-size', val); el.setAttribute('font-size', val); } 
+            else { el.setAttribute('height', val); }
+        }
+        
+        if (elUI) {
+            const badge = document.getElementById('val-' + prop + '-' + id);
+            if (badge) badge.innerText = val + 'px';
+            if (elUI.type === 'range' && elUI.nextElementSibling && elUI.nextElementSibling.type === 'number') elUI.nextElementSibling.value = val;
+            else if (elUI.type === 'number' && elUI.previousElementSibling && elUI.previousElementSibling.type === 'range') elUI.previousElementSibling.value = val;
+        }
+        
+        if(el.tagName === 'text') window.applyTextCurve(el);
+        if(el.tagName === 'image' || el.tagName === 'rect') window.applyShapeMask(el);
+        if(window.updateEditorUI) window.updateEditorUI(el);
+    };
+
+    window.changeSetting = function(id, key, val, elUI) {
+        const el = document.getElementById(id); if(!el) return;
+        window.setD(el, key, val);
+        
+        if(key === 'curve' || key === 'raw-text' || key === 'letter-spacing' || key === 'max-width') { 
+            if(key === 'letter-spacing') el.setAttribute('letter-spacing', val); 
+            window.applyTextCurve(el); 
+        }
+        if(key === 'rx' || key === 'mask-shape') window.applyShapeMask(el);
+        if(key === 'angle') window.applyTransforms(el);
+        
+        if (elUI) {
+            const badge = document.getElementById('val-' + key + '-' + id);
+            if (badge) badge.innerText = val + (key === 'angle' ? '°' : (key === 'curve' ? '' : 'px'));
+            if (elUI.type === 'range' && elUI.nextElementSibling && elUI.nextElementSibling.type === 'number') elUI.nextElementSibling.value = val;
+            else if (elUI.type === 'number' && elUI.previousElementSibling && elUI.previousElementSibling.type === 'range') elUI.previousElementSibling.value = val;
+        }
+        if(window.updateEditorUI) window.updateEditorUI(el);
+    };
+    
+    window.changeFilter = function(id, filterType, val, elUI) {
+        const el = document.getElementById(id); if(!el) return;
+        if(filterType === 'opacity') el.setAttribute('opacity', val);
+        else window.setD(el, filterType, val);
+        window.applyFilters(el);
+        
+        if (elUI) {
+            const badge = document.getElementById('val-' + (filterType==='opacity'?'op':(filterType==='shadow-x'?'sx':(filterType==='shadow-y'?'sy':(filterType==='shadow-blur'?'sb':'bl')))) + '-' + id);
+            if (badge) badge.innerText = (filterType==='opacity' ? Math.round(val*100)+'%' : val+'px');
+            if (elUI.type === 'range' && elUI.nextElementSibling && elUI.nextElementSibling.type === 'number') elUI.nextElementSibling.value = val;
+            else if (elUI.type === 'number' && elUI.previousElementSibling && elUI.previousElementSibling.type === 'range') elUI.previousElementSibling.value = val;
+        }
+    };
+
+    window.handleImageFile = function(file) {
+        if (!file || !file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const svg = document.querySelector('#canvas-inner svg'); const center = window.getCanvasCenter();
+            const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+            img.id = "img_" + Date.now(); img.setAttribute("class", "duzenlenebilir"); 
+            img.setAttribute("x", center.cx - 150); img.setAttribute("y", center.cy - 150); 
+            img.setAttribute("width", 300); img.setAttribute("height", 300); 
+            window.setD(img, "rx", "0"); window.setD(img, "smoothing", "0.5"); window.setD(img, "mask-shape", "none"); 
+            img.setAttribute("href", ev.target.result); img.setAttributeNS("http://www.w3.org/1999/xlink", "href", ev.target.result);
+            svg.appendChild(img); selectedEl = img; window.saveState(); window.setupLayers(); window.updateEditorUI(img); window.renderEditor();
+        }; reader.readAsDataURL(file);
+    };
+    
+    document.getElementById('img-in').onchange = (e) => { window.handleImageFile(e.target.files[0]); e.target.value = ""; };
+    const mainView = document.getElementById('main-view');
+    mainView.addEventListener('dragover', (e) => { e.preventDefault(); mainView.style.opacity = '0.8'; });
+    mainView.addEventListener('dragleave', (e) => { e.preventDefault(); mainView.style.opacity = '1'; });
+    mainView.addEventListener('drop', (e) => { e.preventDefault(); mainView.style.opacity = '1'; window.handleImageFile(e.dataTransfer.files[0]); });
+
+    window.closeCtx = function() { document.getElementById('context-menu').style.display = 'none'; };
+    document.addEventListener('click', window.closeCtx);
+    document.getElementById('svg-wrapper').addEventListener('contextmenu', (e) => {
+        const el = e.target.closest('.duzenlenebilir');
+        if(el) {
+            e.preventDefault(); selectedEl = el; isDraggingElement = false; window.updateEditorUI(el); window.renderEditor();
+            const ctxMenu = document.getElementById('context-menu');
+            document.getElementById('ctx-lock-text').innerText = window.getD(el, 'locked') === "true" ? "🔓 Kilidi Aç" : "🔒 Kilitle";
+            ctxMenu.style.display = 'block';
+            let x = e.clientX; let y = e.clientY;
+            if(x + 180 > window.innerWidth) x = window.innerWidth - 180;
+            if(y + 200 > window.innerHeight) y = window.innerHeight - 200;
+            ctxMenu.style.left = x + 'px'; ctxMenu.style.top = y + 'px';
+        }
+    });
+
+    window.hideGuides = function(hide) { const gg = document.getElementById('guides-group'); if(gg) gg.style.display = hide ? 'none' : 'block'; };
+    window.clearGuides = function() { const gg = document.getElementById('guides-group'); if(gg) { gg.innerHTML = ''; window.saveState(); } };
+    window.openExport = function(type) { document.getElementById('export-format').value = type; document.getElementById('export-modal').style.display = 'flex'; };
+    window.executeExport = function() {
+        const format = document.getElementById('export-format').value; const scale = parseInt(document.getElementById('export-scale').value); const scope = document.getElementById('export-scope').value;
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return;
+        document.getElementById('control-layer').innerHTML = ""; window.renderEditor(); window.hideGuides(true); document.getElementById('export-modal').style.display = 'none';
+        
+        let hiddenElements = [];
+        if (scope === 'selected') {
+            if(!selectedEl) { alert("Önce bir nesne seçmelisiniz!"); window.hideGuides(false); return; }
+            document.querySelectorAll('.duzenlenebilir, #canvas-background').forEach(el => { if(el !== selectedEl) { hiddenElements.push({el: el, display: el.style.display}); el.style.display = 'none'; } });
+        }
+
+        const originalWidth = svg.getAttribute('width'); const originalHeight = svg.getAttribute('height');
+        const vb = svg.viewBox.baseVal; const targetW = (vb.width || 1920) * scale; const targetH = (vb.height || 1080) * scale;
+        svg.setAttribute('width', targetW); svg.setAttribute('height', targetH);
+        const svgData = new XMLSerializer().serializeToString(svg);
+        
+        if (format === 'png') {
+            const canvas = document.createElement("canvas"); const ctx = canvas.getContext("2d"); const img = new Image();
+            img.onload = function() { canvas.width = targetW; canvas.height = targetH; ctx.drawImage(img, 0, 0); const a = document.createElement("a"); a.download = "tasarim.png"; a.href = canvas.toDataURL("image/png"); a.click(); finishExport(); };
+            img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+        } else {
+            const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"}); const url = URL.createObjectURL(blob);
+            const a = document.createElement("a"); a.download = "tasarim_vektor.svg"; a.href = url; a.click(); finishExport();
+        }
+        function finishExport() { svg.setAttribute('width', originalWidth || "100%"); svg.setAttribute('height', originalHeight || "100%"); hiddenElements.forEach(item => item.el.style.display = item.display); window.hideGuides(false); if(selectedEl) window.updateEditorUI(selectedEl); }
+    };
+
+    window.updateRulers = function() {
+        const hRuler = document.getElementById('horizontal-ruler'); const vRuler = document.getElementById('vertical-ruler'); if(!hRuler || !vRuler) return;
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; const vb = svg.viewBox.baseVal; const w = vb.width || 1920; const h = vb.height || 1080;
+        const pt_h = `M0,0 h${w} M0,0 v15 `; const pt_v = `M0,0 v${h} M0,0 h15 `;
+        let labels_h = ''; let labels_v = '';
+        for(let x=0; x<=w; x+=100) { if(x>0) labels_h += `<text x="${x}" y="12" font-size="10" text-anchor="middle" fill="#94a3b8">${x}</text>`; }
+        for(let y=0; y<=h; y+=100) { if(y>0) labels_v += `<text x="2" y="${y+3}" font-size="10" fill="#94a3b8">${y}</text>`; }
+        hRuler.innerHTML = `<svg width="100%" height="20" viewBox="0 0 ${w} 20" preserveAspectRatio="none"><path d="${pt_h}" stroke="#334155"/><line id="h-cursor" x1="0" y1="0" x2="0" y2="20" stroke="#ef4444" stroke-width="1"/><g>${labels_h}</g></svg>`;
+        vRuler.innerHTML = `<svg width="20" height="100%" viewBox="0 0 20 ${h}" preserveAspectRatio="none"><path d="${pt_v}" stroke="#334155"/><line id="v-cursor" x1="0" y1="0" x2="20" y2="0" stroke="#ef4444" stroke-width="1"/><g>${labels_v}</g></svg>`;
+        window.syncRulerTransform();
+    };
+    
+    window.syncRulerTransform = function() {
+        const hRulerSvg = document.querySelector('#horizontal-ruler svg'); const vRulerSvg = document.querySelector('#vertical-ruler svg'); if(!hRulerSvg || !vRulerSvg) return;
+        hRulerSvg.style.transform = `scaleX(${currentZoom}) translateX(${panX}px)`; hRulerSvg.style.transformOrigin = 'left center';
+        vRulerSvg.style.transform = `scaleY(${currentZoom}) translateY(${panY}px)`; vRulerSvg.style.transformOrigin = 'top center';
+    };
+    
+    document.getElementById('main-view').addEventListener('mousemove', (e) => {
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; 
+        const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const cursorpt = pt.matrixTransform(svg.getScreenCTM().inverse());
+        const hCursor = document.getElementById('h-cursor'); const vCursor = document.getElementById('v-cursor'); if(!hCursor || !vCursor) return;
+        hCursor.setAttribute('x1', cursorpt.x); hCursor.setAttribute('x2', cursorpt.x); vCursor.setAttribute('y1', cursorpt.y); vCursor.setAttribute('y2', cursorpt.y);
+    });
+
+    window.initCanvasSettings = function() {
+        const svg = document.querySelector('#canvas-inner svg'); if (!svg) return; const vb = svg.viewBox.baseVal;
+        document.getElementById('canvas-w').value = vb.width || 1920; document.getElementById('canvas-h').value = vb.height || 1080;
+        let bgRect = svg.querySelector('#canvas-background');
+        if (!bgRect) { bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); bgRect.id = "canvas-background"; bgRect.setAttribute("x", "0"); bgRect.setAttribute("y", "0"); bgRect.setAttribute("width", vb.width || 1920); bgRect.setAttribute("height", vb.height || 1080); bgRect.setAttribute("fill", "#ffffff"); svg.insertBefore(bgRect, svg.firstChild); }
+        document.getElementById('canvas-bg-color').value = safeColor(bgRect.getAttribute("fill"));
+        if(!svg.querySelector('#guides-group')) { const gg = document.createElementNS("http://www.w3.org/2000/svg", "g"); gg.id = "guides-group"; svg.appendChild(gg); }
+        window.updateRulers();
+    };
+    
+    window.updateCanvasSize = function() { const w = document.getElementById('canvas-w').value; const h = document.getElementById('canvas-h').value; const svg = document.querySelector('#canvas-inner svg'); svg.setAttribute("viewBox", `0 0 ${w} ${h}`); document.getElementById('control-layer').setAttribute("viewBox", `0 0 ${w} ${h}`); const bgRect = svg.querySelector('#canvas-background'); if(bgRect) { bgRect.setAttribute("width", w); bgRect.setAttribute("height", h); } window.saveState(); window.updateRulers(); };
+    window.updateCanvasBg = function() { const col = document.getElementById('canvas-bg-color').value; const bgRect = document.querySelector('#canvas-background'); if(bgRect) bgRect.setAttribute("fill", col); window.saveState(); };
+
+    window.addGuide = function(type) {
+        const svg = document.querySelector('#canvas-inner svg'); const vb = svg.viewBox.baseVal;
+        const gg = document.getElementById('guides-group'); if(!gg) return;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line"); line.classList.add("guide-line"); window.setD(line, "type", type);
+        if(type === 'h') { line.setAttribute("x1", 0); line.setAttribute("y1", vb.height/2); line.setAttribute("x2", vb.width); line.setAttribute("y2", vb.height/2); line.style.cursor = "row-resize"; } else { line.setAttribute("x1", vb.width/2); line.setAttribute("y1", 0); line.setAttribute("x2", vb.width/2); line.setAttribute("y2", vb.height); line.style.cursor = "col-resize"; }
+        line.ondblclick = function() { this.remove(); window.saveState(); }; gg.appendChild(line); window.saveState();
+    };
+
+    window.toggleDrawMode = function() { isDrawingMode = !isDrawingMode; document.getElementById('btn-draw').classList.toggle('active', isDrawingMode); document.getElementById('svg-wrapper').classList.toggle('draw-mode', isDrawingMode); selectedEl = null; document.getElementById('control-layer').innerHTML = ""; window.renderEditor(); };
+
+    window.applyTextStyle = function(id, style, val) {
+        const el = document.getElementById(id); if(!el || el.tagName !== 'text') return;
+        const rawText = window.getD(el, 'raw-text') || el.textContent;
+        if(style === 'normal') { el.innerHTML = ''; el.textContent = rawText; window.setD(el, 'text-style', 'normal'); window.applyTextCurve(el); }
+        else if(style === 'neon') { window.setD(el, 'text-style', 'neon'); el.innerHTML = `<tspan font-weight="bold" fill="#ffffff" stroke="${window.getD(el, 'solid-color')||'#000'}" stroke-width="2" filter="drop-shadow(0 0 15px ${window.getD(el, 'solid-color')||'#000'})">${rawText}</tspan>`; }
+        else if(style === '3d') { window.setD(el, 'text-style', '3d'); el.innerHTML = `<tspan font-weight="bold" fill="${window.getD(el, 'solid-color')||'#000'}" stroke="#000000" stroke-width="3" filter="drop-shadow(6px 6px 0 #000000)">${rawText}</tspan>`; }
+        else if(style === 'hollow') { window.setD(el, 'text-style', 'hollow'); el.innerHTML = `<tspan fill="none" stroke="${window.getD(el, 'solid-color')||'#000'}" stroke-width="4">${rawText}</tspan>`; }
+        else if(style === 'bold') { window.setD(el, 'bold', window.getD(el, 'bold') === 'true' ? 'false' : 'true'); el.setAttribute('font-weight', window.getD(el, 'bold') === 'true' ? 'bold' : 'normal'); }
+        else if(style === 'italic') { window.setD(el, 'italic', window.getD(el, 'italic') === 'true' ? 'false' : 'true'); el.setAttribute('font-style', window.getD(el, 'italic') === 'true' ? 'italic' : 'normal'); }
+        else if(style === 'underline') { window.setD(el, 'underline', window.getD(el, 'underline') === 'true' ? 'false' : 'true'); el.setAttribute('text-decoration', window.getD(el, 'underline') === 'true' ? 'underline' : 'none'); }
+        else if(style === 'align') { el.setAttribute('text-anchor', val); window.autoFitText(el); } 
+        window.saveState(); window.renderEditor(); if(window.updateEditorUI) window.updateEditorUI(el);
+    };
+    
+    window.alignElement = function(id, type) {
+        const el = document.getElementById(id); if(!el) return; const svg = document.querySelector('#canvas-inner svg'); const vb = svg.viewBox.baseVal; 
+        let bbox = {x:0, y:0, width:0, height:0}; try { bbox = el.getBBox(); } catch(e){}
+        if (el.tagName === 'text') { if(type === 'center-h') el.setAttribute('x', vb.width/2); if(type === 'center-v') el.setAttribute('y', vb.height/2); if(type === 'left') el.setAttribute('x', bbox.width/2); if(type === 'right') el.setAttribute('x', vb.width - bbox.width/2); } 
+        else { let nw = parseFloat(el.getAttribute('width')) || bbox.width; let nh = parseFloat(el.getAttribute('height')) || bbox.height; if(type === 'center-h') el.setAttribute('x', (vb.width/2) - (nw/2)); if(type === 'center-v') el.setAttribute('y', (vb.height/2) - (nh/2)); if(type === 'left') el.setAttribute('x', 0); if(type === 'right') el.setAttribute('x', vb.width - nw); } 
+        if(el.tagName === 'image' || el.tagName === 'rect') window.applyShapeMask(el); window.saveState(); if(window.updateEditorUI) window.updateEditorUI(el);
+    };
+
+    window.toggleFlip = function(id, dir) { const el = document.getElementById(id); if(!el) return; if(dir === 'x') window.setD(el, 'flip-x', window.getD(el, 'flip-x') === "-1" ? "1" : "-1"); else window.setD(el, 'flip-y', window.getD(el, 'flip-y') === "-1" ? "1" : "-1"); window.applyTransforms(el); window.saveState(); };
+    
+    window.applyTransforms = function(el) {
+        let cx = 0, cy = 0;
+        if(el.tagName === 'text') { cx = parseFloat(el.getAttribute('x')) || 0; cy = parseFloat(el.getAttribute('y')) || 0; } 
+        else if(el.tagName !== 'path') { cx = (parseFloat(el.getAttribute('x')) || 0) + (parseFloat(el.getAttribute('width')) || 0) / 2; cy = (parseFloat(el.getAttribute('y')) || 0) + (parseFloat(el.getAttribute('height')) || 0) / 2; }
+        const angle = parseFloat(window.getD(el, 'angle')) || 0; const fx = parseFloat(window.getD(el, 'flip-x')) || 1; const fy = parseFloat(window.getD(el, 'flip-y')) || 1;
+        el.setAttribute("transform", `rotate(${angle} ${cx} ${cy}) translate(${cx} ${cy}) scale(${fx} ${fy}) translate(${-cx} ${-cy})`);
+        if(window.updateEditorUI) window.updateEditorUI(el);
+    };
+
+    window.pickColor = async function(id, dataKey, attrToSet) {
+        if (!window.EyeDropper) { alert("Tarayıcınız Göz Damlası özelliğini desteklemiyor."); return; }
+        try { const eyeDropper = new EyeDropper(); const result = await eyeDropper.open(); const color = result.sRGBHex; const el = document.getElementById(id); if(el) { window.addRecentColor(color); if (dataKey) window.setD(el, dataKey.replace(/([A-Z])/g, "-$1").toLowerCase(), color); if (dataKey === 'color1' || dataKey === 'color2' || dataKey === 'solidColor') window.applyFill(el); else { el.setAttribute(attrToSet, color); } window.saveState(); window.renderProperties(); } } catch (e) {}
+    };
+    
+    window.applyRecentColor = function(id, color) { const el = document.getElementById(id); if(!el) return; const fillType = window.getD(el, 'fill-type') || 'solid'; if(fillType === 'solid') { window.setD(el, 'solid-color', color); window.applyFill(el); } else { window.setD(el, 'color1', color); window.applyFill(el); } window.saveState(); window.renderProperties(); };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.code === 'Space') { e.preventDefault(); isSpacePressed = true; document.getElementById('svg-wrapper').classList.add('pan-mode'); return; }
+        if (e.ctrlKey && e.key === 'z') { e.preventDefault(); window.undo(); return; } if (e.ctrlKey && e.key === 'y') { e.preventDefault(); window.redo(); return; }
+        if (selectedEl && window.getD(selectedEl, 'locked') !== "true") {
+            const step = e.shiftKey ? 10 : 1; let moved = false; let x = parseFloat(selectedEl.getAttribute("x")) || 0, y = parseFloat(selectedEl.getAttribute("y")) || 0;
+            if (e.key === 'ArrowUp') { y -= step; moved = true; } if (e.key === 'ArrowDown') { y += step; moved = true; } if (e.key === 'ArrowLeft') { x -= step; moved = true; } if (e.key === 'ArrowRight') { x += step; moved = true; }
+            if (moved) { e.preventDefault(); selectedEl.setAttribute("x", x); selectedEl.setAttribute("y", y); if(selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') window.applyShapeMask(selectedEl); if(selectedEl.tagName === 'text') window.applyTextCurve(selectedEl); if(window.updateEditorUI) window.updateEditorUI(selectedEl); isModified = true; }
+            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); selectedEl.remove(); document.getElementById('control-layer').innerHTML = ''; selectedEl = null; window.saveState(); window.renderEditor(); }
+            if (e.ctrlKey && e.key === 'c') { e.preventDefault(); clipboard = selectedEl.cloneNode(true); }
+        }
+        if (e.ctrlKey && e.key === 'v' && clipboard) { e.preventDefault(); const clone = clipboard.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(clone.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(clone.getAttribute("y")) || 0) + 30); document.querySelector('#canvas-inner svg').appendChild(clone); selectedEl = clone; window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); }
+    });
+    
+    document.addEventListener('keyup', (e) => { 
+        if (e.code === 'Space') { isSpacePressed = false; isPanning = false; document.getElementById('svg-wrapper').classList.remove('pan-mode'); document.getElementById('svg-wrapper').classList.remove('panning'); return; }
+        if(isModified && e.key.startsWith('Arrow')) { window.saveState(); isModified = false; } 
+    });
+
+    window.saveState = function() {
+        const svg = document.querySelector('#canvas-inner svg'); if (!svg) return;
+        document.getElementById('control-layer').innerHTML = ""; window.hideGuides(true); const state = svg.innerHTML; window.hideGuides(false);
+        if (historyIndex < historyStack.length - 1) historyStack = historyStack.slice(0, historyIndex + 1);
+        historyStack.push(state); historyIndex++; window.updateHistoryButtons(); window.renderLayers();
+        const now = new Date(); document.getElementById('status-time').innerText = `Son Kayıt: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    };
+    
+    window.undo = function() { if (historyIndex > 0) { historyIndex--; window.restoreState(); } };
+    window.redo = function() { if (historyIndex < historyStack.length - 1) { historyIndex++; window.restoreState(); } };
+    window.restoreState = function() { const svg = document.querySelector('#canvas-inner svg'); svg.innerHTML = historyStack[historyIndex]; document.getElementById('control-layer').innerHTML = ""; selectedEl = null; window.setupLayers(); window.updateHistoryButtons(); };
+    window.updateHistoryButtons = function() { document.getElementById('btn-undo').disabled = historyIndex <= 0; document.getElementById('btn-redo').disabled = historyIndex >= historyStack.length - 1; };
+
+    window.changeZoom = function(amount) { currentZoom = Math.max(0.3, Math.min(3, currentZoom + amount)); window.applyZoom(); window.syncRulerTransform(); };
+    window.resetZoom = function() { currentZoom = 1; panX = 0; panY = 0; window.applyZoom(); window.syncRulerTransform(); };
+    window.applyZoom = function() { document.getElementById('svg-wrapper').style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`; document.getElementById('zoom-val').innerText = Math.round(currentZoom * 100) + "%"; };
+
+    window.moveLayer = function(id, dir) { const el = document.getElementById(id); if(!el) return; if (dir === 1 && el.nextElementSibling && el.nextElementSibling.id !== 'guides-group') el.parentNode.insertBefore(el.nextElementSibling, el); else if (dir === -1 && el.previousElementSibling && el.previousElementSibling.id !== 'canvas-background') el.parentNode.insertBefore(el, el.previousElementSibling); window.saveState(); if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); };
+    window.cloneElement = function(id) { const el = document.getElementById(id); if(!el) return; const clone = el.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(el.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(el.getAttribute("y")) || 0) + 30); el.parentNode.insertBefore(clone, el.nextSibling); selectedEl = clone; clone.classList.add("duzenlenebilir"); window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); };
+    window.toggleLock = function(id) { const el = document.getElementById(id); if(!el) return; const isLocked = window.getD(el, 'locked') === "true"; window.setD(el, 'locked', isLocked ? "false" : "true"); el.classList.toggle('locked', !isLocked); window.saveState(); window.renderEditor(); if(window.updateEditorUI) window.updateEditorUI(el); };
+    
+    window.applyFilters = function(el) { 
+        const sx = parseFloat(window.getD(el, 'shadow-x')) || 0, sy = parseFloat(window.getD(el, 'shadow-y')) || 0, sb = parseFloat(window.getD(el, 'shadow-blur')) || 0, sc = window.getD(el, 'shadow-color') || '#000000'; 
+        const bri = parseFloat(window.getD(el, 'bri')) || 100, con = parseFloat(window.getD(el, 'con')) || 100, sat = parseFloat(window.getD(el, 'sat')) || 100, gray = parseFloat(window.getD(el, 'gray')) || 0, bl = parseFloat(window.getD(el, 'blur')) || 0; 
+        const blend = window.getD(el, 'blend') || 'normal'; let filterStr = ''; 
+        if (sx != 0 || sy != 0 || sb != 0) filterStr += `drop-shadow(${sx}px ${sy}px ${sb}px ${sc}) `; 
+        if (bri != 100) filterStr += `brightness(${bri}%) `; if (con != 100) filterStr += `contrast(${con}%) `; if (sat != 100) filterStr += `saturate(${sat}%) `; if (gray > 0) filterStr += `grayscale(${gray}%) `; if (bl > 0) filterStr += `blur(${bl}px) `;
+        el.style.filter = filterStr.trim(); el.style.mixBlendMode = blend; el.setAttribute('style', el.getAttribute('style') || ''); 
+    };
+    
+    window.applyFill = function(el) {
+        if(el.tagName === 'image') return; const type = window.getD(el, 'fill-type') || 'solid'; let fillVal = '';
+        if (type === 'gradient') {
+            const c1 = window.getD(el, 'color1') || '#10b981'; const c2 = window.getD(el, 'color2') || '#3b82f6';
+            const svg = document.querySelector('#canvas-inner svg'); let defs = svg.querySelector('defs'); if (!defs) { defs = document.createElementNS("http://www.w3.org/2000/svg", "defs"); svg.prepend(defs); }
+            let gradId = "grad_" + el.id; let grad = defs.querySelector("#" + gradId);
+            if (!grad) { grad = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient"); grad.id = gradId; grad.setAttribute("x1", "0%"); grad.setAttribute("y1", "0%"); grad.setAttribute("x2", "100%"); grad.setAttribute("y2", "100%"); const stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop"); stop1.setAttribute("offset", "0%"); stop1.className = "stop1"; const stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop"); stop2.setAttribute("offset", "100%"); stop2.className = "stop2"; grad.appendChild(stop1); grad.appendChild(stop2); defs.appendChild(grad); }
+            grad.querySelector(".stop1").setAttribute("stop-color", c1); grad.querySelector(".stop2").setAttribute("stop-color", c2);
+            fillVal = `url(#${gradId})`;
+        } else { fillVal = window.getD(el, 'solid-color') || '#000000'; }
+        
+        el.setAttribute("fill", fillVal); if(el.tagName !== 'path') el.style.fill = fillVal;
+        if(el.tagName === 'g' || el.tagName === 'svg') { el.querySelectorAll('path, circle, rect, polygon').forEach(child => { child.style.fill = fillVal; child.setAttribute('fill', fillVal); }); }
+    };
+
+    window.autoFitText = function(el) { 
+        if (el.tagName !== 'text') return; 
+        const mw = parseFloat(window.getD(el, 'max-width')) || 0; 
+        const baseFs = parseFloat(window.getD(el, 'base-font-size')) || 60; 
+        el.style.fontSize = baseFs + "px"; el.setAttribute("font-size", baseFs); 
+        
+        if (mw > 0) { 
+            let bbox = {width:0}; try { bbox = el.getBBox(); } catch(e){} 
+            if (bbox.width > mw && bbox.width > 0) { const scale = mw / bbox.width; const newFs = baseFs * scale; el.style.fontSize = newFs + "px"; el.setAttribute("font-size", newFs); } 
+        }
+    };
+    
+    window.applyTextCurve = function(el) {
+        if (el.tagName !== 'text') return; const curve = parseFloat(window.getD(el, 'curve')) || 0; if(!window.getD(el, 'raw-text')) window.setD(el, 'raw-text', el.textContent); const rawText = window.getD(el, 'raw-text');
+        
+        el.innerHTML = ''; el.textContent = rawText; 
+        
+        if (curve === 0) { 
+            const style = window.getD(el, 'text-style') || 'normal';
+            if(style !== 'normal') window.applyTextStyle(el.id, style, el.getAttribute('text-anchor'));
+        } else {
+            const svg = document.querySelector('#canvas-inner svg'); let defs = svg.querySelector('defs'); if (!defs) { defs = document.createElementNS("http://www.w3.org/2000/svg", "defs"); svg.prepend(defs); }
+            const pathId = "curve_" + el.id; let curvePath = defs.querySelector("#" + pathId); if (!curvePath) { curvePath = document.createElementNS("http://www.w3.org/2000/svg", "path"); curvePath.id = pathId; curvePath.setAttribute("fill", "none"); defs.appendChild(curvePath); }
+            const x = parseFloat(el.getAttribute('x')) || 0; const y = parseFloat(el.getAttribute('y')) || 0; const curveStrength = curve * 2.5; 
+            curvePath.setAttribute("d", `M ${x - 1500}, ${y - curveStrength/2} Q ${x}, ${y + curveStrength} ${x + 1500}, ${y - curveStrength/2}`); 
+            
+            el.innerHTML = '';
+            const tp = document.createElementNS("http://www.w3.org/2000/svg", "textPath");
+            tp.setAttribute("href", "#" + pathId); tp.setAttribute("startOffset", "50%"); tp.setAttribute("text-anchor", "middle"); tp.textContent = rawText;
+            
+            const style = window.getD(el, 'text-style') || 'normal';
+            if(style === 'neon') { tp.setAttribute("font-weight", "bold"); tp.setAttribute("fill", "#ffffff"); tp.setAttribute("stroke", window.getD(el, 'solid-color')||"#000"); tp.setAttribute("stroke-width", "2"); tp.setAttribute("filter", `drop-shadow(0 0 15px ${window.getD(el, 'solid-color')||'#000'})`); } 
+            else if(style === '3d') { tp.setAttribute("font-weight", "bold"); tp.setAttribute("fill", window.getD(el, 'solid-color')||"#000"); tp.setAttribute("stroke", "#000000"); tp.setAttribute("stroke-width", "3"); tp.setAttribute("filter", `drop-shadow(6px 6px 0 #000000)`); } 
+            else if (style === 'hollow') { tp.setAttribute("fill", "none"); tp.setAttribute("stroke", window.getD(el, 'solid-color')||"#000"); tp.setAttribute("stroke-width", "4"); }
+            
+            const w = el.getAttribute('textLength');
+            if (w) { tp.setAttribute('textLength', w); tp.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+            el.appendChild(tp);
+        } window.autoFitText(el);
+    };
+
+    window.describeRoundedRect = function(r, s, x, y, w, h) { if (r <= 0) return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`; r = Math.min(r, w / 2, h / 2); const kappa = (4 * (r * (1 - s)) * Math.tan(Math.PI / 4)) / 3; const pts = [ [x + r, y], [x + w - r, y], [x + w, y + r], [x + w, y + h - r], [x + w - r, y + h], [x + r, y + h], [x, y + h - r], [x, y + r] ]; return `M ${pts[0][0]} ${pts[0][1]} L ${pts[1][0]} ${pts[1][1]} C ${pts[1][0] + kappa} ${pts[1][1]} ${pts[2][0]} ${pts[2][1] - kappa} ${pts[2][0]} ${pts[2][1]} L ${pts[3][0]} ${pts[3][1]} C ${pts[3][0]} ${pts[3][1] + kappa} ${pts[4][0] + kappa} ${pts[4][1]} ${pts[4][0]} ${pts[4][1]} L ${pts[5][0]} ${pts[5][1]} C ${pts[5][0] - kappa} ${pts[5][1]} ${pts[6][0]} ${pts[6][1] + kappa} ${pts[6][0]} ${pts[6][1]} L ${pts[7][0]} ${pts[7][1]} C ${pts[7][0]} ${pts[7][1] - kappa} ${pts[0][0] - kappa} ${pts[0][1]} ${pts[0][0]} ${pts[0][1]} Z`; };
+    
+    window.applyShapeMask = function(el) { 
+        if (el.tagName !== 'image' && el.tagName !== 'rect') return; if (!window.getD(el, 'mask-shape') || window.getD(el, 'mask-shape') === "none") { el.removeAttribute("clip-path"); return; }
+        const shape = window.getD(el, 'mask-shape'); const x = parseFloat(el.getAttribute('x')) || 0, y = parseFloat(el.getAttribute('y')) || 0, w = parseFloat(el.getAttribute('width')) || 0, h = parseFloat(el.getAttribute('height')) || 0; if(w === 0 || h === 0) return; let d = "";
+        if (shape === 'circle') { const cx = x+w/2, cy = y+h/2, r = Math.min(w,h)/2; d = `M ${cx-r},${cy} A ${r},${r} 0 1,0 ${cx+r},${cy} A ${r},${r} 0 1,0 ${cx-r},${cy} Z`; } else if (shape === 'triangle') { d = `M ${x+w/2},${y} L ${x+w},${y+h} L ${x},${y+h} Z`; } else if (shape === 'star') { const cx = x+w/2, cy = y+h/2, outerR = Math.min(w,h)/2, innerR = outerR/2.5; for(let i=0; i<10; i++) { let r = i%2===0 ? outerR : innerR; let angle = (Math.PI/2) - (i * Math.PI/5); d += (i===0 ? "M " : " L ") + (cx + Math.cos(angle)*r) + "," + (cy - Math.sin(angle)*r); } d += " Z"; } else { let rx = parseFloat(window.getD(el, 'rx')) || 0; let sm = parseFloat(window.getD(el, 'smoothing')); if (isNaN(sm)) sm = 0.5; d = window.describeRoundedRect(rx, sm, x, y, w, h); }
+        const svg = document.querySelector('#canvas-inner svg'); let defs = svg.querySelector('defs'); if (!defs) { defs = document.createElementNS("http://www.w3.org/2000/svg", "defs"); svg.prepend(defs); } const clipId = "clip_" + el.id; let clipPath = defs.querySelector("#" + clipId); if (!clipPath) { clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath"); clipPath.id = clipId; const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); clipPath.appendChild(path); defs.appendChild(clipPath); el.setAttribute("clip-path", `url(#${clipId})`); } clipPath.querySelector('path').setAttribute("d", d); 
+    };
+
+    window.setupLayers = function() {
+        const mainSvg = document.querySelector('#canvas-inner svg'); const ctrl = document.getElementById('control-layer');
+        if (!mainSvg) return;
+        if (!mainSvg.getAttribute('xmlns')) mainSvg.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+        let w = 1920, h = 1080;
+        if (mainSvg.hasAttribute('viewBox')) { const vb = mainSvg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
+        ctrl.setAttribute("viewBox", `0 0 ${w} ${h}`);
+        
+        let editables = mainSvg.querySelectorAll('.duzenlenebilir');
+        if (editables.length === 0) { mainSvg.querySelectorAll('text, image, rect, g:not(#guides-group), svg:not(#control-layer), path:not(svg path):not(g path)').forEach(el => { if(el.id !== 'control-layer' && el.id !== 'canvas-background' && !el.closest('#control-layer') && !el.classList.contains('guide-line')) { el.classList.add('duzenlenebilir'); } }); }
+        mainSvg.querySelectorAll('.duzenlenebilir').forEach(el => {
+            if(!el.id) el.id = "el_" + Math.random().toString(36).substr(2,9);
+            if(window.getD(el, 'locked') === "true") el.classList.add('locked');
+            if(el.tagName === 'text' && window.getD(el, 'curve')) window.applyTextCurve(el);
+            if((el.tagName === 'image' || el.tagName === 'rect') && window.getD(el, 'mask-shape') && window.getD(el, 'mask-shape') !== "none") window.applyShapeMask(el);
+            if(window.getD(el, 'angle') || window.getD(el, 'flip-x') || window.getD(el, 'flip-y')) window.applyTransforms(el);
+            if(window.getD(el, 'shadow-blur') || window.getD(el, 'blur') || window.getD(el, 'blend')) window.applyFilters(el);
+            if(window.getD(el, 'fill-type')) window.applyFill(el);
+        });
+        window.initEngine(mainSvg); window.renderEditor(); window.updateRulers();
+    };
+
+    window.initEngine = function(svg) {
+        const wrapper = document.getElementById('svg-wrapper'); const ctrl = document.getElementById('control-layer');
+        const getCoords = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const ctm = svg.getScreenCTM(); if (!ctm) return { x: 0, y: 0 }; const cursorpt = pt.matrixTransform(ctm.inverse()); return { x: cursorpt.x, y: cursorpt.y }; };
+
+        wrapper.onpointerdown = (e) => {
+            if (isSpacePressed) { isPanning = true; panStart = {x: e.clientX, y: e.clientY}; panOffsetStart = {x: panX, y: panY}; document.getElementById('svg-wrapper').classList.add('panning'); return; }
+            const p = getCoords(e); const target = e.target; isModified = false;
+
+            if (isDrawingMode) {
+                isDrawing = true; currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path"); currentPath.id = "pth_" + Date.now(); currentPath.setAttribute("class", "duzenlenebilir"); currentPath.setAttribute("fill", "none"); currentPath.setAttribute("stroke", "#10b981"); currentPath.setAttribute("stroke-width", "5"); currentPath.setAttribute("stroke-linecap", "round"); currentPath.setAttribute("stroke-linejoin", "round"); pathData = `M ${p.x} ${p.y}`; currentPath.setAttribute("d", pathData);
+                const guidesGroup = document.getElementById('guides-group'); if(guidesGroup) svg.insertBefore(currentPath, guidesGroup); else svg.appendChild(currentPath);
+                try { wrapper.setPointerCapture(e.pointerId); } catch(err){} return;
+            }
+
+            if (target.classList.contains('guide-line')) { isDraggingGuide = true; currentGuide = target; try { wrapper.setPointerCapture(e.pointerId); } catch(err){} e.preventDefault(); e.stopPropagation(); return; }
+            if (target.classList.contains('handle')) {
+                const el = document.getElementById(target.dataset.id); if (!el || window.getD(el, 'locked') === "true") return;
+                
+                let tempW = 0, tempH = 0;
+                if(el.tagName === 'text') { tempW = parseFloat(el.getAttribute("textLength")) || el.getBBox().width || 0; tempH = parseFloat(window.getD(el, "base-font-size")) || 80; }
+                else { tempW = parseFloat(el.getAttribute("width")) || 0; tempH = parseFloat(el.getAttribute("height")) || 0; }
+                
+                startP = p; startData = { x: parseFloat(el.getAttribute("x")) || 0, y: parseFloat(el.getAttribute("y")) || 0, w: tempW, h: tempH, rx: parseFloat(window.getD(el, 'rx')) || 0, baseFontSize: parseFloat(window.getD(el, 'base-font-size')) || 60 };
+                if (target.classList.contains('handle-resize')) { resizingEl = el; activeHandle = target.dataset.handle; } else if (target.classList.contains('handle-rotate')) { rotatingEl = el; } else if (target.classList.contains('handle-radius')) { radiusingEl = el; }
+                try { wrapper.setPointerCapture(e.pointerId); } catch(err){} e.preventDefault(); e.stopPropagation(); return;
+            }
+            
+            const el = target.closest('.duzenlenebilir');
+            if (el) {
+                if (e.altKey && window.getD(el, 'locked') !== "true") { const clone = el.cloneNode(true); clone.id = "el_" + Date.now(); clone.classList.add("duzenlenebilir"); el.parentNode.insertBefore(clone, el.nextSibling); selectedEl = clone; } else { selectedEl = el; }
+                isDraggingElement = true; offset.x = p.x - (parseFloat(selectedEl.getAttribute("x")) || 0); offset.y = p.y - (parseFloat(selectedEl.getAttribute("y")) || 0); 
+                window.updateUI(selectedEl); window.renderEditor();
+                if(window.getD(selectedEl, 'locked') !== "true") { try { wrapper.setPointerCapture(e.pointerId); } catch(err){} }
+            } else { 
+                if(!e.target.closest('#sidebar')) { selectedEl = null; ctrl.innerHTML = ""; window.renderEditor(); }
+            }
+        };
+
+        window.onpointermove = (e) => {
+            if (isPanning) { panX = panOffsetStart.x + ((e.clientX - panStart.x) / currentZoom); panY = panOffsetStart.y + ((e.clientY - panStart.y) / currentZoom); window.applyZoom(); window.syncRulerTransform(); return; }
+            const p = getCoords(e);
+            if (isDrawing && currentPath) { pathData += ` L ${p.x} ${p.y}`; currentPath.setAttribute("d", pathData); return; }
+            if (isDraggingGuide && currentGuide) { if(window.getD(currentGuide, 'type') === 'h') { currentGuide.setAttribute('y1', p.y); currentGuide.setAttribute('y2', p.y); } else { currentGuide.setAttribute('x1', p.x); currentGuide.setAttribute('x2', p.x); } return; }
+            if (!selectedEl && !resizingEl && !rotatingEl && !radiusingEl) return;
+            if (selectedEl && window.getD(selectedEl, 'locked') === "true" && !resizingEl && !rotatingEl && !radiusingEl) return; 
+            if(isDraggingElement || resizingEl || rotatingEl || radiusingEl) e.preventDefault(); 
+            const dx = p.x - startP.x; const dy = p.y - startP.y;
+            let snapX = null, snapY = null; const snapTolerance = 15; 
+            
+            let w = 1920, h = 1080;
+            if (svg.hasAttribute('viewBox')) { const vb = svg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
+            const cx = w / 2, cy = h / 2;
+
+            if (resizingEl) {
+                isModified = true; let { x, y, w, h } = startData;
+                if (activeHandle === 'br') { w += dx; h += dy; } else if (activeHandle === 'bl') { x += dx; w -= dx; h += dy; } else if (activeHandle === 'tr') { y += dy; w += dx; h -= dy; } else if (activeHandle === 'tl') { x += dx; y += dy; w -= dx; h -= dy; }
+                
+                if (resizingEl.tagName === "text") { 
+                    if(w > 10) { 
+                        resizingEl.setAttribute('textLength', w); 
+                        resizingEl.setAttribute('lengthAdjust', 'spacingAndGlyphs'); 
+                        const tp = resizingEl.querySelector('textPath');
+                        if (tp) { tp.setAttribute('textLength', w); tp.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+                    }
+                    if(h > 5) { window.setD(resizingEl, 'base-font-size', h); }
+                    if(activeHandle.includes('l')) resizingEl.setAttribute('x', x);
+                    if(activeHandle.includes('t')) resizingEl.setAttribute('y', y);
+                    window.applyTextCurve(resizingEl);
+                } 
+                else if (resizingEl.tagName === "image" || resizingEl.tagName === "rect" || resizingEl.tagName === "svg" || resizingEl.tagName === "g") { 
+                    if (w > 10 && h > 10) { resizingEl.setAttribute("x", x); resizingEl.setAttribute("y", y); resizingEl.setAttribute("width", w); resizingEl.setAttribute("height", h); if(resizingEl.tagName !== "svg" && resizingEl.tagName !== "g" && window.getD(resizingEl, 'mask-shape') && window.getD(resizingEl, 'mask-shape') !== "none") window.applyShapeMask(resizingEl); } 
+                }
+                window.updateUI(resizingEl);
+            } 
+            else if (rotatingEl) {
+                isModified = true; let bbox = {x:0, y:0, width:0, height:0}; try{ bbox = rotatingEl.getBBox(); }catch(e){}
+                const angle = Math.atan2(p.y - (bbox.y + bbox.height/2), p.x - (bbox.x + bbox.width/2)) * (180 / Math.PI) + 90; 
+                window.setD(rotatingEl, 'angle', angle); window.applyTransforms(rotatingEl); window.updateUI(rotatingEl);
+            }
+            else if (radiusingEl && (radiusingEl.tagName === "image" || radiusingEl.tagName === "rect")) {
+                isModified = true; window.setD(radiusingEl, 'rx', Math.max(0, Math.min(startData.w/2, startData.h/2, startData.rx + dy))); window.applyShapeMask(radiusingEl); window.updateUI(radiusingEl);
+            }
+            else if (selectedEl && isDraggingElement) {
+                isModified = true; let newX = p.x - offset.x, newY = p.y - offset.y;
+                let bbox = {width:0, height:0}; try { bbox = selectedEl.getBBox(); }catch(e){}
+                const isTxt = selectedEl.tagName === 'text';
+                const elCx = isTxt ? newX : newX + bbox.width / 2; const elCy = isTxt ? newY : newY + bbox.height / 2;
+                const elLeft = isTxt ? newX - bbox.width/2 : newX; const elRight = isTxt ? newX + bbox.width/2 : newX + bbox.width;
+                const elTop = isTxt ? newY - bbox.height/2 : newY; const elBottom = isTxt ? newY + bbox.height/2 : newY + bbox.height;
+
+                if (Math.abs(elCx - cx) < snapTolerance) { snapX = cx; newX = isTxt ? cx : cx - bbox.width / 2; }
+                if (Math.abs(elCy - cy) < snapTolerance) { snapY = cy; newY = isTxt ? cy : cy - bbox.height / 2; }
+                
+                document.querySelectorAll('.guide-line').forEach(g => { if (window.getD(g, 'type') === 'h') { const gy = parseFloat(g.getAttribute('y1')); if (Math.abs(elCy - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy : gy - bbox.height / 2; } else if (Math.abs(elTop - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy + bbox.height/2 : gy; } else if (Math.abs(elBottom - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy - bbox.height/2 : gy - bbox.height; } } else { const gx = parseFloat(g.getAttribute('x1')); if (Math.abs(elCx - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx : gx - bbox.width / 2; } else if (Math.abs(elLeft - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx + bbox.width/2 : gx; } else if (Math.abs(elRight - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx - bbox.width/2 : gx - bbox.width; } } });
+
+                Array.from(document.querySelectorAll('.duzenlenebilir')).filter(e => e !== selectedEl && window.getD(e, 'locked') !== "true").forEach(other => {
+                    let oBBox = {x:0, y:0, width:0, height:0}; try { oBBox = other.getBBox(); } catch(e){ return; }
+                    const oIsTxt = other.tagName === 'text';
+                    const ox = parseFloat(other.getAttribute('x'))||0; const oy = parseFloat(other.getAttribute('y'))||0;
+                    const oLeft = oIsTxt ? ox - oBBox.width/2 : ox; const oRight = oIsTxt ? ox + oBBox.width/2 : ox + oBBox.width;
+                    const oTop = oIsTxt ? oy - oBBox.height/2 : oy; const oBottom = oIsTxt ? oy + oBBox.height/2 : oy + oBBox.height;
+                    const oCx = oLeft + oBBox.width/2; const oCy = oTop + oBBox.height/2;
+
+                    if (Math.abs(elCx - oCx) < snapTolerance) { snapX = oCx; newX = isTxt ? oCx : oCx - bbox.width/2; }
+                    else if (Math.abs(elLeft - oLeft) < snapTolerance) { snapX = oLeft; newX = isTxt ? oLeft + bbox.width/2 : oLeft; }
+                    else if (Math.abs(elRight - oRight) < snapTolerance) { snapX = oRight; newX = isTxt ? oRight - bbox.width/2 : oRight - bbox.width; }
+
+                    if (Math.abs(elCy - oCy) < snapTolerance) { snapY = oCy; newY = isTxt ? oCy : oCy - bbox.height/2; }
+                    else if (Math.abs(elTop - oTop) < snapTolerance) { snapY = oTop; newY = isTxt ? oTop + bbox.height/2 : oTop; }
+                    else if (Math.abs(elBottom - oBottom) < snapTolerance) { snapY = oBottom; newY = isTxt ? oBottom - bbox.height/2 : oBottom - bbox.height; }
+                });
+
+                selectedEl.setAttribute("x", newX); selectedEl.setAttribute("y", newY);
+                if((selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') && window.getD(selectedEl, 'mask-shape') && window.getD(selectedEl, 'mask-shape') !== "none") window.applyShapeMask(selectedEl); 
+                if(selectedEl.tagName === 'text' && window.getD(selectedEl, 'curve')) window.applyTextCurve(selectedEl);
+                window.updateUI(selectedEl, snapX, snapY);
+            }
+        };
+
+        const release = (e) => { 
+            try { wrapper.releasePointerCapture(e.pointerId); } catch(err){} 
+            isDraggingElement = false; 
+            if (isPanning) { isPanning = false; document.getElementById('svg-wrapper').classList.remove('panning'); return; }
+            if (isDrawing) { isDrawing = false; selectedEl = currentPath; currentPath = null; isDrawingMode = false; document.getElementById('btn-draw').classList.remove('active'); document.getElementById('svg-wrapper').classList.remove('draw-mode'); window.saveState(); window.renderEditor(); window.updateUI(selectedEl); return; }
+            if (isDraggingGuide) { isDraggingGuide = false; currentGuide = null; window.saveState(); return; }
+            
+            if (isModified) { window.saveState(); if(selectedEl) window.renderProperties(); }
+            resizingEl = null; rotatingEl = null; radiusingEl = null; activeHandle = null; isModified = false; 
+            document.querySelectorAll('.snap-line').forEach(l=>l.remove()); 
+        };
+        window.onpointerup = release; window.onpointercancel = release;
+    };
+
+    window.updateUI = function(el, snapX=null, snapY=null) {
+        const ctrl = document.getElementById('control-layer');
+        ctrl.innerHTML = ""; if(!el) return;
+        let b = {x:0,y:0,width:0,height:0}; try { b = el.getBBox(); }catch(e){return;}
+        const transform = el.getAttribute("transform") || ""; const isLocked = window.getD(el, 'locked') === "true";
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("transform", transform); ctrl.appendChild(g);
+
+        const svg = document.querySelector('#canvas-inner svg');
+        let w = 1920, h = 1080;
+        if (svg && svg.hasAttribute('viewBox')) { const vb = svg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
+
+        if (snapX !== null) { const lX = document.createElementNS("http://www.w3.org/2000/svg", "line"); lX.setAttribute("x1", snapX); lX.setAttribute("y1", 0); lX.setAttribute("x2", snapX); lX.setAttribute("y2", h); lX.classList.add("snap-line"); ctrl.appendChild(lX); }
+        if (snapY !== null) { const lY = document.createElementNS("http://www.w3.org/2000/svg", "line"); lY.setAttribute("x1", 0); lY.setAttribute("y1", snapY); lY.setAttribute("x2", w); lY.setAttribute("y2", snapY); lY.classList.add("snap-line"); ctrl.appendChild(lY); }
+
+        if (el.tagName === 'text' && (parseFloat(window.getD(el, 'max-width')) || 0) > 0 && !isLocked) {
+            const mw = parseFloat(window.getD(el, 'max-width')); const cx = parseFloat(el.getAttribute("x")) || 0; const mwRect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); mwRect.setAttribute("x", cx - mw/2); mwRect.setAttribute("y", b.y); mwRect.setAttribute("width", mw); mwRect.setAttribute("height", b.height); mwRect.setAttribute("fill", "rgba(16, 185, 129, 0.05)"); mwRect.setAttribute("stroke", "var(--accent)"); mwRect.setAttribute("stroke-dasharray", "4,4"); g.appendChild(mwRect);
+        }
+        const strokeColor = isLocked ? "var(--error)" : "var(--handle-move)";
+        const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("x", b.x); r.setAttribute("y", b.y); r.setAttribute("width", b.width); r.setAttribute("height", b.height); r.setAttribute("fill", "none"); r.setAttribute("stroke", strokeColor); r.setAttribute("stroke-width", "2"); r.setAttribute("stroke-dasharray", "6,4"); g.appendChild(r);
+        
+        if (isLocked) return;
+        const s = 24; const corners = [{ id: 'tl', x: b.x, y: b.y, cur: 'nwse-resize' }, { id: 'tr', x: b.x + b.width, y: b.y, cur: 'nesw-resize' }, { id: 'bl', x: b.x, y: b.y + b.height, cur: 'nesw-resize' }, { id: 'br', x: b.x + b.width, y: b.y + b.height, cur: 'nwse-resize' }];
+        corners.forEach(c => { const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("x", c.x - s/2); rect.setAttribute("y", c.y - s/2); rect.setAttribute("width", s); rect.setAttribute("height", s); rect.setAttribute("class", "handle handle-resize"); rect.dataset.id = el.id; rect.dataset.handle = c.id; rect.style.cursor = c.cur; g.appendChild(rect); });
+        
+        const rotY = b.y - 40; const line = document.createElementNS("http://www.w3.org/2000/svg", "line"); line.setAttribute("x1", b.x + b.width/2); line.setAttribute("y1", b.y); line.setAttribute("x2", b.x + b.width/2); line.setAttribute("y2", rotY); line.setAttribute("stroke", "var(--handle-rotate)"); line.setAttribute("stroke-width", "2"); g.appendChild(line);
+        const rotH = document.createElementNS("http://www.w3.org/2000/svg", "circle"); rotH.setAttribute("cx", b.x + b.width/2); rotH.setAttribute("cy", rotY); rotH.setAttribute("r", s/2.5); rotH.setAttribute("class", "handle handle-rotate"); rotH.dataset.id = el.id; g.appendChild(rotH);
+
+        if ((el.tagName === "image" || el.tagName === "rect") && window.getD(el, 'mask-shape') && window.getD(el, 'mask-shape') === 'squircle') {
+            const radH = document.createElementNS("http://www.w3.org/2000/svg", "circle"); radH.setAttribute("cx", b.x + b.width); radH.setAttribute("cy", b.y + (parseFloat(window.getD(el, 'rx')) || 0)); radH.setAttribute("r", s/2.5); radH.setAttribute("class", "handle handle-radius"); radH.dataset.id = el.id; g.appendChild(radH);
+        }
+    };
+    
+    window.updateEditorUI = window.updateUI; 
+
+    window.renderEditor = function() { 
+        window.renderLayers(); 
+        if(selectedEl) window.renderProperties(); 
+        else document.getElementById('editor-fields').innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.</div>`;
+    };
+
+    window.renderLayers = function() {
+        const list = document.getElementById('layers-list'); list.innerHTML = "";
+        const elements = Array.from(document.querySelectorAll('.duzenlenebilir')).reverse();
+        document.getElementById('status-count').innerText = `Nesne Sayısı: ${elements.length}`;
+        
+        elements.forEach((el) => {
+            const isLocked = window.getD(el, 'locked') === "true"; const isActive = selectedEl === el;
+            let typeName = el.tagName.toUpperCase(); 
+            if (typeName === 'RECT') typeName = 'ŞEKİL'; if (typeName === 'G' || typeName === 'SVG') typeName = 'İKON'; 
+            if (typeName === 'PATH') typeName = 'ÇİZİM'; if (typeName === 'IMAGE') typeName = 'RESİM';
+            if (el.tagName === 'text') { let txt = window.getD(el, 'raw-text') || el.textContent; typeName = `T: ${txt.substring(0,10)}${txt.length>10?'...':''}`; }
+
+            const item = document.createElement('div'); item.className = `layer-item ${isActive ? 'active' : ''}`;
+            item.onclick = (e) => { 
+                if(e.target.closest('.layer-btn')) return; 
+                selectedEl = el; isDraggingElement = false; 
+                if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); 
+            };
+            item.innerHTML = `<span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''}">${typeName}</span><div class="layer-actions"><button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı">▲</button><button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı">▼</button><button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit">${isLocked ? '🔒' : '🔓'}</button><button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }">×</button></div>`;
+            list.appendChild(item);
+        });
+    };
+
+    window.createPropertySection = function(title, content) {
+        return `<details class="property-details" open><summary>${title}</summary><div>${content}</div></details>`;
+    };
+
+    window.renderProperties = function() {
+        const f = document.getElementById('editor-fields');
+        if (!selectedEl || !selectedEl.tagName) { f.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.</div>`; return; }
+        
+        try {
+            const el = selectedEl; const id = el.id; const tag = el.tagName.toLowerCase();
+            const isLocked = window.getD(el, 'locked') === "true"; const isPath = tag === 'path'; const isText = tag === 'text'; const isShape = tag === 'rect'; const isImage = tag === 'image'; const isIcon = tag === 'svg' || tag === 'g';
+            
+            let typeName = tag.toUpperCase(); if (isShape) typeName = 'ŞEKİL'; if (isIcon) typeName = 'İKON'; if (isPath) typeName = 'ÇİZİM'; if (isImage) typeName = 'RESİM'; if (isText) typeName = 'METİN';
+
+            let sections = [];
+
+            let headerHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+                    <div style="font-size:14px; color:white; font-weight:bold; letter-spacing:1px;">${typeName} AYARLARI ${isLocked ? '🔒' : ''}</div>
+                    <div class="delete-btn" style="cursor:pointer;" title="Sil" onclick="if(confirm('Silinecek?')){ document.getElementById('${id}').remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; }">❌</div>
+                </div>
+                <div class="action-row" style="margin-bottom:15px;">
+                    <button class="action-btn" onclick="window.toggleLock('${id}')" style="background:${isLocked?'var(--error)':'#334155'}">${isLocked ? '🔓 KİLİDİ AÇ' : '🔒 KİLİTLE'}</button>
+                    <button class="action-btn special" onclick="window.cloneElement('${id}')" ${isLocked ? 'disabled':''}>⧉ KOPYALA</button>
+                </div>
+            `;
+            sections.push(headerHtml);
+
+            if (isLocked) { 
+                sections.push(`<div style="text-align:center; color:#ef4444; font-size:12px; margin-top:20px;">🔒 Bu öğe kilitli. Düzenlemek için kilidini açın.</div>`); 
+                f.innerHTML = sections.join(''); return; 
+            }
+
+            if(!isPath) {
+                let alignHtml = `<div class="action-row" style="margin-bottom:8px;"><button class="action-btn" onclick="window.alignElement('${id}', 'left')">⬅️ SOL</button><button class="action-btn" onclick="window.alignElement('${id}', 'center-h')">🎯 ORTA</button><button class="action-btn" onclick="window.alignElement('${id}', 'right')">SAĞ ➡️</button></div><div class="action-row" style="margin-bottom:10px;"><button class="action-btn" onclick="window.alignElement('${id}', 'center-v')">⬆️⬇️ DİKEY ORTA</button><button class="action-btn" onclick="window.toggleFlip('${id}', 'x')">↔️ YATAY ÇEVİR</button><button class="action-btn" onclick="window.toggleFlip('${id}', 'y')">↕️ DİKEY ÇEVİR</button></div>`;
+                sections.push(window.createPropertySection("Hizalama & Çevirme", alignHtml));
+            }
+
+            if (isText) {
+                const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                let contentHtml = `<input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value);" onchange="window.saveState()" placeholder="Metni girin...">`;
+                sections.push(window.createPropertySection("Metin İçeriği", contentHtml));
+            }
+
+            if (!isPath) {
+                let bbox = {x:0, y:0, width:0, height:0}; try { bbox = el.getBBox(); } catch(e){}
+                const x = Math.round(parseFloat(el.getAttribute("x")) || bbox.x || 0); const y = Math.round(parseFloat(el.getAttribute("y")) || bbox.y || 0);
+                
+                let w = 0, h = 0;
+                
+                if(isText) { 
+                    w = Math.round(parseFloat(el.getAttribute("textLength")) || bbox.width || 0); 
+                    h = Math.round(parseFloat(window.getD(el, "base-font-size")) || 80); 
+                } else { 
+                    w = Math.round(parseFloat(el.getAttribute("width")) || bbox.width || 0); 
+                    h = Math.round(parseFloat(el.getAttribute("height")) || bbox.height || 0); 
+                }
+                
+                let posHtml = `
+                    <div class="label-row"><span class="label-text">X KONUMU</span><span class="value-badge" id="val-x-${id}">${x}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="-1000" max="3000" value="${x}" style="flex:1;" oninput="window.changeProp('${id}', 'x', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${x}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'x', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">Y KONUMU</span><span class="value-badge" id="val-y-${id}">${y}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="-1000" max="3000" value="${y}" style="flex:1;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${y}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">GENİŞLİK (W)</span><span class="value-badge" id="val-w-${id}">${w}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="1" max="2500" value="${w}" style="flex:1;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${w}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">YÜKSEKLİK (H)</span><span class="value-badge" id="val-h-${id}">${h}px</span></div>
+                    <div style="display:flex; gap:10px;">
+                        <input type="range" min="1" max="2500" value="${h}" style="flex:1;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${h}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                sections.push(window.createPropertySection("Konum ve Boyut", posHtml));
+                
+                const angle = parseFloat(window.getD(el, 'angle')) || 0;
+                let transHtml = `
+                    <div class="label-row" style="margin-top:0;"><span class="label-text">DÖNDÜRME AÇISI</span><span class="value-badge" id="val-angle-${id}">${angle}°</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="360" value="${angle}" style="flex:1;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${angle}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                sections.push(window.createPropertySection("Dönüştürme (Transform)", transHtml));
+            }
+
+            if (isText) {
+                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0;
+                const isB = el.getAttribute('font-weight') === 'bold'; const isI = el.getAttribute('font-style') === 'italic'; const isU = el.getAttribute('text-decoration') === 'underline';
+                const tAlign = el.getAttribute('text-anchor') || 'middle';
+                let fontOptions = googleFonts.map(font => `<option value="${font.val}" style="font-family: ${font.val}" ${currentFont.includes(font.name) ? "selected" : ""}>${font.name}</option>`).join('');
+                
+                let fontHtml = `<select class="font-select" style="margin-bottom:15px;" onchange="const t=document.getElementById('${id}'); t.setAttribute('font-family', this.value); t.style.fontFamily=this.value; window.applyTextCurve(t); if(window.updateEditorUI) window.updateEditorUI(t); window.saveState();">${fontOptions}</select>
+                    <div style="display:flex; gap:5px; margin-bottom:15px;">
+                        <button class="action-btn ${isB?'active':''}" style="flex:1; font-size:14px;" onclick="window.applyTextStyle('${id}', 'bold')"><b>B</b></button>
+                        <button class="action-btn ${isI?'active':''}" style="flex:1; font-size:14px; font-style:italic;" onclick="window.applyTextStyle('${id}', 'italic')">I</button>
+                        <button class="action-btn ${isU?'active':''}" style="flex:1; font-size:14px; text-decoration:underline;" onclick="window.applyTextStyle('${id}', 'underline')">U</button>
+                        <div style="width:1px; background:var(--border); margin:0 5px;"></div>
+                        <button class="action-btn ${tAlign==='start'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'start')">⇤</button>
+                        <button class="action-btn ${tAlign==='middle'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'middle')">↔</button>
+                        <button class="action-btn ${tAlign==='end'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'end')">⇥</button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Temizle</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
+                    
+                    <div class="label-row"><span class="label-text">EĞRİLİK (KAVİS)</span><span class="value-badge" id="val-curve-${id}">${curve}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-100" max="100" value="${curve}" style="flex:1;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${curve}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">HARF ARALIĞI</span><span class="value-badge" id="val-letter-spacing-${id}">${ls}px</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-20" max="100" value="${ls}" style="flex:1;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${ls}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="2000" value="${mw}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mw}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                sections.push(window.createPropertySection("Yazı Tipi & Biçimlendirme", fontHtml));
+            }
+
+            if (isShape || isImage) {
+                const rx = parseFloat(window.getD(el, 'rx')) || 0; const maskShape = window.getD(el, 'mask-shape') || 'none';
+                let bbox = {width:0, height:0}; try { bbox = el.getBBox(); }catch(e){} const maxR = Math.min(bbox.width, bbox.height) / 2;
+                let formHtml = `<div class="label-text" style="margin-bottom:5px;">MASKELEME ŞEKLİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'mask-shape', this.value); window.saveState();"><option value="none" ${maskShape === 'none' ? 'selected' : ''}>Yok (Düz)</option><option value="squircle" ${maskShape === 'squircle' ? 'selected' : ''}>Oval Kare (Squircle)</option><option value="circle" ${maskShape === 'circle' ? 'selected' : ''}>Daire</option><option value="triangle" ${maskShape === 'triangle' ? 'selected' : ''}>Üçgen</option><option value="star" ${maskShape === 'star' ? 'selected' : ''}>Yıldız</option></select>
+                <div class="label-row"><span class="label-text">KÖŞE YARIÇAPI (SQUIRCLE)</span><span class="value-badge" id="val-rx-${id}">${Math.round(rx)}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="range" min="0" max="${maxR}" value="${rx}" style="flex:1;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${rx}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                </div>`;
+                sections.push(window.createPropertySection("Form & Maskeleme", formHtml));
+            }
+
+            if (!isImage) {
+                const fillType = window.getD(el, 'fill-type') || 'solid'; const col1 = window.getD(el, 'color1') || '#10b981'; const col2 = window.getD(el, 'color2') || '#3b82f6'; const solidCol = window.getD(el, 'solid-color') || (el.getAttribute('fill') === 'none' ? el.getAttribute('stroke') : el.getAttribute('fill')) || "#ffffff";
+                let swatchHtml = `<div class="label-text" style="margin-top:15px; margin-bottom:8px;">PROJE RENKLERİ</div><div class="swatch-container">` + recentColors.map(c => `<div class="color-swatch" style="background:${c}" onclick="window.applyRecentColor('${id}', '${c}')" title="${c}"></div>`).join('') + `</div>`;
+                let fillHtml = `<div class="label-text" style="margin-bottom:5px;">DOLGU TİPİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'fill-type', this.value); window.renderProperties(); window.saveState();"><option value="solid" ${fillType === 'solid' ? 'selected' : ''}>Düz Renk</option><option value="gradient" ${fillType === 'gradient' ? 'selected' : ''}>Renk Geçişi (Gradient)</option></select>`;
+                if (fillType === 'solid') { fillHtml += `<div class="label-text" style="margin-bottom:5px;">${isPath?'ÇİZGİ':'İÇ'} RENK</div><div style="display:flex; gap:10px; align-items:center;"><input type="color" value="${safeColor(solidCol)}" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'solidColor', 'fill')" title="Göz Damlası">💧</button><input type="text" value="${safeColor(solidCol)}" style="flex:1;" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>`; } 
+                else { fillHtml += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div class="input-group"><span class="label-text">RENK 1</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col1)}" oninput="window.changeSetting('${id}', 'color1', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155;" onclick="window.pickColor('${id}', 'color1', '')">💧</button></div></div><div class="input-group"><span class="label-text">RENK 2</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col2)}" oninput="window.changeSetting('${id}', 'color2', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155;" onclick="window.pickColor('${id}', 'color2', '')">💧</button></div></div></div>`; }
+                fillHtml += swatchHtml;
+                sections.push(window.createPropertySection("Dolgu & Renk", fillHtml));
+            }
+
+            const strokeCol = el.getAttribute('stroke') || '#000000'; const strokeW = parseFloat(el.getAttribute('stroke-width')) || 0; const dash = el.getAttribute('stroke-dasharray') || 'none';
+            let strokeHtml = `<div class="label-text" style="margin-bottom:5px;">ÇİZGİ RENGİ</div><div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;"><input type="color" value="${safeColor(strokeCol)}" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', '', 'stroke')" title="Göz Damlası">💧</button><input type="text" value="${safeColor(strokeCol)}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>
+            <div class="label-row"><span class="label-text">KALINLIK</span><span class="value-badge" id="val-sw-${id}">${strokeW}px</span></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                <input type="range" min="0" max="50" value="${strokeW}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke-width', this.value); t.setAttribute('paint-order', 'stroke fill'); document.getElementById('val-sw-${id}').innerText=this.value+'px'; this.nextElementSibling.value=this.value;" onchange="window.saveState()">
+                <input type="number" value="${strokeW}" style="width:70px; padding:8px;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke-width', this.value); t.setAttribute('paint-order', 'stroke fill'); document.getElementById('val-sw-${id}').innerText=this.value+'px'; this.previousElementSibling.value=this.value;" onchange="window.saveState()">
+            </div>
+            <div class="label-text" style="margin-bottom:5px;">ÇİZGİ TİPİ</div>
+            <select class="font-select" onchange="document.getElementById('${id}').setAttribute('stroke-dasharray', this.value); window.saveState();"><option value="none" ${dash === 'none' ? 'selected' : ''}>Düz</option><option value="5,5" ${dash === '5,5' ? 'selected' : ''}>Kesikli</option><option value="2,2" ${dash === '2,2' ? 'selected' : ''}>Noktalı</option></select>`;
+            sections.push(window.createPropertySection("Kenarlık & Çizgi", strokeHtml));
+
+            let opacityVal = parseFloat(el.getAttribute('opacity')); if (isNaN(opacityVal)) opacityVal = 1;
+            const sX = parseFloat(window.getD(el, 'shadow-x')) || 0, sY = parseFloat(window.getD(el, 'shadow-y')) || 0, sB = parseFloat(window.getD(el, 'shadow-blur')) || 0, sC = window.getD(el, 'shadow-color') || '#000000', bl = parseFloat(window.getD(el, 'blur')) || 0; const blend = window.getD(el, 'blend') || 'normal';
+            
+            let fxHtml = `
+            <div class="label-row"><span class="label-text">SAYDAMLIK (OPACITY)</span><span class="value-badge" id="val-opacity-${id}">${Math.round(opacityVal*100)}%</span></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                <input type="range" min="0" max="1" step="0.05" value="${opacityVal}" style="flex:1;" oninput="window.changeFilter('${id}', 'opacity', this.value, this);" onchange="window.saveState()">
+                <input type="number" min="0" max="1" step="0.05" value="${opacityVal}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'opacity', this.value, this);" onchange="window.saveState()">
+            </div>
+            <div class="label-text" style="margin-bottom:5px;">KARIŞIM MODU (BLEND)</div>
+            <select class="font-select" style="margin-bottom:15px;" onchange="window.changeFilter('${id}', 'blend', this.value); window.saveState();">
+                <option value="normal" ${blend === 'normal' ? 'selected' : ''}>Normal</option><option value="multiply" ${blend === 'multiply' ? 'selected' : ''}>Çoğalt (Multiply)</option><option value="screen" ${blend === 'screen' ? 'selected' : ''}>Ekran (Screen)</option><option value="overlay" ${blend === 'overlay' ? 'selected' : ''}>Kaplama (Overlay)</option>
+            </select>
+            <div class="group-box">
+                <div class="label-text" style="color:white; margin-bottom:10px;">GÖLGE VE BLUR</div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="color" value="${sC}" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:40px; height:40px; cursor:pointer; border-radius:8px; border:none; background:none;">
+                    <button class="action-btn" style="padding:10px; background:#334155;" onclick="window.pickColor('${id}', 'shadow-color', '')">💧</button>
+                    <input type="text" value="${sC}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE X</span><span class="value-badge" id="val-shadow-x-${id}">${sX}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="-100" max="100" value="${sX}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-x', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sX}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-x', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE Y</span><span class="value-badge" id="val-shadow-y-${id}">${sY}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="-100" max="100" value="${sY}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-y', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sY}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-y', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE YAYILMASI</span><span class="value-badge" id="val-shadow-blur-${id}">${sB}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="0" max="100" value="${sB}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-blur', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sB}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-blur', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">NESNE BULANIKLIĞI</span><span class="value-badge" id="val-blur-${id}">${bl}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="range" min="0" max="100" value="${bl}" style="flex:1;" oninput="window.changeFilter('${id}', 'blur', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${bl}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'blur', this.value, this);" onchange="window.saveState()">
+                </div>
+            </div>`;
+            sections.push(window.createPropertySection("Efektler & Görünüm", fxHtml));
+
+            const rawSvgCode = el.outerHTML.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            let codeHtml = `<textarea id="raw-svg-code" style="width:100%; height:120px; background:#000; color:var(--accent); font-family:monospace; font-size:11px; padding:10px; border-radius:8px; border:1px solid var(--border); resize:vertical;" onchange="window.saveState()">${rawSvgCode}</textarea>
+            <button class="action-btn active" style="width:100%; margin-top:10px; padding:10px;" onclick="window.applyRawCode('${id}')">💻 KODU UYGULA</button>`;
+            sections.push(window.createPropertySection("</> Canlı SVG Kodu", codeHtml));
+
+            f.innerHTML = sections.join('');
+        } catch(err) {
+            console.error("Özellik Paneli Hatası:", err);
+            f.innerHTML = `<div style="color:#ef4444; padding:20px; font-size:12px; text-align:center;">Özellikler yüklenemedi. Lütfen nesneyi tekrar seçin.</div>`;
+        }
+    };
+
+    window.applyRawCode = function(id) {
+        try {
+            let p = new DOMParser(); 
+            let code = document.getElementById('raw-svg-code').value.trim();
+            let n;
+            if (!code.toLowerCase().startsWith('<svg')) {
+                let d = p.parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + code + '</svg>', 'image/svg+xml');
+                if(d.documentElement.tagName === 'parsererror') throw new Error('Hatalı Kod');
+                n = d.documentElement.firstElementChild;
+            } else {
+                let d = p.parseFromString(code, 'image/svg+xml'); 
+                n = d.documentElement; 
+                if(n.tagName==='parsererror') throw new Error('Hatalı Kod');
+            }
+            if(!n) throw new Error('Geçersiz SVG');
+            let o = document.getElementById(id); o.replaceWith(n); selectedEl = n; 
+            if(!selectedEl.id) selectedEl.id='el_'+Date.now(); 
+            if(!selectedEl.classList.contains('duzenlenebilir')) selectedEl.classList.add('duzenlenebilir'); 
+            window.saveState(); window.setupLayers(); window.updateEditorUI(selectedEl); window.renderEditor(); 
+        } catch(err) { alert('Hata: Lütfen geçerli bir SVG kodu girin.'); }
+    };
+</script>
+</body>
+</html>
