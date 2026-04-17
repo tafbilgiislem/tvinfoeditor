@@ -31,8 +31,8 @@
         .layer-item{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px;transition:.2s;background:#1e293b;color:#cbd5e1}
         .layer-item:hover{background:#334155}
         .layer-item.active{border-left:4px solid var(--accent);background:rgba(16,185,129,.15);color:#fff;font-weight:700}
-        .layer-actions{display:flex;gap:10px;align-items:center}
-        .layer-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;transition:.2s}
+        .layer-actions{display:flex;gap:6px;align-items:center}
+        .layer-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;padding:0;transition:.2s}
         .layer-btn:hover{color:#fff;transform:scale(1.2)}
         
         #main-view{flex:1;background:#020617;overflow:hidden;position:relative;height:calc(100% - 25px);display:flex}
@@ -115,8 +115,10 @@
 <div id="context-menu">
     <div class="ctx-item" onclick="if(selectedEl) window.cloneElement(selectedEl.id); window.closeCtx();"><span>⧉ Kopyala</span><span class="kbd">Alt+Sürükle</span></div>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 1); window.closeCtx();"><span>▲ Öne Getir</span></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, -1); window.closeCtx();"><span>▼ Arkaya Gönder</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'top'); window.closeCtx();"><span>⏫ En Öne Getir</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 1); window.closeCtx();"><span>▲ Bir Öne Getir</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, -1); window.closeCtx();"><span>▼ Bir Arkaya Gönder</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'bottom'); window.closeCtx();"><span>⏬ En Arkaya Gönder</span></div>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
     <div class="ctx-item" onclick="if(selectedEl) window.toggleLock(selectedEl.id); window.closeCtx();"><span id="ctx-lock-text">🔒 Kilitle</span></div>
     <div class="ctx-item danger" onclick="if(selectedEl && confirm('Silinecek?')){ selectedEl.remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; } window.closeCtx();"><span>🗑️ Sil</span><span class="kbd">Del</span></div>
@@ -164,7 +166,7 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="margin-top:0; color:white;">Pro Studio V40</h2>
+        <h2 style="margin-top:0; color:white;">Pro Studio V41</h2>
         <div style="font-size:12px; color:#94a3b8; margin-bottom:20px;">Lütfen Cloudflare Worker şifrenizi girin.</div>
         <input type="password" id="passInput" placeholder="Sunucu Şifresi">
         <button id="loginBtn" onclick="window.login()">Sunucuya Bağlan</button>
@@ -195,7 +197,7 @@
         </div>
         <div id="status-bar">
             <div id="status-count">Nesne Sayısı: 0</div>
-            <div>SVG Pro Studio Ultimate V40</div>
+            <div>SVG Pro Studio Ultimate V41</div>
             <div id="status-time">Son Kayıt: Bekleniyor...</div>
         </div>
     </div>
@@ -235,6 +237,29 @@
                         </select>
                     </div>
                     <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()">💾 AYARLARI KAYDET (JSON)</button>
+                </div>
+            </details>
+
+            <details style="margin-bottom: 10px;">
+                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px;">🌐 İNDEX.HTML EFEKT AYARLARI</summary>
+                <div class="group-box" style="margin-top:5px;">
+                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">index.html dosyasındaki CSS geçiş (.active) sürelerini düzenler.</div>
+                    <div class="input-group" style="margin-bottom:10px;">
+                        <span class="label-text">EFEKT SEÇİMİ</span>
+                        <select id="html-effect-select" class="font-select" onchange="window.updateHtmlEffectUI()">
+                            <option value="fade">Fade (Yumuşak Geçiş)</option>
+                            <option value="slide">Slide (Kaydırma)</option>
+                            <option value="zoom">Zoom (Yakınlaştırma)</option>
+                            <option value="cube">Cube (3D Küp)</option>
+                            <option value="coverflow">Coverflow (3D Galeri)</option>
+                            <option value="flip">Flip (Kart Çevirme)</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin-bottom:10px;">
+                        <span class="label-text">GEÇİŞ SÜRESİ (Saniye / "1.5" gibi)</span>
+                        <input type="number" step="0.1" id="html-effect-duration" value="1.5">
+                    </div>
+                    <button class="action-btn" style="width:100%; background:#10b981; color:white;" onclick="window.saveHtmlSettings()">💾 İNDEX.HTML'E KAYDET</button>
                 </div>
             </details>
 
@@ -288,6 +313,7 @@
     const WORKER_URL = "https://tvinfoeditor.tafbilgiislem.workers.dev"; 
     
     let SHA_KEY = "", SESSION_PASS = "", settingsData = [], settingsSha = "";
+    let indexHtmlContent = "", indexHtmlSha = "";
 
     window.setD = function(el, key, val) { if(el) el.setAttribute('data-' + key, val); };
     window.getD = function(el, key) { return el ? el.getAttribute('data-' + key) : null; };
@@ -325,12 +351,14 @@
         if(!passVal) { alert("Lütfen Worker şifrenizi girin!"); return; }
         SESSION_PASS = passVal; 
         await window.loadSettings();
+        await window.loadIndexHtml();
         await window.loadSlide();    
     };
     
     document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.login(); });
     document.getElementById('file-selector').addEventListener('change', async () => { await window.loadSlide(); window.updateSettingsUI(); });
 
+    // --- JSON Ayarları Modülü ---
     window.loadSettings = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json"} });
@@ -358,22 +386,95 @@
             const timeVal = parseInt(document.getElementById('slide-time').value) || 3000;
             const effectVal = document.getElementById('slide-effect').value;
 
-            let slideConfig = settingsData.find(s => s.file === currentFile);
-            if (slideConfig) { slideConfig.duration = timeVal; slideConfig.effect = effectVal; } 
-            else { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
+            let found = false;
+            // Tüm eşleşen dosyaları güncelle (Aynı dosya JSON'da birden fazla kez varsa hepsi senkronize olur)
+            settingsData.forEach(s => {
+                if (s.file === currentFile) {
+                    s.duration = timeVal;
+                    s.effect = effectVal;
+                    found = true;
+                }
+            });
+            // Eğer dosya JSON'da hiç yoksa yeni ekle
+            if (!found) { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
 
             const newContent = JSON.stringify(settingsData, null, 2);
             const b64 = btoa(unescape(encodeURIComponent(newContent)));
 
-            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı", content: b64, sha: settingsSha}) });
+            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
             if(putRes.ok) { 
                 try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
-                st.innerText = "AYARLAR KAYDEDİLDİ!"; 
+                st.innerText = "TÜM EŞLEŞEN AYARLAR KAYDEDİLDİ!"; 
             } else { st.innerText = "KAYIT HATASI!"; }
             setTimeout(() => st.style.display="none", 2000);
         } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
     };
 
+    // --- Index HTML (Efekt) Modülü ---
+    window.loadIndexHtml = async function() {
+        try {
+            const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
+            if (res.ok) {
+                const data = await res.json();
+                indexHtmlSha = data.sha || (data.content && data.content.sha) || "";
+                indexHtmlContent = decodeURIComponent(escape(atob(data.content)));
+            }
+            window.updateHtmlEffectUI();
+        } catch (e) { console.error("index.html yüklenemedi", e); }
+    };
+
+    window.updateHtmlEffectUI = function() {
+        if(!indexHtmlContent) return;
+        const effect = document.getElementById('html-effect-select').value;
+        // İlgili class içindeki transition saniyesini yakalayan Regex
+        const regex = new RegExp("\\." + effect + "\\.active\\s*\\{[^}]*transition:\\s*([\\d\\.]+)s", "i");
+        const match = indexHtmlContent.match(regex);
+        if (match && match[1]) {
+            document.getElementById('html-effect-duration').value = match[1];
+        } else {
+            document.getElementById('html-effect-duration').value = "1.5"; // Bulunamazsa varsayılan
+        }
+    };
+
+    window.saveHtmlSettings = async function() {
+        if(!indexHtmlContent) { alert("index.html içeriği yüklenmedi. Sayfayı yenileyip tekrar bağlanın."); return; }
+        const st = document.getElementById('status-info'); st.innerText = "İNDEX.HTML EFEKTLERİ GÜNCELLENİYOR..."; st.style.display = "block";
+        
+        try {
+            const effect = document.getElementById('html-effect-select').value;
+            const duration = document.getElementById('html-effect-duration').value;
+
+            // Regex ile ilgili efektin active sınıfındaki transition saniyesini değiştir
+            const regex = new RegExp("(\\." + effect + "\\.active\\s*\\{[^}]*transition:\\s*)([\\d\\.]+)s", "i");
+            
+            if (regex.test(indexHtmlContent)) {
+                indexHtmlContent = indexHtmlContent.replace(regex, `$1${duration}s`);
+            } else {
+                alert(`Uyarı: '${effect}' efekti için geçerli bir CSS transition kuralı index.html içinde bulunamadı.`);
+                st.style.display="none";
+                return;
+            }
+
+            const b64 = btoa(unescape(encodeURIComponent(indexHtmlContent)));
+            const putRes = await fetch(WORKER_URL, {
+                method: "PUT",
+                headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html" },
+                body: JSON.stringify({message: `Efekt Güncelleme: ${effect}`, content: b64, sha: indexHtmlSha})
+            });
+
+            if(putRes.ok) {
+                try { const data = await putRes.json(); indexHtmlSha = data.content?.sha || data.sha || indexHtmlSha; } catch(e) {}
+                st.innerText = "İNDEX.HTML BAŞARIYLA KAYDEDİLDİ!";
+            } else {
+                st.innerText = "KAYIT HATASI!";
+            }
+            setTimeout(() => st.style.display="none", 2000);
+        } catch(e) {
+            alert("index.html kaydedilemedi."); st.style.display="none";
+        }
+    };
+
+    // --- Slayt ve Çizim Modülleri ---
     window.loadSlide = async function() {
         const file = document.getElementById('file-selector').value;
         const st = document.getElementById('status-info'); st.innerText = "YÜKLENİYOR..."; st.style.display = "block";
@@ -393,7 +494,6 @@
         } catch(e) { alert("Bağlantı Hatası!"); st.style.display="none"; document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
     };
 
-    // ====== KAYDET, YAZI EKLE, KARE EKLE BUTONLARI (Kusursuz ve Eksiksiz) ======
     window.saveData = async function() {
         if (!WORKER_URL || WORKER_URL === "") { alert("Lütfen kodun içindeki WORKER_URL kısmına kendi linkinizi yazın!"); return; }
         const st = document.getElementById('status-info'); st.innerText = "KAYDEDİLİYOR..."; st.style.display = "block";
@@ -408,7 +508,7 @@
             const res = await fetch(WORKER_URL, { 
                 method: "PUT", 
                 headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": fileName }, 
-                body: JSON.stringify({message: "Pro Studio Ultimate Fix V40", content: b64, sha: SHA_KEY}) 
+                body: JSON.stringify({message: "Pro Studio Ultimate Fix V41", content: b64, sha: SHA_KEY}) 
             });
             
             if(res.ok) { 
@@ -448,7 +548,6 @@
         svg.appendChild(rect); selectedEl = rect; window.saveState(); window.setupLayers(); window.updateEditorUI(rect); window.renderEditor();
     };
 
-    // ======= GÜVENLİ VE HIZLI KAYDIRICI (SLIDER) MOTORU =======
     window.changeProp = function(id, prop, val, elUI) {
         const el = document.getElementById(id); if(!el) return;
         if(prop === 'x') el.setAttribute('x', val);
@@ -708,7 +807,38 @@
     window.resetZoom = function() { currentZoom = 1; panX = 0; panY = 0; window.applyZoom(); window.syncRulerTransform(); };
     window.applyZoom = function() { document.getElementById('svg-wrapper').style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`; document.getElementById('zoom-val').innerText = Math.round(currentZoom * 100) + "%"; };
 
-    window.moveLayer = function(id, dir) { const el = document.getElementById(id); if(!el) return; if (dir === 1 && el.nextElementSibling && el.nextElementSibling.id !== 'guides-group') el.parentNode.insertBefore(el.nextElementSibling, el); else if (dir === -1 && el.previousElementSibling && el.previousElementSibling.id !== 'canvas-background') el.parentNode.insertBefore(el, el.previousElementSibling); window.saveState(); if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); };
+    window.moveLayer = function(id, dir) { 
+        const el = document.getElementById(id); if(!el) return; 
+        const parent = el.parentNode;
+        
+        if (dir === 'top') {
+            const guides = document.getElementById('guides-group');
+            if (guides) parent.insertBefore(el, guides);
+            else parent.appendChild(el);
+        } else if (dir === 'bottom') {
+            const bg = document.getElementById('canvas-background');
+            if (bg && bg.nextSibling) parent.insertBefore(el, bg.nextSibling);
+            else parent.insertBefore(el, parent.firstChild);
+        } else if (dir === 1 && el.nextElementSibling && el.nextElementSibling.id !== 'guides-group') {
+            parent.insertBefore(el.nextElementSibling, el); 
+        } else if (dir === -1 && el.previousElementSibling && el.previousElementSibling.id !== 'canvas-background') {
+            parent.insertBefore(el, el.previousElementSibling); 
+        }
+        
+        window.saveState(); if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); 
+    };
+
+    window.toggleVisibility = function(id) {
+        const el = document.getElementById(id); if(!el) return;
+        if (el.getAttribute('visibility') === 'hidden') {
+            el.removeAttribute('visibility');
+        } else {
+            el.setAttribute('visibility', 'hidden');
+            if (selectedEl === el) { selectedEl = null; document.getElementById('control-layer').innerHTML = ""; }
+        }
+        window.saveState(); window.renderEditor();
+    };
+
     window.cloneElement = function(id) { const el = document.getElementById(id); if(!el) return; const clone = el.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(el.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(el.getAttribute("y")) || 0) + 30); el.parentNode.insertBefore(clone, el.nextSibling); selectedEl = clone; clone.classList.add("duzenlenebilir"); window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); };
     window.toggleLock = function(id) { const el = document.getElementById(id); if(!el) return; const isLocked = window.getD(el, 'locked') === "true"; window.setD(el, 'locked', isLocked ? "false" : "true"); el.classList.toggle('locked', !isLocked); window.saveState(); window.renderEditor(); if(window.updateEditorUI) window.updateEditorUI(el); };
     
@@ -988,6 +1118,7 @@
         
         elements.forEach((el) => {
             const isLocked = window.getD(el, 'locked') === "true"; const isActive = selectedEl === el;
+            const isHidden = el.getAttribute('visibility') === 'hidden';
             let typeName = el.tagName.toUpperCase(); 
             if (typeName === 'RECT') typeName = 'ŞEKİL'; if (typeName === 'G' || typeName === 'SVG') typeName = 'İKON'; 
             if (typeName === 'PATH') typeName = 'ÇİZİM'; if (typeName === 'IMAGE') typeName = 'RESİM';
@@ -999,7 +1130,16 @@
                 selectedEl = el; isDraggingElement = false; 
                 if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); 
             };
-            item.innerHTML = `<span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''}">${typeName}</span><div class="layer-actions"><button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı">▲</button><button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı">▼</button><button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit">${isLocked ? '🔒' : '🔓'}</button><button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }">×</button></div>`;
+            item.innerHTML = `<span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''} ${isHidden ? 'opacity:0.3;' : ''}">${typeName}</span>
+            <div class="layer-actions">
+                <button class="layer-btn" onclick="window.toggleVisibility('${el.id}')" title="Göster/Gizle">${isHidden ? '👓' : '👁️'}</button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'top')" title="En Üste">⏫</button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı">▲</button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı">▼</button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'bottom')" title="En Alta">⏬</button>
+                <button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit">${isLocked ? '🔒' : '🔓'}</button>
+                <button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }">×</button>
+            </div>`;
             list.appendChild(item);
         });
     };
