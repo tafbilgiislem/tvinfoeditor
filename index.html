@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SVG Pro Studio | Swiper Edition V43</title>
+    <title>SVG Pro Studio | Kusursuz CMS V42 (Sıfır Hata)</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700;800&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root{--accent:#10b981;--bg:#0f172a;--panel:#1e293b;--border:#334155;--handle-move:#3b82f6;--handle-rotate:#f59e0b;--handle-radius:#ec4899}
@@ -166,7 +166,7 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="margin-top:0; color:white;">Pro Studio V43 (Swiper)</h2>
+        <h2 style="margin-top:0; color:white;">Pro Studio V42</h2>
         <div style="font-size:12px; color:#94a3b8; margin-bottom:20px;">Lütfen Cloudflare Worker şifrenizi girin.</div>
         <input type="password" id="passInput" placeholder="Sunucu Şifresi">
         <button id="loginBtn" onclick="window.login()">Sunucuya Bağlan</button>
@@ -197,7 +197,7 @@
         </div>
         <div id="status-bar">
             <div id="status-count">Nesne Sayısı: 0</div>
-            <div>SVG Pro Studio Ultimate V43</div>
+            <div>SVG Pro Studio Ultimate V42</div>
             <div id="status-time">Son Kayıt: Bekleniyor...</div>
         </div>
     </div>
@@ -217,34 +217,46 @@
             </select>
             
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px;">🎬 SEÇİLİ SLAYT SÜRESİ (JSON)</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px;">🎬 SEÇİLİ SLAYT AYARLARI (JSON)</summary>
                 <div class="group-box" style="margin-top:5px;">
-                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Bu ayar Swiper "Autoplay" için settings.json'a kaydedilir.</div>
+                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Değişiklikler doğrudan settings.json dosyasına işlenir.</div>
                     <div class="input-group" style="margin-bottom:10px;">
                         <span class="label-text">BU SLAYTIN EKRANDA KALMA SÜRESİ (ms)</span>
                         <input type="number" id="slide-time" value="5000">
                     </div>
-                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()">💾 SÜREYİ KAYDET (JSON)</button>
+                    <div class="input-group" style="margin-bottom:10px;">
+                        <span class="label-text">BU SLAYT İÇİN GEÇİŞ EFEKTİ</span>
+                        <select id="slide-effect" class="font-select">
+                            <option value="fade">Fade (Yumuşak Geçiş)</option>
+                            <option value="slide">Slide (Kaydırma)</option>
+                            <option value="zoom">Zoom (Yakınlaştırma)</option>
+                            <option value="cube">Cube (3D Küp)</option>
+                            <option value="coverflow">Coverflow (3D Galeri)</option>
+                            <option value="flip">Flip (Kart Çevirme)</option>
+                            <option value="none">Efektsiz</option>
+                        </select>
+                    </div>
+                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()">💾 AYARLARI KAYDET (JSON)</button>
                 </div>
             </details>
 
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px;">🌐 SWIPER GEÇİŞ AYARLARI (İNDEX.HTML)</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px;">🌐 İNDEX.HTML EFEKT AYARLARI</summary>
                 <div class="group-box" style="margin-top:5px;">
-                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">index.html dosyasındaki Swiper init parametrelerini (speed, effect) düzenler.</div>
+                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">index.html dosyasındaki CSS geçiş (.active) sürelerini düzenler.</div>
                     <div class="input-group" style="margin-bottom:10px;">
-                        <span class="label-text">GENEL GEÇİŞ EFEKTİ</span>
-                        <select id="html-global-effect" class="font-select">
+                        <span class="label-text">EFEKT SEÇİMİ</span>
+                        <select id="html-effect-select" class="font-select" onchange="window.updateHtmlEffectUI()">
                             <option value="fade">Fade (Yumuşak Geçiş)</option>
                             <option value="slide">Slide (Kaydırma)</option>
+                            <option value="zoom">Zoom (Yakınlaştırma)</option>
                             <option value="cube">Cube (3D Küp)</option>
                             <option value="coverflow">Coverflow (3D Galeri)</option>
                             <option value="flip">Flip (Kart Çevirme)</option>
-                            <option value="cards">Cards (Deste)</option>
                         </select>
                     </div>
                     <div class="input-group" style="margin-bottom:10px;">
-                        <span class="label-text">GÖRSEL ANİMASYON HIZI (Saniye / "1.5" gibi)</span>
+                        <span class="label-text">GEÇİŞ SÜRESİ (Saniye / "1.5" gibi)</span>
                         <input type="number" step="0.1" id="html-effect-duration" value="1.5">
                     </div>
                     <button class="action-btn" style="width:100%; background:#10b981; color:white;" onclick="window.saveHtmlSettings()">💾 İNDEX.HTML'E KAYDET</button>
@@ -354,7 +366,7 @@
                 const data = await res.json();
                 settingsSha = data.sha || (data.content && data.content.sha) || "";
                 settingsData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-            } else { settingsData = [ {file: "slayt.svg", duration: 5000} ]; }
+            } else { settingsData = [ {file: "slayt.svg", effect: "fade", duration: 5000} ]; }
             window.updateSettingsUI();
         } catch (e) { settingsData = []; window.updateSettingsUI(); }
     };
@@ -362,8 +374,8 @@
     window.updateSettingsUI = function() {
         const currentFile = document.getElementById('file-selector').value;
         const slideConfig = settingsData.find(s => s.file === currentFile);
-        if (slideConfig) { document.getElementById('slide-time').value = slideConfig.duration || 3000; } 
-        else { document.getElementById('slide-time').value = 3000; }
+        if (slideConfig) { document.getElementById('slide-time').value = slideConfig.duration || 3000; document.getElementById('slide-effect').value = slideConfig.effect || 'fade'; } 
+        else { document.getElementById('slide-time').value = 3000; document.getElementById('slide-effect').value = 'fade'; }
     };
 
     window.saveSlideSettings = async function() {
@@ -372,20 +384,22 @@
         try {
             const currentFile = document.getElementById('file-selector').value;
             const timeVal = parseInt(document.getElementById('slide-time').value) || 3000;
+            const effectVal = document.getElementById('slide-effect').value;
 
             let found = false;
             settingsData.forEach(s => {
                 if (s.file === currentFile) {
                     s.duration = timeVal;
+                    s.effect = effectVal;
                     found = true;
                 }
             });
-            if (!found) { settingsData.push({ file: currentFile, duration: timeVal }); }
+            if (!found) { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
 
             const newContent = JSON.stringify(settingsData, null, 2);
             const b64 = btoa(unescape(encodeURIComponent(newContent)));
 
-            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Süresi Senkronizasyonu", content: b64, sha: settingsSha}) });
+            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
             if(putRes.ok) { 
                 try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
                 st.innerText = "TÜM EŞLEŞEN AYARLAR KAYDEDİLDİ!"; 
@@ -394,7 +408,7 @@
         } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
     };
 
-    // --- SWIPER Index HTML Modülü ---
+    // --- Index HTML (Efekt) Modülü DÜZELTİLDİ ---
     window.loadIndexHtml = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
@@ -411,53 +425,59 @@
 
     window.updateHtmlEffectUI = function() {
         if(!indexHtmlContent) return;
+        const effect = document.getElementById('html-effect-select').value;
         
-        // Swiper Scripti İçindeki Hız (speed) Değerini Bul
-        const speedMatch = indexHtmlContent.match(/speed\s*:\s*(\d+)/i);
-        if (speedMatch && speedMatch[1]) {
-            document.getElementById('html-effect-duration').value = parseInt(speedMatch[1]) / 1000;
-        }
-
-        // Swiper Scripti İçindeki Efekt (effect) Değerini Bul
-        const effectMatch = indexHtmlContent.match(/effect\s*:\s*['"](.*?)['"]/i);
-        if (effectMatch && effectMatch[1]) {
-            const select = document.getElementById('html-global-effect');
-            for(let i=0; i<select.options.length; i++) {
-                if(select.options[i].value === effectMatch[1]) { select.selectedIndex = i; break; }
+        // Bu Regex CSS sınıfını güvenli bir şekilde bulur (Örn: .zoom.active { ... })
+        const blockRegex = new RegExp(`\\.${effect}\\.active[^\\{]*\\{([^}]*)\\}`, "i");
+        const match = indexHtmlContent.match(blockRegex);
+        
+        if (match && match[1]) {
+            // İçerisindeki transition süresini ayıklar (Örn: transition:1.5s; -> 1.5)
+            const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
+            if (transMatch && transMatch[1]) {
+                document.getElementById('html-effect-duration').value = transMatch[1];
+            } else {
+                document.getElementById('html-effect-duration').value = "1.5";
             }
+        } else {
+            document.getElementById('html-effect-duration').value = "1.5";
         }
     };
 
     window.saveHtmlSettings = async function() {
         if(!indexHtmlContent) { alert("index.html içeriği sunucudan okunamadı. Lütfen sayfayı yenileyip sunucuya tekrar bağlanın."); return; }
-        const st = document.getElementById('status-info'); st.innerText = "SWIPER AYARLARI GÜNCELLENİYOR..."; st.style.display = "block";
+        const st = document.getElementById('status-info'); st.innerText = "İNDEX.HTML EFEKTLERİ GÜNCELLENİYOR..."; st.style.display = "block";
         
         try {
-            const effect = document.getElementById('html-global-effect').value;
-            const durationSec = parseFloat(document.getElementById('html-effect-duration').value);
-            const durationMs = Math.round(durationSec * 1000);
+            const effect = document.getElementById('html-effect-select').value;
+            const duration = document.getElementById('html-effect-duration').value;
 
-            // 1. Swiper Hızını Güncelle (Örn: speed: 1500)
-            if (/speed\s*:\s*\d+/i.test(indexHtmlContent)) {
-                indexHtmlContent = indexHtmlContent.replace(/(speed\s*:\s*)(\d+)/gi, `$1${durationMs}`);
+            // Bloğu tam olarak yakalıyoruz.
+            const blockRegex = new RegExp(`(\\.${effect}\\.active[^\\{]*\\{)([^}]*)(\\})`, "i");
+            
+            if (blockRegex.test(indexHtmlContent)) {
+                indexHtmlContent = indexHtmlContent.replace(blockRegex, function(fullMatch, p1, p2, p3) {
+                    let updatedInner = p2;
+                    // Eğer transition özelliği varsa sadece sayıyı değiştiriyoruz
+                    if (/transition:/i.test(p2)) {
+                        updatedInner = p2.replace(/(transition:[^;]*?)([\d\.]+)(s|ms)/gi, `$1${duration}$3`);
+                    } else {
+                        // Eğer transition özelliği yoksa yeni ekliyoruz
+                        updatedInner = p2 + `transition: ${duration}s;`;
+                    }
+                    return p1 + updatedInner + p3;
+                });
             } else {
-                alert("Swiper 'speed' parametresi index.html içinde bulunamadı. Lütfen yeni oynatıcı kodunu eklediğinizden emin olun.");
-                st.style.display="none"; return;
-            }
-
-            // 2. Swiper Efektini Güncelle (Örn: effect: 'cube')
-            if (/effect\s*:\s*['"][^'"]*['"]/i.test(indexHtmlContent)) {
-                indexHtmlContent = indexHtmlContent.replace(/(effect\s*:\s*['"])(.*?)(['"])/gi, `$1${effect}$3`);
-            } else {
-                alert("Swiper 'effect' parametresi index.html içinde bulunamadı.");
-                st.style.display="none"; return;
+                alert(`Uyarı: '${effect}' efekti için geçerli bir CSS kuralı (.${effect}.active) index.html dosyasında bulunamadı!`);
+                st.style.display="none";
+                return;
             }
 
             const b64 = btoa(unescape(encodeURIComponent(indexHtmlContent)));
             const putRes = await fetch(WORKER_URL, {
                 method: "PUT",
                 headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html" },
-                body: JSON.stringify({message: `Swiper Güncelleme: ${effect} - ${durationMs}ms`, content: b64, sha: indexHtmlSha})
+                body: JSON.stringify({message: `Efekt Güncelleme: ${effect}`, content: b64, sha: indexHtmlSha})
             });
 
             if(putRes.ok) {
@@ -506,7 +526,7 @@
             const res = await fetch(WORKER_URL, { 
                 method: "PUT", 
                 headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": fileName }, 
-                body: JSON.stringify({message: "Pro Studio Ultimate Fix V43", content: b64, sha: SHA_KEY}) 
+                body: JSON.stringify({message: "Pro Studio Ultimate Fix V42", content: b64, sha: SHA_KEY}) 
             });
             
             if(res.ok) { 
