@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SVG Pro Studio | Kusursuz CMS V41 (Sıfır Hata)</title>
+    <title>SVG Pro Studio | Kusursuz CMS V42 (Sıfır Hata)</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700;800&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root{--accent:#10b981;--bg:#0f172a;--panel:#1e293b;--border:#334155;--handle-move:#3b82f6;--handle-rotate:#f59e0b;--handle-radius:#ec4899}
@@ -166,7 +166,7 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="margin-top:0; color:white;">Pro Studio V41</h2>
+        <h2 style="margin-top:0; color:white;">Pro Studio V42</h2>
         <div style="font-size:12px; color:#94a3b8; margin-bottom:20px;">Lütfen Cloudflare Worker şifrenizi girin.</div>
         <input type="password" id="passInput" placeholder="Sunucu Şifresi">
         <button id="loginBtn" onclick="window.login()">Sunucuya Bağlan</button>
@@ -197,7 +197,7 @@
         </div>
         <div id="status-bar">
             <div id="status-count">Nesne Sayısı: 0</div>
-            <div>SVG Pro Studio Ultimate V41</div>
+            <div>SVG Pro Studio Ultimate V42</div>
             <div id="status-time">Son Kayıt: Bekleniyor...</div>
         </div>
     </div>
@@ -387,7 +387,6 @@
             const effectVal = document.getElementById('slide-effect').value;
 
             let found = false;
-            // Tüm eşleşen dosyaları güncelle (Aynı dosya JSON'da birden fazla kez varsa hepsi senkronize olur)
             settingsData.forEach(s => {
                 if (s.file === currentFile) {
                     s.duration = timeVal;
@@ -395,7 +394,6 @@
                     found = true;
                 }
             });
-            // Eğer dosya JSON'da hiç yoksa yeni ekle
             if (!found) { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
 
             const newContent = JSON.stringify(settingsData, null, 2);
@@ -410,7 +408,7 @@
         } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
     };
 
-    // --- Index HTML (Efekt) Modülü ---
+    // --- Index HTML (Efekt) Modülü DÜZELTİLDİ ---
     window.loadIndexHtml = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
@@ -418,39 +416,59 @@
                 const data = await res.json();
                 indexHtmlSha = data.sha || (data.content && data.content.sha) || "";
                 indexHtmlContent = decodeURIComponent(escape(atob(data.content)));
+                window.updateHtmlEffectUI();
+            } else {
+                console.error("index.html yüklenemedi. Durum:", res.status);
             }
-            window.updateHtmlEffectUI();
-        } catch (e) { console.error("index.html yüklenemedi", e); }
+        } catch (e) { console.error("index.html bağlantı hatası", e); }
     };
 
     window.updateHtmlEffectUI = function() {
         if(!indexHtmlContent) return;
         const effect = document.getElementById('html-effect-select').value;
-        // İlgili class içindeki transition saniyesini yakalayan Regex
-        const regex = new RegExp("\\." + effect + "\\.active\\s*\\{[^}]*transition:\\s*([\\d\\.]+)s", "i");
-        const match = indexHtmlContent.match(regex);
+        
+        // Bu Regex CSS sınıfını güvenli bir şekilde bulur (Örn: .zoom.active { ... })
+        const blockRegex = new RegExp(`\\.${effect}\\.active[^\\{]*\\{([^}]*)\\}`, "i");
+        const match = indexHtmlContent.match(blockRegex);
+        
         if (match && match[1]) {
-            document.getElementById('html-effect-duration').value = match[1];
+            // İçerisindeki transition süresini ayıklar (Örn: transition:1.5s; -> 1.5)
+            const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
+            if (transMatch && transMatch[1]) {
+                document.getElementById('html-effect-duration').value = transMatch[1];
+            } else {
+                document.getElementById('html-effect-duration').value = "1.5";
+            }
         } else {
-            document.getElementById('html-effect-duration').value = "1.5"; // Bulunamazsa varsayılan
+            document.getElementById('html-effect-duration').value = "1.5";
         }
     };
 
     window.saveHtmlSettings = async function() {
-        if(!indexHtmlContent) { alert("index.html içeriği yüklenmedi. Sayfayı yenileyip tekrar bağlanın."); return; }
+        if(!indexHtmlContent) { alert("index.html içeriği sunucudan okunamadı. Lütfen sayfayı yenileyip sunucuya tekrar bağlanın."); return; }
         const st = document.getElementById('status-info'); st.innerText = "İNDEX.HTML EFEKTLERİ GÜNCELLENİYOR..."; st.style.display = "block";
         
         try {
             const effect = document.getElementById('html-effect-select').value;
             const duration = document.getElementById('html-effect-duration').value;
 
-            // Regex ile ilgili efektin active sınıfındaki transition saniyesini değiştir
-            const regex = new RegExp("(\\." + effect + "\\.active\\s*\\{[^}]*transition:\\s*)([\\d\\.]+)s", "i");
+            // Bloğu tam olarak yakalıyoruz.
+            const blockRegex = new RegExp(`(\\.${effect}\\.active[^\\{]*\\{)([^}]*)(\\})`, "i");
             
-            if (regex.test(indexHtmlContent)) {
-                indexHtmlContent = indexHtmlContent.replace(regex, `$1${duration}s`);
+            if (blockRegex.test(indexHtmlContent)) {
+                indexHtmlContent = indexHtmlContent.replace(blockRegex, function(fullMatch, p1, p2, p3) {
+                    let updatedInner = p2;
+                    // Eğer transition özelliği varsa sadece sayıyı değiştiriyoruz
+                    if (/transition:/i.test(p2)) {
+                        updatedInner = p2.replace(/(transition:[^;]*?)([\d\.]+)(s|ms)/gi, `$1${duration}$3`);
+                    } else {
+                        // Eğer transition özelliği yoksa yeni ekliyoruz
+                        updatedInner = p2 + `transition: ${duration}s;`;
+                    }
+                    return p1 + updatedInner + p3;
+                });
             } else {
-                alert(`Uyarı: '${effect}' efekti için geçerli bir CSS transition kuralı index.html içinde bulunamadı.`);
+                alert(`Uyarı: '${effect}' efekti için geçerli bir CSS kuralı (.${effect}.active) index.html dosyasında bulunamadı!`);
                 st.style.display="none";
                 return;
             }
@@ -470,7 +488,7 @@
             }
             setTimeout(() => st.style.display="none", 2000);
         } catch(e) {
-            alert("index.html kaydedilemedi."); st.style.display="none";
+            alert("index.html kaydedilirken bağlantı hatası oluştu."); st.style.display="none";
         }
     };
 
@@ -508,7 +526,7 @@
             const res = await fetch(WORKER_URL, { 
                 method: "PUT", 
                 headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": fileName }, 
-                body: JSON.stringify({message: "Pro Studio Ultimate Fix V41", content: b64, sha: SHA_KEY}) 
+                body: JSON.stringify({message: "Pro Studio Ultimate Fix V42", content: b64, sha: SHA_KEY}) 
             });
             
             if(res.ok) { 
