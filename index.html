@@ -598,9 +598,9 @@
         t.id = "txt_" + Date.now(); t.setAttribute("class", "duzenlenebilir"); 
         t.setAttribute("x", center.cx); t.setAttribute("y", center.cy); 
         t.setAttribute("text-anchor", "middle"); t.setAttribute("dominant-baseline", "central"); 
-        window.setD(t, 'base-font-size', "80"); window.setD(t, 'raw-text', "YENİ METİN"); 
+        window.setD(t, 'base-font-size', "60"); window.setD(t, 'raw-text', "YENİ METİN"); 
         window.setD(t, 'solid-color', "#000000"); t.setAttribute("fill", "#000000"); 
-        t.setAttribute("font-size", "80"); t.setAttribute("font-family", "sans-serif"); t.textContent = "YENİ METİN";
+        t.setAttribute("font-size", "60"); t.setAttribute("font-family", "sans-serif"); t.textContent = "YENİ METİN";
         svg.appendChild(t); selectedEl = t; window.saveState(); window.setupLayers(); window.updateEditorUI(t); window.renderEditor();
     };
     
@@ -653,6 +653,14 @@
         const el = document.getElementById(id); if(!el) return;
         window.setD(el, key, val);
         
+        // ÖNEMLİ DÜZELTME: Metin içeriği değiştiğinde zorunlu yatay sündürmeyi iptal et.
+        if (key === 'raw-text') {
+            el.removeAttribute('textLength');
+            el.removeAttribute('lengthAdjust');
+            const tp = el.querySelector('textPath');
+            if (tp) { tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust'); }
+        }
+
         if(key === 'curve' || key === 'raw-text' || key === 'letter-spacing' || key === 'max-width' || key === 'max-height') { 
             if(key === 'letter-spacing') el.setAttribute('letter-spacing', val); 
             window.applyTextCurve(el); 
@@ -953,12 +961,27 @@
                 
                 window.setD(el, 'max-width', Math.max(10, rw - 40)); 
                 window.setD(el, 'max-height', Math.max(10, rh - 40)); // Yükseklik de otomatik ayarlanıyor
+                
+                // Kutuya sabitliyken esnetmeyi iptal edip sadece orantılı küçültmeye izin veriyoruz
+                el.removeAttribute('textLength');
+                el.removeAttribute('lengthAdjust');
+                const tp = el.querySelector('textPath');
+                if (tp) { tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust'); }
             }
         }
 
         const mw = parseFloat(window.getD(el, 'max-width')) || 0; 
         const mh = parseFloat(window.getD(el, 'max-height')) || 0; 
         const baseFs = parseFloat(window.getD(el, 'base-font-size')) || 60; 
+        
+        // Sığdırma işlemi varsa esnetmeyi her ihtimale karşı iptal ediyoruz (Standart görünüm için)
+        if (mw > 0 || mh > 0) {
+            el.removeAttribute('textLength');
+            el.removeAttribute('lengthAdjust');
+            const tp = el.querySelector('textPath');
+            if (tp) { tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust'); }
+        }
+
         el.style.fontSize = baseFs + "px"; el.setAttribute("font-size", baseFs); 
         
         if (mw > 0 || mh > 0) { 
@@ -1349,7 +1372,7 @@
                 
                 if(isText) { 
                     w = Math.round(parseFloat(el.getAttribute("textLength")) || bbox.width || 0); 
-                    h = Math.round(parseFloat(window.getD(el, "base-font-size")) || 80); 
+                    h = Math.round(parseFloat(window.getD(el, "base-font-size")) || 60); 
                 } else { 
                     w = Math.round(parseFloat(el.getAttribute("width")) || bbox.width || 0); 
                     h = Math.round(parseFloat(el.getAttribute("height")) || bbox.height || 0); 
@@ -1366,12 +1389,12 @@
                         <input type="range" min="-1000" max="3000" value="${y}" style="flex:1;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${y}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
                     </div>
-                    <div class="label-row"><span class="label-text">GENİŞLİK (W)</span><span class="value-badge" id="val-w-${id}">${w}px</span></div>
+                    <div class="label-row"><span class="label-text">${isText ? 'GENİŞLİK (ESNETME W)' : 'GENİŞLİK (W)'}</span><span class="value-badge" id="val-w-${id}">${w}px</span></div>
                     <div style="display:flex; gap:10px; margin-bottom:15px;">
                         <input type="range" min="1" max="2500" value="${w}" style="flex:1;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${w}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
                     </div>
-                    <div class="label-row"><span class="label-text">YÜKSEKLİK (H)</span><span class="value-badge" id="val-h-${id}">${h}px</span></div>
+                    <div class="label-row"><span class="label-text">${isText ? 'YAZI PUNTO (H)' : 'YÜKSEKLİK (H)'}</span><span class="value-badge" id="val-h-${id}">${h}px</span></div>
                     <div style="display:flex; gap:10px;">
                         <input type="range" min="1" max="2500" value="${h}" style="flex:1;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${h}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
@@ -1404,7 +1427,11 @@
                         <button class="action-btn ${tAlign==='middle'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'middle')">↔</button>
                         <button class="action-btn ${tAlign==='end'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'end')">⇥</button>
                     </div>
-                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Temizle</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
+                    <div class="action-row" style="margin-bottom:15px;">
+                        <button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Stil Temizle</button>
+                        <button class="action-btn special" onclick="document.getElementById('${id}').removeAttribute('textLength'); document.getElementById('${id}').removeAttribute('lengthAdjust'); window.autoFitText(document.getElementById('${id}')); window.saveState(); window.renderProperties();">📏 ESNETMEYİ SIFIRLA (STANDART YAP)</button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
                     
                     <div class="label-row"><span class="label-text">EĞRİLİK (KAVİS)</span><span class="value-badge" id="val-curve-${id}">${curve}</span></div>
                     <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
