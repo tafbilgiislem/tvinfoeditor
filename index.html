@@ -11,7 +11,7 @@
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:#fff;font-family:'Inter', 'Roboto', sans-serif;overscroll-behavior-y:none}
         
-        /* ÖZEL KAYDIRMA ÇUBUKLARI (Custom Scrollbar) */
+        /* ÖZEL KAYDIRMA ÇUBUKLARI */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
@@ -71,6 +71,7 @@
         .handle-rotate{stroke:var(--handle-rotate);cursor:crosshair;fill:var(--handle-rotate)}
         .handle-radius{stroke:var(--handle-radius);cursor:ns-resize;fill:var(--handle-radius)}
         .snap-line{stroke:#ec4899;stroke-width:1.5;stroke-dasharray:4,4;pointer-events:none;z-index:60}
+        .snap-text{fill:#ec4899; font-size:10px; font-family:monospace; font-weight:bold; pointer-events:none; z-index:61;}
         .guide-line{stroke:#06b6d4;stroke-width:3;stroke-dasharray:8,4;cursor:grab;pointer-events:all}
         
         input[type="range"]{width:100%;accent-color:var(--accent);height:6px;cursor:pointer;margin:0}
@@ -113,7 +114,7 @@
         
         #status-bar{position:absolute;bottom:0;left:0;width:100%;height:25px;background:#0f172a;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:11px;color:#94a3b8;z-index:400;font-family:monospace}
         
-        /* TOAST BİLDİRİM SİSTEMİ (MODERN) */
+        /* TOAST BİLDİRİM SİSTEMİ */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events:none;}
         .toast { background: var(--panel); border: 1px solid var(--border); color: #fff; padding: 14px 24px; border-radius: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); transform: translateX(120%); animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; font-size: 13px; font-weight: 700; transition: all 0.3s ease;}
         .toast.success i { color: var(--accent); font-size: 22px; }
@@ -131,6 +132,13 @@
         .swatch-container{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
         .color-swatch{width:26px;height:26px;border-radius:6px;cursor:pointer;border:1px solid var(--border);transition:transform .1s}
         .color-swatch:hover{transform:scale(1.2);border-color:#fff; z-index:2;}
+
+        /* İKON KÜTÜPHANESİ GRİDİ */
+        .icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto; padding-right: 5px;}
+        .icon-item { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .icon-item svg { width: 24px; height: 24px; fill: var(--accent); }
+        .icon-item:hover { background: var(--accent); border-color: var(--accent); }
+        .icon-item:hover svg { fill: #fff; }
         
         @media (max-width:1023px){#app-container{flex-direction:column}#sidebar{width:100%;height:50%;border-top:1px solid var(--border);border-left:none;order:2}#main-view{width:100%;height:50%;order:1;padding-left:0;padding-top:0;}#zoom-container{margin:0;width:100%;height:100%;}.floating-tools{bottom:auto;top:10px;left:50%;transform:translateX(-50%)}}
     </style>
@@ -242,7 +250,45 @@
                 <option value="kampanya.svg">Kampanya (kampanya.svg)</option>
                 <option value="duyuru.svg">Duyuru (duyuru.svg)</option>
             </select>
+
+            <details style="margin-bottom: 10px;" open>
+                <summary style="font-size:11px; font-weight:bold; color:#38bdf8; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-shapes" style="font-size:14px;"></i> HAZIR İKON KÜTÜPHANESİ</summary>
+                <div class="group-box" style="margin-top:5px;">
+                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Tek tıkla sahneye vektörel ikon ekleyin.</div>
+                    <div class="icon-grid" id="icon-library-grid">
+                        </div>
+                </div>
+            </details>
             
+            <details style="margin-bottom: 10px;" open>
+                <summary style="font-size:11px; font-weight:bold; color:#8b5cf6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-paint-brush" style="font-size:14px;"></i> NESNE EKLE & ARAÇLAR</summary>
+                <div class="group-box" style="margin-top:5px; margin-bottom:5px;">
+                    <div class="action-row" style="margin-bottom:0;">
+                        <button onclick="window.addNewText()" class="action-btn" style="background:#475569;"><i class="ph ph-text-t"></i> YAZI</button>
+                        <button onclick="document.getElementById('img-in').click()" class="action-btn" style="background:#475569;" title="Sürükle-Bırak da Yapabilirsiniz"><i class="ph ph-image-square"></i> RESİM</button>
+                        <button onclick="window.addShape('rect')" class="action-btn" style="background:#475569;"><i class="ph ph-square"></i> KARE</button>
+                        <button id="btn-draw" onclick="window.toggleDrawMode()" class="action-btn draw" style="background:#8b5cf6;" title="Fırça Aracı"><i class="ph ph-pencil-simple"></i> ÇİZİM</button>
+                    </div>
+                </div>
+            </details>
+
+            <details style="margin-bottom: 10px;">
+                <summary style="font-size:11px; font-weight:bold; color:var(--accent); cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-frame-corners" style="font-size:14px;"></i> TUVAL AYARLARI</summary>
+                <div class="group-box" style="margin-top:5px;">
+                    <div style="display:flex; gap:10px; align-items: center; margin-bottom:10px;">
+                        <input type="number" id="canvas-w" placeholder="Genişlik" onchange="window.updateCanvasSize()">
+                        <span style="color:#64748b;"><i class="ph ph-x"></i></span>
+                        <input type="number" id="canvas-h" placeholder="Yükseklik" onchange="window.updateCanvasSize()">
+                        <input type="color" id="canvas-bg-color" title="Arka Plan Rengi" oninput="window.updateCanvasBg()" style="width:40px; height:35px; cursor:pointer; border:none; background:none;">
+                    </div>
+                    <div class="action-row" style="margin:0;">
+                        <button onclick="window.addGuide('h')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-horizontal"></i> YATAY</button>
+                        <button onclick="window.addGuide('v')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-vertical"></i> DİKEY</button>
+                        <button onclick="window.clearGuides()" class="action-btn" style="background:#ef4444; font-size:11px;"><i class="ph ph-trash"></i> TEMİZLE</button>
+                    </div>
+                </div>
+            </details>
+
             <details style="margin-bottom: 10px;">
                 <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-film-script" style="font-size:14px;"></i> SEÇİLİ SLAYT AYARLARI (JSON)</summary>
                 <div class="group-box" style="margin-top:5px;">
@@ -268,58 +314,6 @@
             </details>
 
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-globe" style="font-size:14px;"></i> İNDEX.HTML EFEKT AYARLARI</summary>
-                <div class="group-box" style="margin-top:5px;">
-                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">index.html dosyasındaki CSS geçiş (.active) sürelerini düzenler.</div>
-                    <div class="input-group" style="margin-bottom:10px;">
-                        <span class="label-text">EFEKT SEÇİMİ</span>
-                        <select id="html-effect-select" class="font-select" onchange="window.updateHtmlEffectUI()">
-                            <option value="fade">Fade (Yumuşak Geçiş)</option>
-                            <option value="slide">Slide (Kaydırma)</option>
-                            <option value="zoom">Zoom (Yakınlaştırma)</option>
-                            <option value="cube">Cube (3D Küp)</option>
-                            <option value="coverflow">Coverflow (3D Galeri)</option>
-                            <option value="flip">Flip (Kart Çevirme)</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="margin-bottom:10px;">
-                        <span class="label-text">GEÇİŞ SÜRESİ (Saniye / "1.5" gibi)</span>
-                        <input type="number" step="0.1" id="html-effect-duration" value="1.5">
-                    </div>
-                    <button class="action-btn" style="width:100%; background:#10b981; color:white;" onclick="window.saveHtmlSettings()"><i class="ph ph-code"></i> İNDEX.HTML'E KAYDET</button>
-                </div>
-            </details>
-
-            <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:var(--accent); cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-frame-corners" style="font-size:14px;"></i> TUVAL AYARLARI</summary>
-                <div class="group-box" style="margin-top:5px;">
-                    <div style="display:flex; gap:10px; align-items: center; margin-bottom:10px;">
-                        <input type="number" id="canvas-w" placeholder="Genişlik" onchange="window.updateCanvasSize()">
-                        <span style="color:#64748b;"><i class="ph ph-x"></i></span>
-                        <input type="number" id="canvas-h" placeholder="Yükseklik" onchange="window.updateCanvasSize()">
-                        <input type="color" id="canvas-bg-color" title="Arka Plan Rengi" oninput="window.updateCanvasBg()" style="width:40px; height:35px; cursor:pointer; border:none; background:none;">
-                    </div>
-                    <div class="action-row" style="margin:0;">
-                        <button onclick="window.addGuide('h')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-horizontal"></i> YATAY</button>
-                        <button onclick="window.addGuide('v')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-vertical"></i> DİKEY</button>
-                        <button onclick="window.clearGuides()" class="action-btn" style="background:#ef4444; font-size:11px;"><i class="ph ph-trash"></i> TEMİZLE</button>
-                    </div>
-                </div>
-            </details>
-            
-            <details style="margin-bottom: 10px;" open>
-                <summary style="font-size:11px; font-weight:bold; color:#8b5cf6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-paint-brush" style="font-size:14px;"></i> NESNE EKLE & ARAÇLAR</summary>
-                <div class="group-box" style="margin-top:5px; margin-bottom:5px;">
-                    <div class="action-row" style="margin-bottom:0;">
-                        <button onclick="window.addNewText()" class="action-btn" style="background:#475569;"><i class="ph ph-text-t"></i> YAZI</button>
-                        <button onclick="document.getElementById('img-in').click()" class="action-btn" style="background:#475569;" title="Sürükle-Bırak da Yapabilirsiniz"><i class="ph ph-image-square"></i> RESİM</button>
-                        <button onclick="window.addShape('rect')" class="action-btn" style="background:#475569;"><i class="ph ph-square"></i> KARE</button>
-                        <button id="btn-draw" onclick="window.toggleDrawMode()" class="action-btn draw" style="background:#8b5cf6;" title="Fırça Aracı"><i class="ph ph-pencil-simple"></i> ÇİZİM</button>
-                    </div>
-                </div>
-            </details>
-
-            <details style="margin-bottom: 10px;" open id="auto-text-panel">
                 <summary style="font-size:11px; font-weight:bold; color:#f472b6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-lightning" style="font-size:14px;"></i> OTOMATİK METİN YERLEŞTİRME</summary>
                 <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 12px; border: 1px solid var(--border);">
                     <div id="auto-fields-list">
@@ -354,7 +348,7 @@
     let SHA_KEY = "", SESSION_PASS = "", settingsData = [], settingsSha = "";
     let indexHtmlContent = "", indexHtmlSha = "";
 
-    // MODERN TOAST BİLDİRİM SİSTEMİ
+    // TOAST BİLDİRİM
     window.showToast = function(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         if(!container) return;
@@ -390,22 +384,59 @@
 
     window.updateEditorUI = null;
 
-    // GENİŞLETİLMİŞ FONT KÜTÜPHANESİ
+    // FONT KÜTÜPHANESİ
     const googleFonts = [
-        { name: "Varsayılan", val: "sans-serif" },
-        { name: "Roboto", val: "'Roboto', sans-serif" },
-        { name: "Montserrat", val: "'Montserrat', sans-serif" },
-        { name: "Poppins", val: "'Poppins', sans-serif" },
-        { name: "Open Sans", val: "'Open Sans', sans-serif" },
-        { name: "Lato", val: "'Lato', sans-serif" },
-        { name: "Merriweather", val: "'Merriweather', serif" },
-        { name: "Nunito", val: "'Nunito', sans-serif" },
-        { name: "Oswald", val: "'Oswald', sans-serif" },
-        { name: "Pacifico", val: "'Pacifico', cursive" },
-        { name: "Playfair Display", val: "'Playfair Display', serif" },
-        { name: "Raleway", val: "'Raleway', sans-serif" },
-        { name: "Ubuntu", val: "'Ubuntu', sans-serif" }
+        { name: "Varsayılan", val: "sans-serif" }, { name: "Roboto", val: "'Roboto', sans-serif" }, { name: "Montserrat", val: "'Montserrat', sans-serif" }, { name: "Poppins", val: "'Poppins', sans-serif" }, { name: "Open Sans", val: "'Open Sans', sans-serif" }, { name: "Lato", val: "'Lato', sans-serif" }, { name: "Merriweather", val: "'Merriweather', serif" }, { name: "Nunito", val: "'Nunito', sans-serif" }, { name: "Oswald", val: "'Oswald', sans-serif" }, { name: "Pacifico", val: "'Pacifico', cursive" }, { name: "Playfair Display", val: "'Playfair Display', serif" }, { name: "Raleway", val: "'Raleway', sans-serif" }, { name: "Ubuntu", val: "'Ubuntu', sans-serif" }
     ];
+
+    // HAZIR İKON ARŞİVİ (Vektörel Yollar)
+    const iconDictionary = {
+        "star": "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
+        "heart": "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+        "user": "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
+        "check-circle": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
+        "info": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z",
+        "warning": "M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z",
+        "lightning": "M7 21h2l1-7h5l-8 10v-5H5l3-8z",
+        "bell": "M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z",
+        "shopping-cart": "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z",
+        "camera": "M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z",
+        "location": "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+    };
+
+    window.renderIconPanel = function() {
+        const grid = document.getElementById('icon-library-grid');
+        if(!grid) return;
+        grid.innerHTML = "";
+        Object.keys(iconDictionary).forEach(key => {
+            const div = document.createElement('div');
+            div.className = "icon-item";
+            div.title = key;
+            div.innerHTML = `<svg viewBox="0 0 24 24"><path d="${iconDictionary[key]}"></path></svg>`;
+            div.onclick = () => window.addReadyIcon(key);
+            grid.appendChild(div);
+        });
+    };
+
+    window.addReadyIcon = function(key) {
+        const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; 
+        const center = window.getCanvasCenter();
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.id = "icon_" + Date.now(); g.setAttribute("class", "duzenlenebilir"); 
+        
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", iconDictionary[key]);
+        path.setAttribute("fill", "#10b981");
+        
+        // Ortala ve Büyüt
+        g.setAttribute("transform", `translate(${center.cx - 50}, ${center.cy - 50}) scale(4)`);
+        window.setD(g, 'solid-color', "#10b981");
+        
+        g.appendChild(path);
+        svg.appendChild(g); selectedEl = g; 
+        window.saveState(); window.setupLayers(); window.updateEditorUI(g); window.renderEditor();
+        window.showToast("İkon Eklendi!");
+    };
 
     window.getCanvasCenter = function() {
         const svg = document.querySelector('#canvas-inner svg');
@@ -423,12 +454,13 @@
         await window.loadSettings();
         await window.loadIndexHtml();
         await window.loadSlide();    
+        window.renderIconPanel();
     };
     
     document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.login(); });
     document.getElementById('file-selector').addEventListener('change', async () => { await window.loadSlide(); window.updateSettingsUI(); });
 
-    // --- Otomatik Metin Yerleştirme Modülü ---
+    // --- Otomatik Metin Modülü ---
     window.refreshAutoTextFields = function() {
         const list = document.getElementById('auto-fields-list');
         const svg = document.querySelector('#canvas-inner svg');
@@ -515,19 +547,18 @@
             const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
             if(putRes.ok) { 
                 try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
-                window.showToast("Ayar JSON Başarıyla Kaydedildi!");
+                window.showToast("Slayt Ayarı Kaydedildi!");
             } else { window.showToast("Ayar Kayıt Hatası!", "error"); }
         } catch (e) { window.showToast("Ayarlar kaydedilemedi.", "error"); }
     };
 
-    // --- Index HTML (Efekt) Modülü ---
     window.loadIndexHtml = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
             if (res.ok) {
                 const data = await res.json();
                 indexHtmlSha = data.sha || (data.content && data.content.sha) || "";
-                indexHtmlContent = decodeURIComponent(escape(atob(data.content)));
+                indexHtmlContent = decodeURIComponent(escape(atob(data.content))));
                 window.updateHtmlEffectUI();
             } else { console.error("index.html yüklenemedi."); }
         } catch (e) { console.error("index.html bağlantı hatası", e); }
@@ -538,18 +569,15 @@
         const effect = document.getElementById('html-effect-select').value;
         const blockRegex = new RegExp(`\\.${effect}\\.active[^\\{]*\\{([^}]*)\\}`, "i");
         const match = indexHtmlContent.match(blockRegex);
-        
         if (match && match[1]) {
             const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
-            if (transMatch && transMatch[1]) {
-                document.getElementById('html-effect-duration').value = transMatch[1];
-            } else { document.getElementById('html-effect-duration').value = "1.5"; }
+            if (transMatch && transMatch[1]) { document.getElementById('html-effect-duration').value = transMatch[1]; } 
+            else { document.getElementById('html-effect-duration').value = "1.5"; }
         } else { document.getElementById('html-effect-duration').value = "1.5"; }
     };
 
     window.saveHtmlSettings = async function() {
-        if(!indexHtmlContent) { window.showToast("index.html içeriği okunamadı. Sayfayı yenileyin.", "error"); return; }
-        
+        if(!indexHtmlContent) { window.showToast("index.html okunamadı. Sayfayı yenileyin.", "error"); return; }
         try {
             const effect = document.getElementById('html-effect-select').value;
             const duration = document.getElementById('html-effect-duration').value;
@@ -562,7 +590,7 @@
                     else { updatedInner = p2 + `transition: ${duration}s;`; }
                     return p1 + updatedInner + p3;
                 });
-            } else { window.showToast(`'${effect}' için CSS kuralı bulunamadı!`, "error"); return; }
+            } else { window.showToast(`'${effect}' kuralı bulunamadı!`, "error"); return; }
 
             const b64 = btoa(unescape(encodeURIComponent(indexHtmlContent)));
             const putRes = await fetch(WORKER_URL, {
@@ -573,12 +601,11 @@
 
             if(putRes.ok) {
                 try { const data = await putRes.json(); indexHtmlSha = data.content?.sha || data.sha || indexHtmlSha; } catch(e) {}
-                window.showToast("İndex.html Başarıyla Güncellendi!");
-            } else { window.showToast("İndex.html Kayıt Hatası!", "error"); }
-        } catch(e) { window.showToast("index.html kaydedilirken hata oluştu.", "error"); }
+                window.showToast("İndex.html Güncellendi!");
+            } else { window.showToast("Kayıt Hatası!", "error"); }
+        } catch(e) { window.showToast("Hata oluştu.", "error"); }
     };
 
-    // --- Slayt ve Çizim Modülleri ---
     window.loadSlide = async function() {
         const file = document.getElementById('file-selector').value;
         try {
@@ -593,13 +620,12 @@
             }
             historyStack = []; historyIndex = -1;
             setTimeout(() => { window.setupLayers(); window.initCanvasSettings(); window.resetZoom(); window.saveState(); }, 200);
-            window.showToast("Slayt Yüklendi!");
-        } catch(e) { window.showToast("Sunucuya Bağlanılamadı!", "error"); document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
+            window.showToast("Tuval Yüklendi!");
+        } catch(e) { window.showToast("Bağlantı Hatası!", "error"); document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
     };
 
     window.saveData = async function() {
         if (!WORKER_URL || WORKER_URL === "") { window.showToast("Worker URL Eksik!", "error"); return; }
-        
         try {
             document.getElementById('control-layer').innerHTML = ""; window.hideGuides(true);
             const svgText = new XMLSerializer().serializeToString(document.querySelector('#canvas-inner svg')); 
@@ -614,11 +640,8 @@
             });
             
             if(res.ok) { 
-                try {
-                    const data = await res.json();
-                    SHA_KEY = data.content?.sha || data.sha || SHA_KEY;
-                } catch(err) {}
-                window.showToast("Tuval Başarıyla Kaydedildi!");
+                try { const data = await res.json(); SHA_KEY = data.content?.sha || data.sha || SHA_KEY; } catch(err) {}
+                window.showToast("Tasarım Başarıyla Kaydedildi!");
                 const now = new Date(); document.getElementById('status-time').innerText = `Son Kayıt: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`; 
             } else { window.showToast("Tuval Kayıt Hatası!", "error"); }
             if(selectedEl && window.updateEditorUI) window.updateEditorUI(selectedEl);
@@ -697,12 +720,13 @@
             if(key === 'letter-spacing') el.setAttribute('letter-spacing', val); 
             window.applyTextCurve(el); 
         }
-        if(key === 'rx' || key === 'mask-shape') window.applyShapeMask(el);
+        // Gelişmiş Kırpma Tetikleyicisi
+        if(key === 'rx' || key === 'mask-shape' || key.startsWith('crop')) window.applyShapeMask(el);
         if(key === 'angle') window.applyTransforms(el);
         
         if (elUI) {
             const badge = document.getElementById('val-' + key + '-' + id);
-            if (badge) badge.innerText = val + (key === 'angle' ? '°' : (key === 'curve' ? '' : 'px'));
+            if (badge) badge.innerText = val + (key === 'angle' ? '°' : (key === 'curve' ? '' : (key.startsWith('crop') ? '%' : 'px')));
             if (elUI.type === 'range' && elUI.nextElementSibling && elUI.nextElementSibling.type === 'number') elUI.nextElementSibling.value = val;
             else if (elUI.type === 'number' && elUI.previousElementSibling && elUI.previousElementSibling.type === 'range') elUI.previousElementSibling.value = val;
         }
@@ -788,7 +812,7 @@
             const blob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"}); const url = URL.createObjectURL(blob);
             const a = document.createElement("a"); a.download = "tasarim_vektor.svg"; a.href = url; a.click(); finishExport();
         }
-        function finishExport() { svg.setAttribute('width', originalWidth || "100%"); svg.setAttribute('height', originalHeight || "100%"); hiddenElements.forEach(item => item.el.style.display = item.display); window.hideGuides(false); if(selectedEl) window.updateEditorUI(selectedEl); }
+        function finishExport() { svg.setAttribute('width', originalWidth || "100%"); svg.setAttribute('height', originalHeight || "100%"); hiddenElements.forEach(item => item.el.style.display = item.display); window.hideGuides(false); if(selectedEl) window.updateEditorUI(selectedEl); window.showToast("İndirme Başarılı!");}
     };
 
     window.updateRulers = function() {
@@ -888,9 +912,9 @@
             if (e.key === 'ArrowUp') { y -= step; moved = true; } if (e.key === 'ArrowDown') { y += step; moved = true; } if (e.key === 'ArrowLeft') { x -= step; moved = true; } if (e.key === 'ArrowRight') { x += step; moved = true; }
             if (moved) { e.preventDefault(); selectedEl.setAttribute("x", x); selectedEl.setAttribute("y", y); if(selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') window.applyShapeMask(selectedEl); if(selectedEl.tagName === 'text') window.applyTextCurve(selectedEl); if(window.updateEditorUI) window.updateEditorUI(selectedEl); isModified = true; }
             if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); selectedEl.remove(); document.getElementById('control-layer').innerHTML = ''; selectedEl = null; window.saveState(); window.renderEditor(); }
-            if (e.ctrlKey && e.key === 'c') { e.preventDefault(); clipboard = selectedEl.cloneNode(true); }
+            if (e.ctrlKey && e.key === 'c') { e.preventDefault(); clipboard = selectedEl.cloneNode(true); window.showToast("Kopyalandı");}
         }
-        if (e.ctrlKey && e.key === 'v' && clipboard) { e.preventDefault(); const clone = clipboard.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(clone.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(clone.getAttribute("y")) || 0) + 30); document.querySelector('#canvas-inner svg').appendChild(clone); selectedEl = clone; window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); }
+        if (e.ctrlKey && e.key === 'v' && clipboard) { e.preventDefault(); const clone = clipboard.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(clone.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(clone.getAttribute("y")) || 0) + 30); document.querySelector('#canvas-inner svg').appendChild(clone); selectedEl = clone; window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); window.showToast("Yapıştırıldı");}
     });
     
     document.addEventListener('keyup', (e) => { 
@@ -938,12 +962,7 @@
 
     window.toggleVisibility = function(id) {
         const el = document.getElementById(id); if(!el) return;
-        if (el.getAttribute('visibility') === 'hidden') {
-            el.removeAttribute('visibility');
-        } else {
-            el.setAttribute('visibility', 'hidden');
-            if (selectedEl === el) { selectedEl = null; document.getElementById('control-layer').innerHTML = ""; }
-        }
+        if (el.getAttribute('visibility') === 'hidden') { el.removeAttribute('visibility'); } else { el.setAttribute('visibility', 'hidden'); if (selectedEl === el) { selectedEl = null; document.getElementById('control-layer').innerHTML = ""; } }
         window.saveState(); window.renderEditor();
     };
 
@@ -977,7 +996,6 @@
     window.autoFitText = function(el) { 
         if (el.tagName !== 'text') return; 
         
-        // --- Kutuya Sabitleme (Bounding Box) Mantığı ---
         const boundRectId = window.getD(el, 'bound-rect');
         if (boundRectId) {
             const rect = document.getElementById(boundRectId);
@@ -1017,16 +1035,9 @@
         
         if (mw > 0 || mh > 0) { 
             let bbox = {width:0, height:0}; try { bbox = el.getBBox(); } catch(e){} 
-            let scaleW = 1;
-            let scaleH = 1;
-            
-            if (mw > 0 && bbox.width > mw && bbox.width > 0) { 
-                scaleW = mw / bbox.width;
-            }
-            if (mh > 0 && bbox.height > mh && bbox.height > 0) {
-                scaleH = mh / bbox.height;
-            }
-            
+            let scaleW = 1; let scaleH = 1;
+            if (mw > 0 && bbox.width > mw && bbox.width > 0) scaleW = mw / bbox.width;
+            if (mh > 0 && bbox.height > mh && bbox.height > 0) scaleH = mh / bbox.height;
             const finalScale = Math.min(scaleW, scaleH);
             if(finalScale < 1) {
                 const newFs = baseFs * finalScale; 
@@ -1066,10 +1077,24 @@
 
     window.describeRoundedRect = function(r, s, x, y, w, h) { if (r <= 0) return `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`; r = Math.min(r, w / 2, h / 2); const kappa = (4 * (r * (1 - s)) * Math.tan(Math.PI / 4)) / 3; const pts = [ [x + r, y], [x + w - r, y], [x + w, y + r], [x + w, y + h - r], [x + w - r, y + h], [x + r, y + h], [x, y + h - r], [x, y + r] ]; return `M ${pts[0][0]} ${pts[0][1]} L ${pts[1][0]} ${pts[1][1]} C ${pts[1][0] + kappa} ${pts[1][1]} ${pts[2][0]} ${pts[2][1] - kappa} ${pts[2][0]} ${pts[2][1]} L ${pts[3][0]} ${pts[3][1]} C ${pts[3][0]} ${pts[3][1] + kappa} ${pts[4][0] + kappa} ${pts[4][1]} ${pts[4][0]} ${pts[4][1]} L ${pts[5][0]} ${pts[5][1]} C ${pts[5][0] - kappa} ${pts[5][1]} ${pts[6][0]} ${pts[6][1] + kappa} ${pts[6][0]} ${pts[6][1]} L ${pts[7][0]} ${pts[7][1]} C ${pts[7][0]} ${pts[7][1] - kappa} ${pts[0][0] - kappa} ${pts[0][1]} ${pts[0][0]} ${pts[0][1]} Z`; };
     
+    // GELİŞMİŞ KIRPMA VE MASKELEME MANTIĞI
     window.applyShapeMask = function(el) { 
         if (el.tagName !== 'image' && el.tagName !== 'rect') return; if (!window.getD(el, 'mask-shape') || window.getD(el, 'mask-shape') === "none") { el.removeAttribute("clip-path"); return; }
         const shape = window.getD(el, 'mask-shape'); const x = parseFloat(el.getAttribute('x')) || 0, y = parseFloat(el.getAttribute('y')) || 0, w = parseFloat(el.getAttribute('width')) || 0, h = parseFloat(el.getAttribute('height')) || 0; if(w === 0 || h === 0) return; let d = "";
-        if (shape === 'circle') { const cx = x+w/2, cy = y+h/2, r = Math.min(w,h)/2; d = `M ${cx-r},${cy} A ${r},${r} 0 1,0 ${cx+r},${cy} A ${r},${r} 0 1,0 ${cx-r},${cy} Z`; } else if (shape === 'triangle') { d = `M ${x+w/2},${y} L ${x+w},${y+h} L ${x},${y+h} Z`; } else if (shape === 'star') { const cx = x+w/2, cy = y+h/2, outerR = Math.min(w,h)/2, innerR = outerR/2.5; for(let i=0; i<10; i++) { let r = i%2===0 ? outerR : innerR; let angle = (Math.PI/2) - (i * Math.PI/5); d += (i===0 ? "M " : " L ") + (cx + Math.cos(angle)*r) + "," + (cy - Math.sin(angle)*r); } d += " Z"; } else { let rx = parseFloat(window.getD(el, 'rx')) || 0; let sm = parseFloat(window.getD(el, 'smoothing')); if (isNaN(sm)) sm = 0.5; d = window.describeRoundedRect(rx, sm, x, y, w, h); }
+        
+        if (shape === 'crop') {
+            // Yüzdelik Kırpma Hesaplaması
+            const ct = (parseFloat(window.getD(el, 'crop-t')) || 0) * h / 100;
+            const cb = (parseFloat(window.getD(el, 'crop-b')) || 0) * h / 100;
+            const cl = (parseFloat(window.getD(el, 'crop-l')) || 0) * w / 100;
+            const cr = (parseFloat(window.getD(el, 'crop-r')) || 0) * w / 100;
+            d = `M ${x + cl} ${y + ct} H ${x + w - cr} V ${y + h - cb} H ${x + cl} Z`;
+        } 
+        else if (shape === 'circle') { const cx = x+w/2, cy = y+h/2, r = Math.min(w,h)/2; d = `M ${cx-r},${cy} A ${r},${r} 0 1,0 ${cx+r},${cy} A ${r},${r} 0 1,0 ${cx-r},${cy} Z`; } 
+        else if (shape === 'triangle') { d = `M ${x+w/2},${y} L ${x+w},${y+h} L ${x},${y+h} Z`; } 
+        else if (shape === 'star') { const cx = x+w/2, cy = y+h/2, outerR = Math.min(w,h)/2, innerR = outerR/2.5; for(let i=0; i<10; i++) { let r = i%2===0 ? outerR : innerR; let angle = (Math.PI/2) - (i * Math.PI/5); d += (i===0 ? "M " : " L ") + (cx + Math.cos(angle)*r) + "," + (cy - Math.sin(angle)*r); } d += " Z"; } 
+        else { let rx = parseFloat(window.getD(el, 'rx')) || 0; let sm = parseFloat(window.getD(el, 'smoothing')); if (isNaN(sm)) sm = 0.5; d = window.describeRoundedRect(rx, sm, x, y, w, h); }
+        
         const svg = document.querySelector('#canvas-inner svg'); let defs = svg.querySelector('defs'); if (!defs) { defs = document.createElementNS("http://www.w3.org/2000/svg", "defs"); svg.prepend(defs); } const clipId = "clip_" + el.id; let clipPath = defs.querySelector("#" + clipId); if (!clipPath) { clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath"); clipPath.id = clipId; const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); clipPath.appendChild(path); defs.appendChild(clipPath); el.setAttribute("clip-path", `url(#${clipId})`); } clipPath.querySelector('path').setAttribute("d", d); 
     };
 
@@ -1142,7 +1167,7 @@
             if (selectedEl && window.getD(selectedEl, 'locked') === "true" && !resizingEl && !rotatingEl && !radiusingEl) return; 
             if(isDraggingElement || resizingEl || rotatingEl || radiusingEl) e.preventDefault(); 
             const dx = p.x - startP.x; const dy = p.y - startP.y;
-            let snapX = null, snapY = null; const snapTolerance = 15; 
+            let snapX = null, snapY = null; let distTextX = "", distTextY = ""; const snapTolerance = 15; 
             
             let w = 1920, h = 1080;
             if (svg.hasAttribute('viewBox')) { const vb = svg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
@@ -1189,10 +1214,11 @@
                 const elLeft = isTxt ? newX - bbox.width/2 : newX; const elRight = isTxt ? newX + bbox.width/2 : newX + bbox.width;
                 const elTop = isTxt ? newY - bbox.height/2 : newY; const elBottom = isTxt ? newY + bbox.height/2 : newY + bbox.height;
 
-                if (Math.abs(elCx - cx) < snapTolerance) { snapX = cx; newX = isTxt ? cx : cx - bbox.width / 2; }
-                if (Math.abs(elCy - cy) < snapTolerance) { snapY = cy; newY = isTxt ? cy : cy - bbox.height / 2; }
+                // AKILLI KILAVUZ (SMART GUIDES) MERKEZ
+                if (Math.abs(elCx - cx) < snapTolerance) { snapX = cx; newX = isTxt ? cx : cx - bbox.width / 2; distTextX = `${Math.round(cx)}px`; }
+                if (Math.abs(elCy - cy) < snapTolerance) { snapY = cy; newY = isTxt ? cy : cy - bbox.height / 2; distTextY = `${Math.round(cy)}px`; }
                 
-                document.querySelectorAll('.guide-line').forEach(g => { if (window.getD(g, 'type') === 'h') { const gy = parseFloat(g.getAttribute('y1')); if (Math.abs(elCy - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy : gy - bbox.height / 2; } else if (Math.abs(elTop - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy + bbox.height/2 : gy; } else if (Math.abs(elBottom - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy - bbox.height/2 : gy - bbox.height; } } else { const gx = parseFloat(g.getAttribute('x1')); if (Math.abs(elCx - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx : gx - bbox.width / 2; } else if (Math.abs(elLeft - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx + bbox.width/2 : gx; } else if (Math.abs(elRight - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx - bbox.width/2 : gx - bbox.width; } } });
+                document.querySelectorAll('.guide-line').forEach(g => { if (window.getD(g, 'type') === 'h') { const gy = parseFloat(g.getAttribute('y1')); if (Math.abs(elCy - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy : gy - bbox.height / 2; distTextY = `${Math.round(gy)}px`;} else if (Math.abs(elTop - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy + bbox.height/2 : gy; } else if (Math.abs(elBottom - gy) < snapTolerance) { snapY = gy; newY = isTxt ? gy - bbox.height/2 : gy - bbox.height; } } else { const gx = parseFloat(g.getAttribute('x1')); if (Math.abs(elCx - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx : gx - bbox.width / 2; distTextX = `${Math.round(gx)}px`;} else if (Math.abs(elLeft - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx + bbox.width/2 : gx; } else if (Math.abs(elRight - gx) < snapTolerance) { snapX = gx; newX = isTxt ? gx - bbox.width/2 : gx - bbox.width; } } });
 
                 Array.from(document.querySelectorAll('.duzenlenebilir')).filter(e => e !== selectedEl && window.getD(e, 'locked') !== "true").forEach(other => {
                     let oBBox = {x:0, y:0, width:0, height:0}; try { oBBox = other.getBBox(); } catch(e){ return; }
@@ -1202,11 +1228,12 @@
                     const oTop = oIsTxt ? oy - oBBox.height/2 : oy; const oBottom = oIsTxt ? oy + oBBox.height/2 : oy + oBBox.height;
                     const oCx = oLeft + oBBox.width/2; const oCy = oTop + oBBox.height/2;
 
-                    if (Math.abs(elCx - oCx) < snapTolerance) { snapX = oCx; newX = isTxt ? oCx : oCx - bbox.width/2; }
+                    // AKILLI KILAVUZ (SMART GUIDES) NESNELER ARASI
+                    if (Math.abs(elCx - oCx) < snapTolerance) { snapX = oCx; newX = isTxt ? oCx : oCx - bbox.width/2; distTextX = `Ortalandı`;}
                     else if (Math.abs(elLeft - oLeft) < snapTolerance) { snapX = oLeft; newX = isTxt ? oLeft + bbox.width/2 : oLeft; }
                     else if (Math.abs(elRight - oRight) < snapTolerance) { snapX = oRight; newX = isTxt ? oRight - bbox.width/2 : oRight - bbox.width; }
 
-                    if (Math.abs(elCy - oCy) < snapTolerance) { snapY = oCy; newY = isTxt ? oCy : oCy - bbox.height/2; }
+                    if (Math.abs(elCy - oCy) < snapTolerance) { snapY = oCy; newY = isTxt ? oCy : oCy - bbox.height/2; distTextY = `Ortalandı`;}
                     else if (Math.abs(elTop - oTop) < snapTolerance) { snapY = oTop; newY = isTxt ? oTop + bbox.height/2 : oTop; }
                     else if (Math.abs(elBottom - oBottom) < snapTolerance) { snapY = oBottom; newY = isTxt ? oBottom - bbox.height/2 : oBottom - bbox.height; }
                 });
@@ -1215,7 +1242,7 @@
                 if((selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') && window.getD(selectedEl, 'mask-shape') && window.getD(selectedEl, 'mask-shape') !== "none") window.applyShapeMask(selectedEl); 
                 if(selectedEl.tagName === 'text' && window.getD(selectedEl, 'curve')) window.applyTextCurve(selectedEl);
                 
-                window.updateUI(selectedEl, snapX, snapY);
+                window.updateUI(selectedEl, snapX, snapY, distTextX, distTextY);
                 if(selectedEl.tagName === 'rect' || selectedEl.tagName === 'image') {
                     document.querySelectorAll(`text[data-bound-rect="${selectedEl.id}"]`).forEach(txt => { window.autoFitText(txt); });
                 }
@@ -1232,11 +1259,12 @@
             if (isModified) { window.saveState(); if(selectedEl) window.renderProperties(); }
             resizingEl = null; rotatingEl = null; radiusingEl = null; activeHandle = null; isModified = false; 
             document.querySelectorAll('.snap-line').forEach(l=>l.remove()); 
+            document.querySelectorAll('.snap-text').forEach(t=>t.remove()); 
         };
         window.onpointerup = release; window.onpointercancel = release;
     };
 
-    window.updateUI = function(el, snapX=null, snapY=null) {
+    window.updateUI = function(el, snapX=null, snapY=null, distTextX="", distTextY="") {
         const ctrl = document.getElementById('control-layer');
         ctrl.innerHTML = ""; if(!el) return;
         let b = {x:0,y:0,width:0,height:0}; try { b = el.getBBox(); }catch(e){return;}
@@ -1247,8 +1275,19 @@
         let w = 1920, h = 1080;
         if (svg && svg.hasAttribute('viewBox')) { const vb = svg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
 
-        if (snapX !== null) { const lX = document.createElementNS("http://www.w3.org/2000/svg", "line"); lX.setAttribute("x1", snapX); lX.setAttribute("y1", 0); lX.setAttribute("x2", snapX); lX.setAttribute("y2", h); lX.classList.add("snap-line"); ctrl.appendChild(lX); }
-        if (snapY !== null) { const lY = document.createElementNS("http://www.w3.org/2000/svg", "line"); lY.setAttribute("x1", 0); lY.setAttribute("y1", snapY); lY.setAttribute("x2", w); lY.setAttribute("y2", snapY); lY.classList.add("snap-line"); ctrl.appendChild(lY); }
+        // AKILLI KILAVUZ (SMART GUIDES) GÖRÜNÜMÜ
+        if (snapX !== null) { 
+            const lX = document.createElementNS("http://www.w3.org/2000/svg", "line"); lX.setAttribute("x1", snapX); lX.setAttribute("y1", 0); lX.setAttribute("x2", snapX); lX.setAttribute("y2", h); lX.classList.add("snap-line"); ctrl.appendChild(lX); 
+            if(distTextX !== "") {
+                const tx = document.createElementNS("http://www.w3.org/2000/svg", "text"); tx.setAttribute("x", snapX + 6); tx.setAttribute("y", b.y - 10); tx.textContent = distTextX; tx.classList.add("snap-text"); ctrl.appendChild(tx);
+            }
+        }
+        if (snapY !== null) { 
+            const lY = document.createElementNS("http://www.w3.org/2000/svg", "line"); lY.setAttribute("x1", 0); lY.setAttribute("y1", snapY); lY.setAttribute("x2", w); lY.setAttribute("y2", snapY); lY.classList.add("snap-line"); ctrl.appendChild(lY); 
+            if(distTextY !== "") {
+                const ty = document.createElementNS("http://www.w3.org/2000/svg", "text"); ty.setAttribute("x", b.x + b.width + 10); ty.setAttribute("y", snapY - 6); ty.textContent = distTextY; ty.classList.add("snap-text"); ctrl.appendChild(ty);
+            }
+        }
 
         if (el.tagName === 'text' && ((parseFloat(window.getD(el, 'max-width')) || 0) > 0 || (parseFloat(window.getD(el, 'max-height')) || 0) > 0) && !isLocked) {
             const mw = parseFloat(window.getD(el, 'max-width')) || b.width; 
@@ -1284,7 +1323,7 @@
     
     window.updateEditorUI = window.updateUI; 
 
-    // YENİ: SEKMELİ YAPI KONTROLCÜSÜ
+    // SEKMELER (TABS)
     window.switchTab = function(btn, tabId) {
         const wrapper = btn.closest('#editor-fields');
         if (!wrapper) return;
@@ -1349,7 +1388,7 @@
         return `<div class="prop-group"><div class="prop-group-title">${title}</div>${content}</div>`;
     }
 
-    // ÖZELLİKLER PANELİ (YENİ SEKMELİ YAPI)
+    // ÖZELLİKLER PANELİ
     window.renderProperties = function() {
         const f = document.getElementById('editor-fields');
         if (!selectedEl || !selectedEl.tagName) { window.renderEditor(); return; }
@@ -1397,7 +1436,7 @@
                 </div>
             `;
 
-            // --- 1. DÜZEN (LAYOUT) SEKMESİ ---
+            // --- 1. DÜZEN (LAYOUT) ---
             if(!isPath) {
                 let alignHtml = `
                 <div class="action-row" style="margin-bottom:8px;">
@@ -1459,15 +1498,38 @@
                 layoutHtml += createPropGroup("<i class='ph ph-arrows-clockwise'></i> Dönüştürme", transHtml);
             }
 
+            // GELİŞMİŞ KIRPMA VE MASKELEME
             if (isShape || isImage) {
                 const rx = parseFloat(window.getD(el, 'rx')) || 0; const maskShape = window.getD(el, 'mask-shape') || 'none';
                 let bbox = {width:0, height:0}; try { bbox = el.getBBox(); }catch(e){} const maxR = Math.min(bbox.width, bbox.height) / 2;
-                let formHtml = `<div class="label-text" style="margin-bottom:5px;">MASKELEME ŞEKLİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'mask-shape', this.value); window.saveState();"><option value="none" ${maskShape === 'none' ? 'selected' : ''}>Yok (Düz)</option><option value="squircle" ${maskShape === 'squircle' ? 'selected' : ''}>Oval Kare (Squircle)</option><option value="circle" ${maskShape === 'circle' ? 'selected' : ''}>Daire</option><option value="triangle" ${maskShape === 'triangle' ? 'selected' : ''}>Üçgen</option><option value="star" ${maskShape === 'star' ? 'selected' : ''}>Yıldız</option></select>
-                <div class="label-row"><span class="label-text">KÖŞE YARIÇAPI (SQUIRCLE)</span><span class="value-badge" id="val-rx-${id}">${Math.round(rx)}px</span></div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="range" min="0" max="${maxR}" value="${rx}" style="flex:1;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
-                    <input type="number" value="${rx}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
-                </div>`;
+                
+                let formHtml = `<div class="label-text" style="margin-bottom:5px;">MASKELEME ŞEKLİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'mask-shape', this.value); window.renderProperties(); window.saveState();"><option value="none" ${maskShape === 'none' ? 'selected' : ''}>Yok (Düz)</option><option value="squircle" ${maskShape === 'squircle' ? 'selected' : ''}>Oval Kare (Squircle)</option><option value="circle" ${maskShape === 'circle' ? 'selected' : ''}>Daire</option><option value="triangle" ${maskShape === 'triangle' ? 'selected' : ''}>Üçgen</option><option value="star" ${maskShape === 'star' ? 'selected' : ''}>Yıldız</option><option value="crop" ${maskShape === 'crop' ? 'selected' : ''}>✂️ GELİŞMİŞ KIRPMA</option></select>`;
+                
+                if(maskShape === 'crop') {
+                    const ct = parseFloat(window.getD(el, 'crop-t')) || 0; const cb = parseFloat(window.getD(el, 'crop-b')) || 0;
+                    const cl = parseFloat(window.getD(el, 'crop-l')) || 0; const cr = parseFloat(window.getD(el, 'crop-r')) || 0;
+                    formHtml += `
+                    <div style="background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; padding:10px;">
+                        <div class="label-row"><span class="label-text">ÜSTTEN KIRP (%)</span><span class="value-badge" id="val-crop-t-${id}">${ct}%</span></div>
+                        <input type="range" min="0" max="100" value="${ct}" style="margin-bottom:10px;" oninput="window.changeSetting('${id}', 'crop-t', this.value, this);" onchange="window.saveState()">
+                        
+                        <div class="label-row"><span class="label-text">ALTTAN KIRP (%)</span><span class="value-badge" id="val-crop-b-${id}">${cb}%</span></div>
+                        <input type="range" min="0" max="100" value="${cb}" style="margin-bottom:10px;" oninput="window.changeSetting('${id}', 'crop-b', this.value, this);" onchange="window.saveState()">
+                        
+                        <div class="label-row"><span class="label-text">SOLDAN KIRP (%)</span><span class="value-badge" id="val-crop-l-${id}">${cl}%</span></div>
+                        <input type="range" min="0" max="100" value="${cl}" style="margin-bottom:10px;" oninput="window.changeSetting('${id}', 'crop-l', this.value, this);" onchange="window.saveState()">
+                        
+                        <div class="label-row"><span class="label-text">SAĞDAN KIRP (%)</span><span class="value-badge" id="val-crop-r-${id}">${cr}%</span></div>
+                        <input type="range" min="0" max="100" value="${cr}" oninput="window.changeSetting('${id}', 'crop-r', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                } else {
+                    formHtml += `
+                    <div class="label-row"><span class="label-text">KÖŞE YARIÇAPI (SQUIRCLE)</span><span class="value-badge" id="val-rx-${id}">${Math.round(rx)}px</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="${maxR}" value="${rx}" style="flex:1;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${rx}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                }
                 layoutHtml += createPropGroup("<i class='ph ph-scissors'></i> Form & Maskeleme", formHtml);
             }
 
