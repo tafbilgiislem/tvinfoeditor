@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SVG Pro Studio | Kusursuz CMS V42 (Sıfır Hata)</title>
+    <title>SVG Pro Studio | Kusursuz CMS V42 (Premium Sürüm)</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;700;800&family=Nunito:wght@400;700&family=Open+Sans:wght@400;700&family=Oswald:wght@400;700&family=Pacifico&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;700&family=Raleway:wght@400;700&family=Roboto:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         :root{--accent:#10b981;--bg:#0f172a;--panel:#1e293b;--border:#334155;--handle-move:#3b82f6;--handle-rotate:#f59e0b;--handle-radius:#ec4899}
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:#fff;font-family:'Inter',sans-serif;overscroll-behavior-y:none}
+        html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:#fff;font-family:'Inter', 'Roboto', sans-serif;overscroll-behavior-y:none}
         
+        /* ÖZEL KAYDIRMA ÇUBUKLARI (Custom Scrollbar) */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
         #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10000}
         .login-card{background:var(--panel);padding:40px;border-radius:20px;width:340px;text-align:center;border:1px solid var(--border);box-shadow:0 20px 50px rgba(0,0,0,.5)}
         .login-card input{width:100%;padding:14px;margin-bottom:15px;border-radius:10px;border:1px solid var(--border);background:#000;color:#fff;text-align:center;outline:none;font-size:14px}
@@ -31,9 +38,9 @@
         .layer-item{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px;transition:.2s;background:#1e293b;color:#cbd5e1}
         .layer-item:hover{background:#334155}
         .layer-item.active{border-left:4px solid var(--accent);background:rgba(16,185,129,.15);color:#fff;font-weight:700}
-        .layer-actions{display:flex;gap:6px;align-items:center}
-        .layer-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;padding:0;transition:.2s}
-        .layer-btn:hover{color:#fff;transform:scale(1.2)}
+        .layer-actions{display:flex;gap:4px;align-items:center}
+        .layer-btn{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:16px;padding:2px;transition:.2s; display:flex; align-items:center; justify-content:center;}
+        .layer-btn:hover{color:#fff;transform:scale(1.1)}
         
         #main-view{flex:1;background:#020617;overflow:hidden;position:relative;height:calc(100% - 25px);display:flex}
         #zoom-container{flex:1;display:flex;align-items:center;justify-content:center;transform-origin:center center;transition:transform .2s ease-out;position:relative; margin-left: 20px; margin-top: 20px; width: calc(100% - 20px); height: calc(100% - 20px);}
@@ -51,7 +58,8 @@
         .ruler svg{position:absolute;top:0;left:0}
         
         .floating-tools{position:fixed;bottom:45px;left:40px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px;display:flex;gap:8px;box-shadow:0 10px 25px rgba(0,0,0,.5);z-index:500;align-items:center}
-        .tool-btn{background:#0f172a;color:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;transition:.2s}
+        .tool-btn{background:#0f172a;color:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;transition:.2s; display:flex; align-items:center; gap:6px;}
+        .tool-btn i{font-size:16px;}
         .tool-btn:hover{background:var(--accent);border-color:var(--accent)}
         
         .duzenlenebilir{cursor:move;pointer-events:all}
@@ -71,63 +79,82 @@
         .font-select{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:#000;color:#fff;margin-bottom:5px;outline:none;font-size:13px;cursor:pointer}
         
         .action-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-        .action-btn{flex:1;background:#334155;color:#fff;border:none;border-radius:8px;padding:10px 15px;font-size:12px;font-weight:700;cursor:pointer;text-align:center}
+        .action-btn{flex:1;background:#334155;color:#fff;border:none;border-radius:8px;padding:10px 15px;font-size:12px;font-weight:700;cursor:pointer;text-align:center; display:flex; align-items:center; justify-content:center; gap:6px;}
+        .action-btn i {font-size:16px;}
         .action-btn:hover{background:#475569}
         .action-btn.active{background:var(--accent);color:#fff}
         .action-btn.danger{background:#991b1b}
         .action-btn.special{background:#0284c7}
         
         .group-box{background:rgba(0,0,0,.2);padding:12px;border-radius:10px;border:1px solid #1e293b;margin-top:10px;margin-bottom:15px}
-        .property-details{background:rgba(0,0,0,.25);padding:12px 18px;border-radius:12px;border:1px solid var(--border);margin-bottom:12px}
-        .property-details summary{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;margin-bottom:5px}
+        .prop-group{margin-bottom:20px;}
+        .prop-group-title{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:6px; display:flex; align-items:center; gap:6px;}
         
+        /* SEKME YAZILIMI (TABS) */
+        .tabs-header { display: flex; gap: 4px; margin-bottom: 15px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+        .tab-btn { flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 11px; font-weight: 700; padding: 10px 4px; cursor: pointer; border-radius: 6px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .tab-btn i { font-size: 16px; }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .tab-btn.active { background: var(--panel); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         .label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;width:100%}
         .label-text{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
         .value-badge{background:#000;color:var(--accent);font-size:11px;padding:3px 6px;border-radius:4px;font-family:monospace;font-weight:700}
         
-        #context-menu{display:none;position:absolute;background:#1e293b;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.7);border-radius:8px;padding:5px;z-index:20000;min-width:180px}
-        .ctx-item{padding:10px 15px;font-size:13px;cursor:pointer;color:#e2e8f0;border-radius:4px;display:flex;justify-content:space-between;align-items:center}
+        #context-menu{display:none;position:absolute;background:#1e293b;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.7);border-radius:8px;padding:5px;z-index:20000;min-width:200px}
+        .ctx-item{padding:10px 15px;font-size:13px;cursor:pointer;color:#e2e8f0;border-radius:4px;display:flex;justify-content:space-between;align-items:center; gap:10px;}
+        .ctx-item i {font-size: 16px; color:#94a3b8;}
         .ctx-item:hover{background:var(--accent);color:#fff}
+        .ctx-item:hover i{color:#fff;}
         .ctx-item.danger:hover{background:#ef4444}
         
         #status-bar{position:absolute;bottom:0;left:0;width:100%;height:25px;background:#0f172a;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:11px;color:#94a3b8;z-index:400;font-family:monospace}
         
+        /* TOAST BİLDİRİM SİSTEMİ (MODERN) */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events:none;}
+        .toast { background: var(--panel); border: 1px solid var(--border); color: #fff; padding: 14px 24px; border-radius: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); transform: translateX(120%); animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; font-size: 13px; font-weight: 700; transition: all 0.3s ease;}
+        .toast.success i { color: var(--accent); font-size: 22px; }
+        .toast.error i { color: #ef4444; font-size: 22px; }
+        @keyframes slideIn { to { transform: translateX(0); } }
+
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:30000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
         .modal-content{background:#1e293b;border:1px solid var(--border);padding:30px;border-radius:16px;width:450px;box-shadow:0 25px 50px rgba(0,0,0,.5);position:relative;max-height:90vh;display:flex;flex-direction:column}
         
         .close-modal{position:absolute;top:15px;right:15px;cursor:pointer;color:#94a3b8;font-size:24px;font-weight:700;line-height:1}
         .close-modal:hover{color:#fff}
-        .shortcut-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-        .kbd{background:#0f172a;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--accent);font-family:monospace}
+        .shortcut-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px; align-items:center;}
+        .kbd{background:#0f172a;padding:4px 10px;border-radius:6px;border:1px solid var(--border);color:var(--accent);font-family:monospace; font-size:11px;}
         
         .swatch-container{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
-        .color-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:1px solid var(--border);transition:transform .1s}
-        .color-swatch:hover{transform:scale(1.2);border-color:#fff}
+        .color-swatch{width:26px;height:26px;border-radius:6px;cursor:pointer;border:1px solid var(--border);transition:transform .1s}
+        .color-swatch:hover{transform:scale(1.2);border-color:#fff; z-index:2;}
         
-        #status-info{position:fixed;top:0;width:100%;background:var(--accent);text-align:center;padding:10px;z-index:11000;display:none;font-weight:700;letter-spacing:1px}
         @media (max-width:1023px){#app-container{flex-direction:column}#sidebar{width:100%;height:50%;border-top:1px solid var(--border);border-left:none;order:2}#main-view{width:100%;height:50%;order:1;padding-left:0;padding-top:0;}#zoom-container{margin:0;width:100%;height:100%;}.floating-tools{bottom:auto;top:10px;left:50%;transform:translateX(-50%)}}
     </style>
 </head>
 <body>
 
-<div id="status-info">İşlem Yapılıyor...</div>
+<div id="toast-container"></div>
 
 <div id="context-menu">
-    <div class="ctx-item" onclick="if(selectedEl) window.cloneElement(selectedEl.id); window.closeCtx();"><span>⧉ Kopyala</span><span class="kbd">Alt+Sürükle</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.cloneElement(selectedEl.id); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-copy"></i><span>Kopyala</span></div><span class="kbd">Alt+Sürükle</span></div>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'top'); window.closeCtx();"><span>⏫ En Öne Getir</span></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 1); window.closeCtx();"><span>▲ Bir Öne Getir</span></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, -1); window.closeCtx();"><span>▼ Bir Arkaya Gönder</span></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'bottom'); window.closeCtx();"><span>⏬ En Arkaya Gönder</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'top'); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-caret-double-up"></i><span>En Öne Getir</span></div></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 1); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-caret-up"></i><span>Bir Öne Getir</span></div></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, -1); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-caret-down"></i><span>Bir Arkaya Gönder</span></div></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.moveLayer(selectedEl.id, 'bottom'); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-caret-double-down"></i><span>En Arkaya Gönder</span></div></div>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
-    <div class="ctx-item" onclick="if(selectedEl) window.toggleLock(selectedEl.id); window.closeCtx();"><span id="ctx-lock-text">🔒 Kilitle</span></div>
-    <div class="ctx-item danger" onclick="if(selectedEl && confirm('Silinecek?')){ selectedEl.remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; } window.closeCtx();"><span>🗑️ Sil</span><span class="kbd">Del</span></div>
+    <div class="ctx-item" onclick="if(selectedEl) window.toggleLock(selectedEl.id); window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-lock-key" id="ctx-lock-icon"></i><span id="ctx-lock-text">Kilitle</span></div></div>
+    <div class="ctx-item danger" onclick="if(selectedEl && confirm('Silinecek?')){ selectedEl.remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; } window.closeCtx();"><div style="display:flex; align-items:center; gap:8px;"><i class="ph ph-trash"></i><span>Sil</span></div><span class="kbd">Del</span></div>
 </div>
 
 <div id="hotkey-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="document.getElementById('hotkey-modal').style.display='none'">×</span>
-        <h3 style="margin-top:0; color:var(--accent);">⌨️ Kısayol Haritası</h3>
+        <h3 style="margin-top:0; color:var(--accent); display:flex; align-items:center; gap:8px;"><i class="ph ph-keyboard"></i> Kısayol Haritası</h3>
         <div class="shortcut-row"><span>Gezinme (El Aracı)</span><span class="kbd">Space + Sürükle</span></div>
         <div class="shortcut-row"><span>Hızlı Kopyalama</span><span class="kbd">Alt + Sürükle</span></div>
         <div class="shortcut-row"><span>Hassas Taşıma</span><span class="kbd">Ok Tuşları</span></div>
@@ -143,7 +170,7 @@
 <div id="export-modal" class="modal-overlay">
     <div class="modal-content">
         <span class="close-modal" onclick="document.getElementById('export-modal').style.display='none'">×</span>
-        <h3 style="margin-top:0; color:var(--accent);">📥 İndirme Seçenekleri</h3>
+        <h3 style="margin-top:0; color:var(--accent); display:flex; align-items:center; gap:8px;"><i class="ph ph-download-simple"></i> İndirme Seçenekleri</h3>
         <input type="hidden" id="export-format" value="png">
         <div class="input-group" style="margin-bottom:15px;">
             <span class="label-text">ÇÖZÜNÜRLÜK (KALİTE)</span>
@@ -160,13 +187,13 @@
                 <option value="selected">Sadece Seçili Nesne (Şeffaf)</option>
             </select>
         </div>
-        <button class="action-btn active" style="width:100%; padding:15px; font-size:14px;" onclick="window.executeExport()">İNDİRMEYİ BAŞLAT</button>
+        <button class="action-btn active" style="width:100%; padding:15px; font-size:14px;" onclick="window.executeExport()"><i class="ph ph-download"></i> İNDİRMEYİ BAŞLAT</button>
     </div>
 </div>
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="margin-top:0; color:white;">Pro Studio V42</h2>
+        <h2 style="margin-top:0; color:white; display:flex; align-items:center; justify-content:center; gap:10px;"><i class="ph ph-shield-check" style="color:var(--accent); font-size:32px;"></i> Pro Studio V42</h2>
         <div style="font-size:12px; color:#94a3b8; margin-bottom:20px;">Lütfen Cloudflare Worker şifrenizi girin.</div>
         <input type="password" id="passInput" placeholder="Sunucu Şifresi">
         <button id="loginBtn" onclick="window.login()">Sunucuya Bağlan</button>
@@ -179,14 +206,14 @@
         <div id="vertical-ruler" class="ruler ruler-v"></div>
 
         <div class="floating-tools">
-            <button class="tool-btn" id="btn-undo" onclick="window.undo()" title="Geri Al (Ctrl+Z)">↩ Geri</button>
-            <button class="tool-btn" id="btn-redo" onclick="window.redo()" title="İleri Al (Ctrl+Y)">İleri ↪</button>
+            <button class="tool-btn" id="btn-undo" onclick="window.undo()" title="Geri Al (Ctrl+Z)"><i class="ph ph-arrow-u-up-left"></i></button>
+            <button class="tool-btn" id="btn-redo" onclick="window.redo()" title="İleri Al (Ctrl+Y)"><i class="ph ph-arrow-u-up-right"></i></button>
             <div style="width: 1px; background: var(--border); margin: 0 5px; height: 20px;"></div>
-            <button class="tool-btn" onclick="window.changeZoom(-0.1)" title="Uzaklaştır">-</button>
-            <button class="tool-btn" id="zoom-val" onclick="window.resetZoom()" title="Sıfırla">100%</button>
-            <button class="tool-btn" onclick="window.changeZoom(0.1)" title="Yakınlaştır">+</button>
+            <button class="tool-btn" onclick="window.changeZoom(-0.1)" title="Uzaklaştır"><i class="ph ph-magnifying-glass-minus"></i></button>
+            <button class="tool-btn" id="zoom-val" onclick="window.resetZoom()" title="Sıfırla" style="min-width:60px; justify-content:center;">100%</button>
+            <button class="tool-btn" onclick="window.changeZoom(0.1)" title="Yakınlaştır"><i class="ph ph-magnifying-glass-plus"></i></button>
             <div style="width: 1px; background: var(--border); margin: 0 5px; height: 20px;"></div>
-            <button class="tool-btn" onclick="document.getElementById('hotkey-modal').style.display='flex'" title="Kısayol Haritası">⌨️</button>
+            <button class="tool-btn" onclick="document.getElementById('hotkey-modal').style.display='flex'" title="Kısayol Haritası"><i class="ph ph-keyboard"></i></button>
         </div>
 
         <div id="zoom-container">
@@ -205,9 +232,9 @@
     <div id="sidebar">
         <div class="sidebar-scroll-area">
             <div style="display:flex; gap:5px; margin-bottom: 10px;">
-                <button onclick="window.saveData()" class="action-btn active" style="flex:2; font-size:12px;">💾 KAYDET</button>
-                <button onclick="window.openExport('png')" class="action-btn special" style="flex:1; background:#0284c7;">📥 PNG</button>
-                <button onclick="window.openExport('svg')" class="action-btn svg" style="flex:1; background:#ea580c;">📥 SVG</button>
+                <button onclick="window.saveData()" class="action-btn active" style="flex:2; font-size:12px;"><i class="ph ph-floppy-disk"></i> KAYDET</button>
+                <button onclick="window.openExport('png')" class="action-btn special" style="flex:1; background:#0284c7;"><i class="ph ph-image"></i> PNG</button>
+                <button onclick="window.openExport('svg')" class="action-btn svg" style="flex:1; background:#ea580c;"><i class="ph ph-file-svg"></i> SVG</button>
             </div>
             
             <select id="file-selector" style="width:100%; padding:10px; background:#000; color:#fff; border-radius:8px; margin-bottom:10px; border:1px solid #334155; outline:none;">
@@ -217,7 +244,7 @@
             </select>
             
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px;">🎬 SEÇİLİ SLAYT AYARLARI (JSON)</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-film-script" style="font-size:14px;"></i> SEÇİLİ SLAYT AYARLARI (JSON)</summary>
                 <div class="group-box" style="margin-top:5px;">
                     <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Değişiklikler doğrudan settings.json dosyasına işlenir.</div>
                     <div class="input-group" style="margin-bottom:10px;">
@@ -236,12 +263,12 @@
                             <option value="none">Efektsiz</option>
                         </select>
                     </div>
-                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()">💾 AYARLARI KAYDET (JSON)</button>
+                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()"><i class="ph ph-database"></i> AYARLARI KAYDET (JSON)</button>
                 </div>
             </details>
 
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px;">🌐 İNDEX.HTML EFEKT AYARLARI</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#10b981; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-globe" style="font-size:14px;"></i> İNDEX.HTML EFEKT AYARLARI</summary>
                 <div class="group-box" style="margin-top:5px;">
                     <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">index.html dosyasındaki CSS geçiş (.active) sürelerini düzenler.</div>
                     <div class="input-group" style="margin-bottom:10px;">
@@ -259,41 +286,41 @@
                         <span class="label-text">GEÇİŞ SÜRESİ (Saniye / "1.5" gibi)</span>
                         <input type="number" step="0.1" id="html-effect-duration" value="1.5">
                     </div>
-                    <button class="action-btn" style="width:100%; background:#10b981; color:white;" onclick="window.saveHtmlSettings()">💾 İNDEX.HTML'E KAYDET</button>
+                    <button class="action-btn" style="width:100%; background:#10b981; color:white;" onclick="window.saveHtmlSettings()"><i class="ph ph-code"></i> İNDEX.HTML'E KAYDET</button>
                 </div>
             </details>
 
             <details style="margin-bottom: 10px;">
-                <summary style="font-size:11px; font-weight:bold; color:var(--accent); cursor:pointer; margin-bottom:5px;">📐 TUVAL AYARLARI</summary>
+                <summary style="font-size:11px; font-weight:bold; color:var(--accent); cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-frame-corners" style="font-size:14px;"></i> TUVAL AYARLARI</summary>
                 <div class="group-box" style="margin-top:5px;">
                     <div style="display:flex; gap:10px; align-items: center; margin-bottom:10px;">
                         <input type="number" id="canvas-w" placeholder="Genişlik" onchange="window.updateCanvasSize()">
-                        <span style="color:#64748b;">X</span>
+                        <span style="color:#64748b;"><i class="ph ph-x"></i></span>
                         <input type="number" id="canvas-h" placeholder="Yükseklik" onchange="window.updateCanvasSize()">
                         <input type="color" id="canvas-bg-color" title="Arka Plan Rengi" oninput="window.updateCanvasBg()" style="width:40px; height:35px; cursor:pointer; border:none; background:none;">
                     </div>
                     <div class="action-row" style="margin:0;">
-                        <button onclick="window.addGuide('h')" class="action-btn" style="background:#06b6d4; font-size:11px;">+ YATAY KILAVUZ</button>
-                        <button onclick="window.addGuide('v')" class="action-btn" style="background:#06b6d4; font-size:11px;">+ DİKEY KILAVUZ</button>
-                        <button onclick="window.clearGuides()" class="action-btn" style="background:#ef4444; font-size:11px;">TEMİZLE</button>
+                        <button onclick="window.addGuide('h')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-horizontal"></i> YATAY</button>
+                        <button onclick="window.addGuide('v')" class="action-btn" style="background:#06b6d4; font-size:11px;"><i class="ph ph-arrows-out-line-vertical"></i> DİKEY</button>
+                        <button onclick="window.clearGuides()" class="action-btn" style="background:#ef4444; font-size:11px;"><i class="ph ph-trash"></i> TEMİZLE</button>
                     </div>
                 </div>
             </details>
             
             <details style="margin-bottom: 10px;" open>
-                <summary style="font-size:11px; font-weight:bold; color:#8b5cf6; cursor:pointer; margin-bottom:5px;">🎨 NESNE EKLE & ARAÇLAR</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#8b5cf6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-paint-brush" style="font-size:14px;"></i> NESNE EKLE & ARAÇLAR</summary>
                 <div class="group-box" style="margin-top:5px; margin-bottom:5px;">
                     <div class="action-row" style="margin-bottom:0;">
-                        <button onclick="window.addNewText()" class="action-btn" style="background:#475569;">+ YAZI</button>
-                        <button onclick="document.getElementById('img-in').click()" class="action-btn" style="background:#475569;" title="Sürükle-Bırak da Yapabilirsiniz">+ RESİM</button>
-                        <button onclick="window.addShape('rect')" class="action-btn" style="background:#475569;">+ KARE</button>
-                        <button id="btn-draw" onclick="window.toggleDrawMode()" class="action-btn draw" style="background:#8b5cf6;" title="Fırça Aracı">🖌️ ÇİZİM</button>
+                        <button onclick="window.addNewText()" class="action-btn" style="background:#475569;"><i class="ph ph-text-t"></i> YAZI</button>
+                        <button onclick="document.getElementById('img-in').click()" class="action-btn" style="background:#475569;" title="Sürükle-Bırak da Yapabilirsiniz"><i class="ph ph-image-square"></i> RESİM</button>
+                        <button onclick="window.addShape('rect')" class="action-btn" style="background:#475569;"><i class="ph ph-square"></i> KARE</button>
+                        <button id="btn-draw" onclick="window.toggleDrawMode()" class="action-btn draw" style="background:#8b5cf6;" title="Fırça Aracı"><i class="ph ph-pencil-simple"></i> ÇİZİM</button>
                     </div>
                 </div>
             </details>
 
             <details style="margin-bottom: 10px;" open id="auto-text-panel">
-                <summary style="font-size:11px; font-weight:bold; color:#f472b6; cursor:pointer; margin-bottom:5px;">📝 OTOMATİK METİN YERLEŞTİRME</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#f472b6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-lightning" style="font-size:14px;"></i> OTOMATİK METİN YERLEŞTİRME</summary>
                 <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 12px; border: 1px solid var(--border);">
                     <div id="auto-fields-list">
                         </div>
@@ -304,7 +331,7 @@
             </details>
 
             <details style="margin-bottom: 5px;" open>
-                <summary style="font-size:11px; font-weight:bold; color:#06b6d4; cursor:pointer; margin-bottom:5px;">📑 KATMANLAR</summary>
+                <summary style="font-size:11px; font-weight:bold; color:#06b6d4; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-layers" style="font-size:14px;"></i> KATMANLAR</summary>
                 <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 0; overflow: hidden; border: 1px solid var(--border);">
                     <div id="layers-list" style="max-height: 200px; overflow-y: auto;"></div>
                 </div>
@@ -315,7 +342,8 @@
 
         <div id="editor-fields">
             <div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">
-                👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.
+                <i class="ph ph-cursor-click" style="font-size:24px; display:block; margin-bottom:10px;"></i>
+                Düzenlemek için sahneden veya katmanlardan bir nesne seçin.
             </div>
         </div>
     </div>
@@ -325,6 +353,22 @@
     
     let SHA_KEY = "", SESSION_PASS = "", settingsData = [], settingsSha = "";
     let indexHtmlContent = "", indexHtmlSha = "";
+
+    // MODERN TOAST BİLDİRİM SİSTEMİ
+    window.showToast = function(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if(!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 'ph-check-circle' : 'ph-warning-circle';
+        toast.innerHTML = `<i class="ph ${icon}"></i> <span>${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { 
+            toast.style.opacity = '0'; 
+            toast.style.transform = 'translateX(120%)'; 
+            setTimeout(() => toast.remove(), 300); 
+        }, 3000);
+    };
 
     window.setD = function(el, key, val) { if(el) el.setAttribute('data-' + key, val); };
     window.getD = function(el, key) { return el ? el.getAttribute('data-' + key) : null; };
@@ -346,7 +390,22 @@
 
     window.updateEditorUI = null;
 
-    const googleFonts = [{ name: "Varsayılan", val: "sans-serif" }, { name: "Roboto", val: "'Roboto', sans-serif" }, { name: "Montserrat", val: "'Montserrat', sans-serif" }, { name: "Poppins", val: "'Poppins', sans-serif" }, { name: "Open Sans", val: "'Open Sans', sans-serif" }, { name: "Lato", val: "'Lato', sans-serif" }];
+    // GENİŞLETİLMİŞ FONT KÜTÜPHANESİ
+    const googleFonts = [
+        { name: "Varsayılan", val: "sans-serif" },
+        { name: "Roboto", val: "'Roboto', sans-serif" },
+        { name: "Montserrat", val: "'Montserrat', sans-serif" },
+        { name: "Poppins", val: "'Poppins', sans-serif" },
+        { name: "Open Sans", val: "'Open Sans', sans-serif" },
+        { name: "Lato", val: "'Lato', sans-serif" },
+        { name: "Merriweather", val: "'Merriweather', serif" },
+        { name: "Nunito", val: "'Nunito', sans-serif" },
+        { name: "Oswald", val: "'Oswald', sans-serif" },
+        { name: "Pacifico", val: "'Pacifico', cursive" },
+        { name: "Playfair Display", val: "'Playfair Display', serif" },
+        { name: "Raleway", val: "'Raleway', sans-serif" },
+        { name: "Ubuntu", val: "'Ubuntu', sans-serif" }
+    ];
 
     window.getCanvasCenter = function() {
         const svg = document.querySelector('#canvas-inner svg');
@@ -357,9 +416,9 @@
     };
 
     window.login = async function() {
-        if (WORKER_URL === "") { alert("Lütfen kodun içindeki WORKER_URL kısmına Worker linkinizi yazın!"); return; }
+        if (WORKER_URL === "") { window.showToast("Worker URL eksik!", "error"); return; }
         const passVal = document.getElementById('passInput').value;
-        if(!passVal) { alert("Lütfen Worker şifrenizi girin!"); return; }
+        if(!passVal) { window.showToast("Şifrenizi girin!", "error"); return; }
         SESSION_PASS = passVal; 
         await window.loadSettings();
         await window.loadIndexHtml();
@@ -388,7 +447,7 @@
             const row = document.createElement('div');
             row.style.marginBottom = "8px";
             row.innerHTML = `
-                <div class="label-row"><span class="label-text" style="color:#f472b6;">${varName}</span></div>
+                <div class="label-row"><span class="label-text" style="color:#f472b6;"><i class="ph ph-text-aa"></i> ${varName}</span></div>
                 <input type="text" value="${currentVal.replace(/"/g, '&quot;')}" 
                        oninput="window.updateVarValue('${el.id}', this.value)" 
                        onchange="window.saveState()" 
@@ -433,8 +492,8 @@
     };
 
     window.saveSlideSettings = async function() {
-        if (!WORKER_URL || WORKER_URL === "") { alert("Worker URL eksik!"); return; }
-        const st = document.getElementById('status-info'); st.innerText = "AYARLAR (JSON) GÜNCELLENİYOR..."; st.style.display = "block";
+        if (!WORKER_URL || WORKER_URL === "") { window.showToast("Worker URL eksik!", "error"); return; }
+        
         try {
             const currentFile = document.getElementById('file-selector').value;
             const timeVal = parseInt(document.getElementById('slide-time').value) || 3000;
@@ -456,10 +515,9 @@
             const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
             if(putRes.ok) { 
                 try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
-                st.innerText = "TÜM EŞLEŞEN AYARLAR KAYDEDİLDİ!"; 
-            } else { st.innerText = "KAYIT HATASI!"; }
-            setTimeout(() => st.style.display="none", 2000);
-        } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
+                window.showToast("Ayar JSON Başarıyla Kaydedildi!");
+            } else { window.showToast("Ayar Kayıt Hatası!", "error"); }
+        } catch (e) { window.showToast("Ayarlar kaydedilemedi.", "error"); }
     };
 
     // --- Index HTML (Efekt) Modülü ---
@@ -471,16 +529,13 @@
                 indexHtmlSha = data.sha || (data.content && data.content.sha) || "";
                 indexHtmlContent = decodeURIComponent(escape(atob(data.content)));
                 window.updateHtmlEffectUI();
-            } else {
-                console.error("index.html yüklenemedi. Durum:", res.status);
-            }
+            } else { console.error("index.html yüklenemedi."); }
         } catch (e) { console.error("index.html bağlantı hatası", e); }
     };
 
     window.updateHtmlEffectUI = function() {
         if(!indexHtmlContent) return;
         const effect = document.getElementById('html-effect-select').value;
-        
         const blockRegex = new RegExp(`\\.${effect}\\.active[^\\{]*\\{([^}]*)\\}`, "i");
         const match = indexHtmlContent.match(blockRegex);
         
@@ -488,39 +543,26 @@
             const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
             if (transMatch && transMatch[1]) {
                 document.getElementById('html-effect-duration').value = transMatch[1];
-            } else {
-                document.getElementById('html-effect-duration').value = "1.5";
-            }
-        } else {
-            document.getElementById('html-effect-duration').value = "1.5";
-        }
+            } else { document.getElementById('html-effect-duration').value = "1.5"; }
+        } else { document.getElementById('html-effect-duration').value = "1.5"; }
     };
 
     window.saveHtmlSettings = async function() {
-        if(!indexHtmlContent) { alert("index.html içeriği sunucudan okunamadı. Lütfen sayfayı yenileyip sunucuya tekrar bağlanın."); return; }
-        const st = document.getElementById('status-info'); st.innerText = "İNDEX.HTML EFEKTLERİ GÜNCELLENİYOR..."; st.style.display = "block";
+        if(!indexHtmlContent) { window.showToast("index.html içeriği okunamadı. Sayfayı yenileyin.", "error"); return; }
         
         try {
             const effect = document.getElementById('html-effect-select').value;
             const duration = document.getElementById('html-effect-duration').value;
-
             const blockRegex = new RegExp(`(\\.${effect}\\.active[^\\{]*\\{)([^}]*)(\\})`, "i");
             
             if (blockRegex.test(indexHtmlContent)) {
                 indexHtmlContent = indexHtmlContent.replace(blockRegex, function(fullMatch, p1, p2, p3) {
                     let updatedInner = p2;
-                    if (/transition:/i.test(p2)) {
-                        updatedInner = p2.replace(/(transition:[^;]*?)([\d\.]+)(s|ms)/gi, `$1${duration}$3`);
-                    } else {
-                        updatedInner = p2 + `transition: ${duration}s;`;
-                    }
+                    if (/transition:/i.test(p2)) { updatedInner = p2.replace(/(transition:[^;]*?)([\d\.]+)(s|ms)/gi, `$1${duration}$3`); } 
+                    else { updatedInner = p2 + `transition: ${duration}s;`; }
                     return p1 + updatedInner + p3;
                 });
-            } else {
-                alert(`Uyarı: '${effect}' efekti için geçerli bir CSS kuralı (.${effect}.active) index.html dosyasında bulunamadı!`);
-                st.style.display="none";
-                return;
-            }
+            } else { window.showToast(`'${effect}' için CSS kuralı bulunamadı!`, "error"); return; }
 
             const b64 = btoa(unescape(encodeURIComponent(indexHtmlContent)));
             const putRes = await fetch(WORKER_URL, {
@@ -531,23 +573,17 @@
 
             if(putRes.ok) {
                 try { const data = await putRes.json(); indexHtmlSha = data.content?.sha || data.sha || indexHtmlSha; } catch(e) {}
-                st.innerText = "İNDEX.HTML BAŞARIYLA KAYDEDİLDİ!";
-            } else {
-                st.innerText = "KAYIT HATASI!";
-            }
-            setTimeout(() => st.style.display="none", 2000);
-        } catch(e) {
-            alert("index.html kaydedilirken bağlantı hatası oluştu."); st.style.display="none";
-        }
+                window.showToast("İndex.html Başarıyla Güncellendi!");
+            } else { window.showToast("İndex.html Kayıt Hatası!", "error"); }
+        } catch(e) { window.showToast("index.html kaydedilirken hata oluştu.", "error"); }
     };
 
     // --- Slayt ve Çizim Modülleri ---
     window.loadSlide = async function() {
         const file = document.getElementById('file-selector').value;
-        const st = document.getElementById('status-info'); st.innerText = "YÜKLENİYOR..."; st.style.display = "block";
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": file} });
-            if (res.status === 401) { alert("Şifre Hatalı!"); st.style.display="none"; document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; return; }
+            if (res.status === 401) { window.showToast("Şifre Hatalı!", "error"); document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; return; }
             document.getElementById('login-screen').style.display = "none"; document.getElementById('app-container').style.display = "flex";
             if (res.status === 404) {
                 SHA_KEY = ""; document.getElementById('canvas-inner').innerHTML = `<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg"><rect id="canvas-background" x="0" y="0" width="1920" height="1080" fill="#ffffff"></rect><g id="guides-group"></g></svg>`;
@@ -557,13 +593,12 @@
             }
             historyStack = []; historyIndex = -1;
             setTimeout(() => { window.setupLayers(); window.initCanvasSettings(); window.resetZoom(); window.saveState(); }, 200);
-            st.style.display = "none";
-        } catch(e) { alert("Bağlantı Hatası!"); st.style.display="none"; document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
+            window.showToast("Slayt Yüklendi!");
+        } catch(e) { window.showToast("Sunucuya Bağlanılamadı!", "error"); document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
     };
 
     window.saveData = async function() {
-        if (!WORKER_URL || WORKER_URL === "") { alert("Lütfen kodun içindeki WORKER_URL kısmına kendi linkinizi yazın!"); return; }
-        const st = document.getElementById('status-info'); st.innerText = "KAYDEDİLİYOR..."; st.style.display = "block";
+        if (!WORKER_URL || WORKER_URL === "") { window.showToast("Worker URL Eksik!", "error"); return; }
         
         try {
             document.getElementById('control-layer').innerHTML = ""; window.hideGuides(true);
@@ -575,7 +610,7 @@
             const res = await fetch(WORKER_URL, { 
                 method: "PUT", 
                 headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": fileName }, 
-                body: JSON.stringify({message: "Pro Studio Ultimate Fix V42", content: b64, sha: SHA_KEY}) 
+                body: JSON.stringify({message: "Pro Studio Premium Kayıt", content: b64, sha: SHA_KEY}) 
             });
             
             if(res.ok) { 
@@ -583,12 +618,11 @@
                     const data = await res.json();
                     SHA_KEY = data.content?.sha || data.sha || SHA_KEY;
                 } catch(err) {}
-                st.innerText = "BAŞARIYLA KAYDEDİLDİ!"; 
+                window.showToast("Tuval Başarıyla Kaydedildi!");
                 const now = new Date(); document.getElementById('status-time').innerText = `Son Kayıt: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`; 
-            } else { st.innerText = "KAYIT HATASI!"; }
-            setTimeout(() => st.style.display="none", 2000);
+            } else { window.showToast("Tuval Kayıt Hatası!", "error"); }
             if(selectedEl && window.updateEditorUI) window.updateEditorUI(selectedEl);
-        } catch(e) { alert("Kayıt Hatası: Sunucu bağlantısı kurulamadı."); st.style.display="none"; }
+        } catch(e) { window.showToast("Bağlantı Hatası!", "error"); }
     };
 
     window.addNewText = function() {
@@ -653,10 +687,8 @@
         const el = document.getElementById(id); if(!el) return;
         window.setD(el, key, val);
         
-        // ÖNEMLİ DÜZELTME: Metin içeriği değiştiğinde zorunlu yatay sündürmeyi iptal et.
         if (key === 'raw-text') {
-            el.removeAttribute('textLength');
-            el.removeAttribute('lengthAdjust');
+            el.removeAttribute('textLength'); el.removeAttribute('lengthAdjust');
             const tp = el.querySelector('textPath');
             if (tp) { tp.removeAttribute('textLength'); tp.removeAttribute('lengthAdjust'); }
         }
@@ -719,11 +751,12 @@
         if(el) {
             e.preventDefault(); selectedEl = el; isDraggingElement = false; window.updateEditorUI(el); window.renderEditor();
             const ctxMenu = document.getElementById('context-menu');
-            document.getElementById('ctx-lock-text').innerText = window.getD(el, 'locked') === "true" ? "🔓 Kilidi Aç" : "🔒 Kilitle";
+            document.getElementById('ctx-lock-text').innerText = window.getD(el, 'locked') === "true" ? "Kilidi Aç" : "Kilitle";
+            document.getElementById('ctx-lock-icon').className = window.getD(el, 'locked') === "true" ? "ph ph-lock-key-open" : "ph ph-lock-key";
             ctxMenu.style.display = 'block';
             let x = e.clientX; let y = e.clientY;
-            if(x + 180 > window.innerWidth) x = window.innerWidth - 180;
-            if(y + 200 > window.innerHeight) y = window.innerHeight - 200;
+            if(x + 200 > window.innerWidth) x = window.innerWidth - 200;
+            if(y + 250 > window.innerHeight) y = window.innerHeight - 250;
             ctxMenu.style.left = x + 'px'; ctxMenu.style.top = y + 'px';
         }
     });
@@ -738,7 +771,7 @@
         
         let hiddenElements = [];
         if (scope === 'selected') {
-            if(!selectedEl) { alert("Önce bir nesne seçmelisiniz!"); window.hideGuides(false); return; }
+            if(!selectedEl) { window.showToast("Önce bir nesne seçmelisiniz!", "error"); window.hideGuides(false); return; }
             document.querySelectorAll('.duzenlenebilir, #canvas-background').forEach(el => { if(el !== selectedEl) { hiddenElements.push({el: el, display: el.style.display}); el.style.display = 'none'; } });
         }
 
@@ -840,7 +873,7 @@
     };
 
     window.pickColor = async function(id, dataKey, attrToSet) {
-        if (!window.EyeDropper) { alert("Tarayıcınız Göz Damlası özelliğini desteklemiyor."); return; }
+        if (!window.EyeDropper) { window.showToast("Tarayıcınız renk seçici desteklemiyor.", "error"); return; }
         try { const eyeDropper = new EyeDropper(); const result = await eyeDropper.open(); const color = result.sRGBHex; const el = document.getElementById(id); if(el) { window.addRecentColor(color); if (dataKey) window.setD(el, dataKey.replace(/([A-Z])/g, "-$1").toLowerCase(), color); if (dataKey === 'color1' || dataKey === 'color2' || dataKey === 'solidColor') window.applyFill(el); else { el.setAttribute(attrToSet, color); } window.saveState(); window.renderProperties(); } } catch (e) {}
     };
     
@@ -960,9 +993,8 @@
                 el.setAttribute('dominant-baseline', 'central');
                 
                 window.setD(el, 'max-width', Math.max(10, rw - 40)); 
-                window.setD(el, 'max-height', Math.max(10, rh - 40)); // Yükseklik de otomatik ayarlanıyor
+                window.setD(el, 'max-height', Math.max(10, rh - 40)); 
                 
-                // Kutuya sabitliyken esnetmeyi iptal edip sadece orantılı küçültmeye izin veriyoruz
                 el.removeAttribute('textLength');
                 el.removeAttribute('lengthAdjust');
                 const tp = el.querySelector('textPath');
@@ -974,7 +1006,6 @@
         const mh = parseFloat(window.getD(el, 'max-height')) || 0; 
         const baseFs = parseFloat(window.getD(el, 'base-font-size')) || 60; 
         
-        // Sığdırma işlemi varsa esnetmeyi her ihtimale karşı iptal ediyoruz (Standart görünüm için)
         if (mw > 0 || mh > 0) {
             el.removeAttribute('textLength');
             el.removeAttribute('lengthAdjust');
@@ -996,7 +1027,6 @@
                 scaleH = mh / bbox.height;
             }
             
-            // Genişlik veya yükseklikten hangisi daha dar ise ona göre küçültüyoruz
             const finalScale = Math.min(scaleW, scaleH);
             if(finalScale < 1) {
                 const newFs = baseFs * finalScale; 
@@ -1254,11 +1284,25 @@
     
     window.updateEditorUI = window.updateUI; 
 
+    // YENİ: SEKMELİ YAPI KONTROLCÜSÜ
+    window.switchTab = function(btn, tabId) {
+        const wrapper = btn.closest('#editor-fields');
+        if (!wrapper) return;
+        wrapper.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        wrapper.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        wrapper.querySelector('#' + tabId).classList.add('active');
+    };
+
     window.renderEditor = function() { 
         window.renderLayers(); 
         window.refreshAutoTextFields();
         if(selectedEl) window.renderProperties(); 
-        else document.getElementById('editor-fields').innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.</div>`;
+        else document.getElementById('editor-fields').innerHTML = `
+            <div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">
+                <i class="ph ph-cursor-click" style="font-size:32px; display:block; margin-bottom:15px; color:var(--accent); opacity:0.5;"></i>
+                👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.
+            </div>`;
     };
 
     window.renderLayers = function() {
@@ -1270,9 +1314,12 @@
             const isLocked = window.getD(el, 'locked') === "true"; const isActive = selectedEl === el;
             const isHidden = el.getAttribute('visibility') === 'hidden';
             let typeName = el.tagName.toUpperCase(); 
-            if (typeName === 'RECT') typeName = 'ŞEKİL'; if (typeName === 'G' || typeName === 'SVG') typeName = 'İKON'; 
-            if (typeName === 'PATH') typeName = 'ÇİZİM'; if (typeName === 'IMAGE') typeName = 'RESİM';
-            if (el.tagName === 'text') { let txt = window.getD(el, 'raw-text') || el.textContent; typeName = `T: ${txt.substring(0,10)}${txt.length>10?'...':''}`; }
+            let icon = 'ph-square';
+            if (typeName === 'RECT') { typeName = 'ŞEKİL'; icon = 'ph-square'; } 
+            if (typeName === 'G' || typeName === 'SVG') { typeName = 'İKON'; icon = 'ph-shapes'; } 
+            if (typeName === 'PATH') { typeName = 'ÇİZİM'; icon = 'ph-scribble-loop'; } 
+            if (typeName === 'IMAGE') { typeName = 'RESİM'; icon = 'ph-image'; }
+            if (el.tagName === 'text') { let txt = window.getD(el, 'raw-text') || el.textContent; typeName = `T: ${txt.substring(0,10)}${txt.length>10?'...':''}`; icon = 'ph-text-t'; }
 
             const item = document.createElement('div'); item.className = `layer-item ${isActive ? 'active' : ''}`;
             item.onclick = (e) => { 
@@ -1280,94 +1327,95 @@
                 selectedEl = el; isDraggingElement = false; 
                 if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); 
             };
-            item.innerHTML = `<span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''} ${isHidden ? 'opacity:0.3;' : ''}">${typeName}</span>
+            item.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px; flex:1; overflow:hidden;">
+                <i class="ph ${icon}" style="color:var(--accent);"></i>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''} ${isHidden ? 'opacity:0.3;' : ''}">${typeName}</span>
+            </div>
             <div class="layer-actions">
-                <button class="layer-btn" onclick="window.toggleVisibility('${el.id}')" title="Göster/Gizle">${isHidden ? '👓' : '👁️'}</button>
-                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'top')" title="En Üste">⏫</button>
-                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı">▲</button>
-                <button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı">▼</button>
-                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'bottom')" title="En Alta">⏬</button>
-                <button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit">${isLocked ? '🔒' : '🔓'}</button>
-                <button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }">×</button>
+                <button class="layer-btn" onclick="window.toggleVisibility('${el.id}')" title="Göster/Gizle"><i class="ph ${isHidden ? 'ph-eye-closed' : 'ph-eye'}"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'top')" title="En Üste"><i class="ph ph-caret-double-up"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı"><i class="ph ph-caret-up"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı"><i class="ph ph-caret-down"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'bottom')" title="En Alta"><i class="ph ph-caret-double-down"></i></button>
+                <button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit"><i class="ph ${isLocked ? 'ph-lock-key' : 'ph-lock-key-open'}"></i></button>
+                <button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }"><i class="ph ph-trash"></i></button>
             </div>`;
             list.appendChild(item);
         });
     };
 
-    window.createPropertySection = function(title, content) {
-        return `<details class="property-details" open><summary>${title}</summary><div>${content}</div></details>`;
-    };
+    function createPropGroup(title, content) {
+        return `<div class="prop-group"><div class="prop-group-title">${title}</div>${content}</div>`;
+    }
 
+    // ÖZELLİKLER PANELİ (YENİ SEKMELİ YAPI)
     window.renderProperties = function() {
         const f = document.getElementById('editor-fields');
-        if (!selectedEl || !selectedEl.tagName) { f.innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.</div>`; return; }
+        if (!selectedEl || !selectedEl.tagName) { window.renderEditor(); return; }
         
         try {
             const el = selectedEl; const id = el.id; const tag = el.tagName.toLowerCase();
             const isLocked = window.getD(el, 'locked') === "true"; const isPath = tag === 'path'; const isText = tag === 'text'; const isShape = tag === 'rect'; const isImage = tag === 'image'; const isIcon = tag === 'svg' || tag === 'g';
             
-            let typeName = tag.toUpperCase(); if (isShape) typeName = 'ŞEKİL'; if (isIcon) typeName = 'İKON'; if (isPath) typeName = 'ÇİZİM'; if (isImage) typeName = 'RESİM'; if (isText) typeName = 'METİN';
+            let typeName = tag.toUpperCase(); let headerIcon = 'ph-square';
+            if (isShape) { typeName = 'ŞEKİL'; headerIcon = 'ph-square'; } 
+            if (isIcon) { typeName = 'İKON'; headerIcon = 'ph-shapes'; } 
+            if (isPath) { typeName = 'ÇİZİM'; headerIcon = 'ph-scribble-loop'; } 
+            if (isImage) { typeName = 'RESİM'; headerIcon = 'ph-image'; } 
+            if (isText) { typeName = 'METİN'; headerIcon = 'ph-text-t'; }
 
-            let sections = [];
+            let layoutHtml = "";
+            let styleHtml = "";
+            let textHtml = "";
+            let codeHtml = "";
 
             let headerHtml = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--border);">
-                    <div style="font-size:14px; color:white; font-weight:bold; letter-spacing:1px;">${typeName} AYARLARI ${isLocked ? '🔒' : ''}</div>
-                    <div class="delete-btn" style="cursor:pointer;" title="Sil" onclick="if(confirm('Silinecek?')){ document.getElementById('${id}').remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; }">❌</div>
+                    <div style="font-size:14px; color:white; font-weight:bold; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="ph ${headerIcon}" style="color:var(--accent);"></i> ${typeName} AYARLARI ${isLocked ? '<i class="ph ph-lock-key" style="color:#ef4444;"></i>' : ''}
+                    </div>
+                    <div class="delete-btn" style="cursor:pointer; color:#94a3b8; font-size:20px; transition:0.2s;" title="Sil" onclick="if(confirm('Silinecek?')){ document.getElementById('${id}').remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; }"><i class="ph ph-x-circle"></i></div>
                 </div>
-                <div class="action-row" style="margin-bottom:15px;">
-                    <button class="action-btn" onclick="window.toggleLock('${id}')" style="background:${isLocked?'var(--error)':'#334155'}">${isLocked ? '🔓 KİLİDİ AÇ' : '🔒 KİLİTLE'}</button>
-                    <button class="action-btn special" onclick="window.cloneElement('${id}')" ${isLocked ? 'disabled':''}>⧉ KOPYALA</button>
+                <div class="action-row" style="margin-bottom:20px;">
+                    <button class="action-btn" onclick="window.toggleLock('${id}')" style="background:${isLocked?'var(--error)':'#334155'}"><i class="ph ${isLocked?'ph-lock-key-open':'ph-lock-key'}"></i> ${isLocked ? 'KİLİDİ AÇ' : 'KİLİTLE'}</button>
+                    <button class="action-btn special" onclick="window.cloneElement('${id}')" ${isLocked ? 'disabled':''}><i class="ph ph-copy"></i> KOPYALA</button>
                 </div>
             `;
-            sections.push(headerHtml);
 
             if (isLocked) { 
-                sections.push(`<div style="text-align:center; color:#ef4444; font-size:12px; margin-top:20px;">🔒 Bu öğe kilitli. Düzenlemek için kilidini açın.</div>`); 
-                f.innerHTML = sections.join(''); return; 
+                f.innerHTML = headerHtml + `<div style="text-align:center; color:#ef4444; font-size:12px; margin-top:30px;"><i class="ph ph-lock-key" style="font-size:40px; display:block; margin-bottom:10px; opacity:0.5;"></i> Bu öğe kilitli. Düzenlemek için kilidini açın.</div>`; 
+                return; 
             }
 
+            let tabsNav = `
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="window.switchTab(this, 'tab-layout')"><i class="ph ph-bounding-box"></i> Düzen</button>
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-style')"><i class="ph ph-palette"></i> Stil</button>
+                    ${isText ? `<button class="tab-btn" onclick="window.switchTab(this, 'tab-text')"><i class="ph ph-text-t"></i> Metin</button>` : ''}
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-code')"><i class="ph ph-code"></i> Kod</button>
+                </div>
+            `;
+
+            // --- 1. DÜZEN (LAYOUT) SEKMESİ ---
             if(!isPath) {
-                let alignHtml = `<div class="action-row" style="margin-bottom:8px;"><button class="action-btn" onclick="window.alignElement('${id}', 'left')">⬅️ SOL</button><button class="action-btn" onclick="window.alignElement('${id}', 'center-h')">🎯 ORTA</button><button class="action-btn" onclick="window.alignElement('${id}', 'right')">SAĞ ➡️</button></div><div class="action-row" style="margin-bottom:10px;"><button class="action-btn" onclick="window.alignElement('${id}', 'center-v')">⬆️⬇️ DİKEY ORTA</button><button class="action-btn" onclick="window.toggleFlip('${id}', 'x')">↔️ YATAY ÇEVİR</button><button class="action-btn" onclick="window.toggleFlip('${id}', 'y')">↕️ DİKEY ÇEVİR</button></div>`;
-                sections.push(window.createPropertySection("Hizalama & Çevirme", alignHtml));
-            }
-
-            if (isText) {
-                const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-                const varName = window.getD(el, 'var-name') || "";
-                
-                let rectOptions = `<option value="">-- Serbest Bırak (Sabitleme Yok) --</option>`;
-                document.querySelectorAll('#canvas-inner svg rect.duzenlenebilir, #canvas-inner svg image.duzenlenebilir').forEach(r => {
-                    const isSelected = window.getD(el, 'bound-rect') === r.id ? 'selected' : '';
-                    rectOptions += `<option value="${r.id}" ${isSelected}>Şekil: ${r.id}</option>`;
-                });
-
-                let contentHtml = `
-                    <div style="margin-bottom:10px;">
-                        <div class="label-text" style="margin-bottom:5px;">METİN İÇERİĞİ</div>
-                        <input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value); window.refreshAutoTextFields();" onchange="window.saveState()" placeholder="Metni girin..." style="margin-bottom:10px;">
-                    </div>
-                    <div style="margin-bottom:10px;">
-                        <div class="label-text" style="color:#f472b6; margin-bottom:5px;">OTOMATİK DEĞİŞKEN ADI (Örn: FIYAT)</div>
-                        <input type="text" value="${varName}" placeholder="Boş bırakırsanız listede görünmez" 
-                               oninput="this.value = this.value.toUpperCase(); window.setD(document.getElementById('${id}'), 'var-name', this.value); window.refreshAutoTextFields();" 
-                               onchange="window.saveState()" style="border-color:#f472b6;">
-                    </div>
-                    <div style="padding:10px; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; margin-top:10px;">
-                        <div class="label-text" style="color:#10b981; margin-bottom:5px;">BİR KUTUYA SABİTLE (ORTALA & SIĞDIR)</div>
-                        <div style="font-size:10px; color:#94a3b8; margin-bottom:8px; font-style:italic;">Seçilen kutunun tam ortasına yapışır ve taşmayı önler.</div>
-                        <select class="font-select" style="border-color:#10b981; background:#0f172a;" onchange="window.changeSetting('${id}', 'bound-rect', this.value); window.autoFitText(document.getElementById('${id}')); window.updateEditorUI(document.getElementById('${id}')); window.saveState();">
-                            ${rectOptions}
-                        </select>
-                    </div>
-                `;
-                sections.push(window.createPropertySection("Metin İçeriği ve Sabitleme", contentHtml));
+                let alignHtml = `
+                <div class="action-row" style="margin-bottom:8px;">
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'left')"><i class="ph ph-align-left"></i> SOL</button>
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'center-h')"><i class="ph ph-align-center-horizontal"></i> ORTA</button>
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'right')"><i class="ph ph-align-right"></i> SAĞ</button>
+                </div>
+                <div class="action-row" style="margin-bottom:10px;">
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'center-v')"><i class="ph ph-align-center-vertical"></i> DİKEY ORTA</button>
+                    <button class="action-btn" onclick="window.toggleFlip('${id}', 'x')"><i class="ph ph-arrows-left-right"></i> YATAY ÇEVİR</button>
+                    <button class="action-btn" onclick="window.toggleFlip('${id}', 'y')"><i class="ph ph-arrows-down-up"></i> DİKEY ÇEVİR</button>
+                </div>`;
+                layoutHtml += createPropGroup("<i class='ph ph-intersect'></i> Hizalama & Çevirme", alignHtml);
             }
 
             if (!isPath) {
                 let bbox = {x:0, y:0, width:0, height:0}; try { bbox = el.getBBox(); } catch(e){}
                 const x = Math.round(parseFloat(el.getAttribute("x")) || bbox.x || 0); const y = Math.round(parseFloat(el.getAttribute("y")) || bbox.y || 0);
-                
                 let w = 0, h = 0;
                 
                 if(isText) { 
@@ -1399,7 +1447,7 @@
                         <input type="range" min="1" max="2500" value="${h}" style="flex:1;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${h}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
                     </div>`;
-                sections.push(window.createPropertySection("Konum ve Boyut", posHtml));
+                layoutHtml += createPropGroup("<i class='ph ph-arrows-out'></i> Konum ve Boyut", posHtml);
                 
                 const angle = parseFloat(window.getD(el, 'angle')) || 0;
                 let transHtml = `
@@ -1408,52 +1456,7 @@
                         <input type="range" min="0" max="360" value="${angle}" style="flex:1;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${angle}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
                     </div>`;
-                sections.push(window.createPropertySection("Dönüştürme (Transform)", transHtml));
-            }
-
-            if (isText) {
-                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0; const mh = parseFloat(window.getD(el, 'max-height')) || 0;
-                const isB = el.getAttribute('font-weight') === 'bold'; const isI = el.getAttribute('font-style') === 'italic'; const isU = el.getAttribute('text-decoration') === 'underline';
-                const tAlign = el.getAttribute('text-anchor') || 'middle';
-                let fontOptions = googleFonts.map(font => `<option value="${font.val}" style="font-family: ${font.val}" ${currentFont.includes(font.name) ? "selected" : ""}>${font.name}</option>`).join('');
-                
-                let fontHtml = `<select class="font-select" style="margin-bottom:15px;" onchange="const t=document.getElementById('${id}'); t.setAttribute('font-family', this.value); t.style.fontFamily=this.value; window.applyTextCurve(t); if(window.updateEditorUI) window.updateEditorUI(t); window.saveState();">${fontOptions}</select>
-                    <div style="display:flex; gap:5px; margin-bottom:15px;">
-                        <button class="action-btn ${isB?'active':''}" style="flex:1; font-size:14px;" onclick="window.applyTextStyle('${id}', 'bold')"><b>B</b></button>
-                        <button class="action-btn ${isI?'active':''}" style="flex:1; font-size:14px; font-style:italic;" onclick="window.applyTextStyle('${id}', 'italic')">I</button>
-                        <button class="action-btn ${isU?'active':''}" style="flex:1; font-size:14px; text-decoration:underline;" onclick="window.applyTextStyle('${id}', 'underline')">U</button>
-                        <div style="width:1px; background:var(--border); margin:0 5px;"></div>
-                        <button class="action-btn ${tAlign==='start'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'start')">⇤</button>
-                        <button class="action-btn ${tAlign==='middle'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'middle')">↔</button>
-                        <button class="action-btn ${tAlign==='end'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'end')">⇥</button>
-                    </div>
-                    <div class="action-row" style="margin-bottom:15px;">
-                        <button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Stil Temizle</button>
-                        <button class="action-btn special" onclick="document.getElementById('${id}').removeAttribute('textLength'); document.getElementById('${id}').removeAttribute('lengthAdjust'); window.autoFitText(document.getElementById('${id}')); window.saveState(); window.renderProperties();">📏 ESNETMEYİ SIFIRLA (STANDART YAP)</button>
-                    </div>
-                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
-                    
-                    <div class="label-row"><span class="label-text">EĞRİLİK (KAVİS)</span><span class="value-badge" id="val-curve-${id}">${curve}</span></div>
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-                        <input type="range" min="-100" max="100" value="${curve}" style="flex:1;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
-                        <input type="number" value="${curve}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
-                    </div>
-                    <div class="label-row"><span class="label-text">HARF ARALIĞI</span><span class="value-badge" id="val-letter-spacing-${id}">${ls}px</span></div>
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-                        <input type="range" min="-20" max="100" value="${ls}" style="flex:1;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
-                        <input type="number" value="${ls}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
-                    </div>
-                    <div class="label-row"><span class="label-text">SIĞDIRMA GENİŞLİK (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
-                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-                        <input type="range" min="0" max="2000" value="${mw}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
-                        <input type="number" value="${mw}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
-                    </div>
-                    <div class="label-row"><span class="label-text">SIĞDIRMA YÜKSEKLİK (MAX-H)</span><span class="value-badge" id="val-max-height-${id}">${mh === 0 ? 'KAPALI' : mh+'px'}</span></div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <input type="range" min="0" max="2000" value="${mh}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
-                        <input type="number" value="${mh}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
-                    </div>`;
-                sections.push(window.createPropertySection("Yazı Tipi & Biçimlendirme", fontHtml));
+                layoutHtml += createPropGroup("<i class='ph ph-arrows-clockwise'></i> Dönüştürme", transHtml);
             }
 
             if (isShape || isImage) {
@@ -1465,21 +1468,23 @@
                     <input type="range" min="0" max="${maxR}" value="${rx}" style="flex:1;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
                     <input type="number" value="${rx}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
                 </div>`;
-                sections.push(window.createPropertySection("Form & Maskeleme", formHtml));
+                layoutHtml += createPropGroup("<i class='ph ph-scissors'></i> Form & Maskeleme", formHtml);
             }
 
+
+            // --- 2. STİL SEKMESİ ---
             if (!isImage) {
                 const fillType = window.getD(el, 'fill-type') || 'solid'; const col1 = window.getD(el, 'color1') || '#10b981'; const col2 = window.getD(el, 'color2') || '#3b82f6'; const solidCol = window.getD(el, 'solid-color') || (el.getAttribute('fill') === 'none' ? el.getAttribute('stroke') : el.getAttribute('fill')) || "#ffffff";
                 let swatchHtml = `<div class="label-text" style="margin-top:15px; margin-bottom:8px;">PROJE RENKLERİ</div><div class="swatch-container">` + recentColors.map(c => `<div class="color-swatch" style="background:${c}" onclick="window.applyRecentColor('${id}', '${c}')" title="${c}"></div>`).join('') + `</div>`;
                 let fillHtml = `<div class="label-text" style="margin-bottom:5px;">DOLGU TİPİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'fill-type', this.value); window.renderProperties(); window.saveState();"><option value="solid" ${fillType === 'solid' ? 'selected' : ''}>Düz Renk</option><option value="gradient" ${fillType === 'gradient' ? 'selected' : ''}>Renk Geçişi (Gradient)</option></select>`;
-                if (fillType === 'solid') { fillHtml += `<div class="label-text" style="margin-bottom:5px;">${isPath?'ÇİZGİ':'İÇ'} RENK</div><div style="display:flex; gap:10px; align-items:center;"><input type="color" value="${safeColor(solidCol)}" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'solidColor', 'fill')" title="Göz Damlası">💧</button><input type="text" value="${safeColor(solidCol)}" style="flex:1;" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>`; } 
-                else { fillHtml += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div class="input-group"><span class="label-text">RENK 1</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col1)}" oninput="window.changeSetting('${id}', 'color1', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155;" onclick="window.pickColor('${id}', 'color1', '')">💧</button></div></div><div class="input-group"><span class="label-text">RENK 2</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col2)}" oninput="window.changeSetting('${id}', 'color2', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155;" onclick="window.pickColor('${id}', 'color2', '')">💧</button></div></div></div>`; }
+                if (fillType === 'solid') { fillHtml += `<div class="label-text" style="margin-bottom:5px;">${isPath?'ÇİZGİ':'İÇ'} RENK</div><div style="display:flex; gap:10px; align-items:center;"><input type="color" value="${safeColor(solidCol)}" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:18px;" onclick="window.pickColor('${id}', 'solidColor', 'fill')" title="Göz Damlası"><i class="ph ph-drop"></i></button><input type="text" value="${safeColor(solidCol)}" style="flex:1;" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>`; } 
+                else { fillHtml += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div class="input-group"><span class="label-text">RENK 1</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col1)}" oninput="window.changeSetting('${id}', 'color1', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'color1', '')"><i class="ph ph-drop"></i></button></div></div><div class="input-group"><span class="label-text">RENK 2</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col2)}" oninput="window.changeSetting('${id}', 'color2', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'color2', '')"><i class="ph ph-drop"></i></button></div></div></div>`; }
                 fillHtml += swatchHtml;
-                sections.push(window.createPropertySection("Dolgu & Renk", fillHtml));
+                styleHtml += createPropGroup("<i class='ph ph-paint-bucket'></i> Dolgu & Renk", fillHtml);
             }
 
             const strokeCol = el.getAttribute('stroke') || '#000000'; const strokeW = parseFloat(el.getAttribute('stroke-width')) || 0; const dash = el.getAttribute('stroke-dasharray') || 'none';
-            let strokeHtml = `<div class="label-text" style="margin-bottom:5px;">ÇİZGİ RENGİ</div><div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;"><input type="color" value="${safeColor(strokeCol)}" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', '', 'stroke')" title="Göz Damlası">💧</button><input type="text" value="${safeColor(strokeCol)}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>
+            let strokeHtml = `<div class="label-text" style="margin-bottom:5px;">ÇİZGİ RENGİ</div><div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;"><input type="color" value="${safeColor(strokeCol)}" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:18px;" onclick="window.pickColor('${id}', '', 'stroke')" title="Göz Damlası"><i class="ph ph-drop"></i></button><input type="text" value="${safeColor(strokeCol)}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>
             <div class="label-row"><span class="label-text">KALINLIK</span><span class="value-badge" id="val-sw-${id}">${strokeW}px</span></div>
             <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
                 <input type="range" min="0" max="50" value="${strokeW}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke-width', this.value); t.setAttribute('paint-order', 'stroke fill'); document.getElementById('val-sw-${id}').innerText=this.value+'px'; this.nextElementSibling.value=this.value;" onchange="window.saveState()">
@@ -1487,7 +1492,7 @@
             </div>
             <div class="label-text" style="margin-bottom:5px;">ÇİZGİ TİPİ</div>
             <select class="font-select" onchange="document.getElementById('${id}').setAttribute('stroke-dasharray', this.value); window.saveState();"><option value="none" ${dash === 'none' ? 'selected' : ''}>Düz</option><option value="5,5" ${dash === '5,5' ? 'selected' : ''}>Kesikli</option><option value="2,2" ${dash === '2,2' ? 'selected' : ''}>Noktalı</option></select>`;
-            sections.push(window.createPropertySection("Kenarlık & Çizgi", strokeHtml));
+            styleHtml += createPropGroup("<i class='ph ph-square-logo'></i> Kenarlık & Çizgi", strokeHtml);
 
             let opacityVal = parseFloat(el.getAttribute('opacity')); if (isNaN(opacityVal)) opacityVal = 1;
             const sX = parseFloat(window.getD(el, 'shadow-x')) || 0, sY = parseFloat(window.getD(el, 'shadow-y')) || 0, sB = parseFloat(window.getD(el, 'shadow-blur')) || 0, sC = window.getD(el, 'shadow-color') || '#000000', bl = parseFloat(window.getD(el, 'blur')) || 0; const blend = window.getD(el, 'blend') || 'normal';
@@ -1503,10 +1508,10 @@
                 <option value="normal" ${blend === 'normal' ? 'selected' : ''}>Normal</option><option value="multiply" ${blend === 'multiply' ? 'selected' : ''}>Çoğalt (Multiply)</option><option value="screen" ${blend === 'screen' ? 'selected' : ''}>Ekran (Screen)</option><option value="overlay" ${blend === 'overlay' ? 'selected' : ''}>Kaplama (Overlay)</option>
             </select>
             <div class="group-box">
-                <div class="label-text" style="color:white; margin-bottom:10px;">GÖLGE VE BLUR</div>
+                <div class="label-text" style="color:white; margin-bottom:10px;"><i class="ph ph-drop-half-bottom"></i> GÖLGE VE BLUR</div>
                 <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
                     <input type="color" value="${sC}" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:40px; height:40px; cursor:pointer; border-radius:8px; border:none; background:none;">
-                    <button class="action-btn" style="padding:10px; background:#334155;" onclick="window.pickColor('${id}', 'shadow-color', '')">💧</button>
+                    <button class="action-btn" style="padding:10px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'shadow-color', '')"><i class="ph ph-drop"></i></button>
                     <input type="text" value="${sC}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();">
                 </div>
                 <div class="label-row"><span class="label-text">GÖLGE X</span><span class="value-badge" id="val-shadow-x-${id}">${sX}px</span></div>
@@ -1530,17 +1535,100 @@
                     <input type="number" value="${bl}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'blur', this.value, this);" onchange="window.saveState()">
                 </div>
             </div>`;
-            sections.push(window.createPropertySection("Efektler & Görünüm", fxHtml));
+            styleHtml += createPropGroup("<i class='ph ph-magic-wand'></i> Efektler & Görünüm", fxHtml);
 
+            // --- 3. METİN SEKMESİ ---
+            if (isText) {
+                const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                const varName = window.getD(el, 'var-name') || "";
+                
+                let rectOptions = `<option value="">-- Serbest Bırak (Sabitleme Yok) --</option>`;
+                document.querySelectorAll('#canvas-inner svg rect.duzenlenebilir, #canvas-inner svg image.duzenlenebilir').forEach(r => {
+                    const isSelected = window.getD(el, 'bound-rect') === r.id ? 'selected' : '';
+                    rectOptions += `<option value="${r.id}" ${isSelected}>Şekil: ${r.id}</option>`;
+                });
+
+                let contentHtml = `
+                    <div style="margin-bottom:10px;">
+                        <div class="label-text" style="margin-bottom:5px;">METİN İÇERİĞİ</div>
+                        <input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value); window.refreshAutoTextFields();" onchange="window.saveState()" placeholder="Metni girin..." style="margin-bottom:10px;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <div class="label-text" style="color:#f472b6; margin-bottom:5px;">OTOMATİK DEĞİŞKEN ADI (Örn: FIYAT)</div>
+                        <input type="text" value="${varName}" placeholder="Boş bırakırsanız listede görünmez" 
+                               oninput="this.value = this.value.toUpperCase(); window.setD(document.getElementById('${id}'), 'var-name', this.value); window.refreshAutoTextFields();" 
+                               onchange="window.saveState()" style="border-color:#f472b6;">
+                    </div>
+                    <div style="padding:10px; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; margin-top:10px;">
+                        <div class="label-text" style="color:#10b981; margin-bottom:5px;"><i class="ph ph-intersect"></i> BİR KUTUYA SABİTLE (ORTALA & SIĞDIR)</div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:8px; font-style:italic;">Seçilen kutunun tam ortasına yapışır ve taşmayı önler.</div>
+                        <select class="font-select" style="border-color:#10b981; background:#0f172a;" onchange="window.changeSetting('${id}', 'bound-rect', this.value); window.autoFitText(document.getElementById('${id}')); window.updateEditorUI(document.getElementById('${id}')); window.saveState();">
+                            ${rectOptions}
+                        </select>
+                    </div>
+                `;
+                textHtml += createPropGroup("<i class='ph ph-text-t'></i> Metin ve Sabitleme", contentHtml);
+
+                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0; const mh = parseFloat(window.getD(el, 'max-height')) || 0;
+                const isB = el.getAttribute('font-weight') === 'bold'; const isI = el.getAttribute('font-style') === 'italic'; const isU = el.getAttribute('text-decoration') === 'underline';
+                const tAlign = el.getAttribute('text-anchor') || 'middle';
+                let fontOptionsHtml = googleFonts.map(font => `<option value="${font.val}" style="font-family: ${font.val}" ${currentFont.includes(font.name) ? "selected" : ""}>${font.name}</option>`).join('');
+                
+                let fontHtml = `<select class="font-select" style="margin-bottom:15px;" onchange="const t=document.getElementById('${id}'); t.setAttribute('font-family', this.value); t.style.fontFamily=this.value; window.applyTextCurve(t); if(window.updateEditorUI) window.updateEditorUI(t); window.saveState();">${fontOptionsHtml}</select>
+                    <div style="display:flex; gap:5px; margin-bottom:15px;">
+                        <button class="action-btn ${isB?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'bold')"><i class="ph ph-text-b"></i></button>
+                        <button class="action-btn ${isI?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'italic')"><i class="ph ph-text-italic"></i></button>
+                        <button class="action-btn ${isU?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'underline')"><i class="ph ph-text-underline"></i></button>
+                        <div style="width:1px; background:var(--border); margin:0 5px;"></div>
+                        <button class="action-btn ${tAlign==='start'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'start')"><i class="ph ph-text-align-left"></i></button>
+                        <button class="action-btn ${tAlign==='middle'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'middle')"><i class="ph ph-text-align-center"></i></button>
+                        <button class="action-btn ${tAlign==='end'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'end')"><i class="ph ph-text-align-right"></i></button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;">
+                        <button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Stil Temizle</button>
+                        <button class="action-btn special" onclick="document.getElementById('${id}').removeAttribute('textLength'); document.getElementById('${id}').removeAttribute('lengthAdjust'); window.autoFitText(document.getElementById('${id}')); window.saveState(); window.renderProperties();"><i class="ph ph-arrows-out-line-horizontal"></i> ESNETMEYİ SIFIRLA</button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
+                    
+                    <div class="label-row"><span class="label-text">EĞRİLİK (KAVİS)</span><span class="value-badge" id="val-curve-${id}">${curve}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-100" max="100" value="${curve}" style="flex:1;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${curve}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">HARF ARALIĞI</span><span class="value-badge" id="val-letter-spacing-${id}">${ls}px</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-20" max="100" value="${ls}" style="flex:1;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${ls}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA GENİŞLİK (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="0" max="2000" value="${mw}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mw}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA YÜKSEKLİK (MAX-H)</span><span class="value-badge" id="val-max-height-${id}">${mh === 0 ? 'KAPALI' : mh+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="2000" value="${mh}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mh}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                textHtml += createPropGroup("<i class='ph ph-text-aa'></i> Yazı Tipi & Biçimlendirme", fontHtml);
+            }
+
+            // --- 4. KOD SEKMESİ ---
             const rawSvgCode = el.outerHTML.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            let codeHtml = `<textarea id="raw-svg-code" style="width:100%; height:120px; background:#000; color:var(--accent); font-family:monospace; font-size:11px; padding:10px; border-radius:8px; border:1px solid var(--border); resize:vertical;" onchange="window.saveState()">${rawSvgCode}</textarea>
-            <button class="action-btn active" style="width:100%; margin-top:10px; padding:10px;" onclick="window.applyRawCode('${id}')">💻 KODU UYGULA</button>`;
-            sections.push(window.createPropertySection("</> Canlı SVG Kodu", codeHtml));
+            let editorCodeHtml = `<textarea id="raw-svg-code" style="width:100%; height:250px; background:#000; color:var(--accent); font-family:monospace; font-size:11px; padding:10px; border-radius:8px; border:1px solid var(--border); resize:vertical;" onchange="window.saveState()">${rawSvgCode}</textarea>
+            <button class="action-btn active" style="width:100%; margin-top:10px; padding:12px;" onclick="window.applyRawCode('${id}')"><i class="ph ph-terminal-window"></i> KODU UYGULA</button>`;
+            codeHtml += createPropGroup("<i class='ph ph-file-code'></i> Canlı SVG Kodu", editorCodeHtml);
 
-            f.innerHTML = sections.join('');
+            // TÜM SEKMELERİ BİRLEŞTİR
+            f.innerHTML = headerHtml + tabsNav + 
+                `<div id="tab-layout" class="tab-content active">${layoutHtml}</div>` +
+                `<div id="tab-style" class="tab-content">${styleHtml}</div>` +
+                (isText ? `<div id="tab-text" class="tab-content">${textHtml}</div>` : '') +
+                `<div id="tab-code" class="tab-content">${codeHtml}</div>`;
+
         } catch(err) {
             console.error("Özellik Paneli Hatası:", err);
-            f.innerHTML = `<div style="color:#ef4444; padding:20px; font-size:12px; text-align:center;">Özellikler yüklenemedi. Lütfen nesneyi tekrar seçin.</div>`;
+            f.innerHTML = `<div style="color:#ef4444; padding:20px; font-size:12px; text-align:center;"><i class="ph ph-warning-circle" style="font-size:32px; display:block; margin-bottom:10px;"></i> Özellikler yüklenemedi. Lütfen nesneyi tekrar seçin.</div>`;
         }
     };
 
@@ -1563,7 +1651,8 @@
             if(!selectedEl.id) selectedEl.id='el_'+Date.now(); 
             if(!selectedEl.classList.contains('duzenlenebilir')) selectedEl.classList.add('duzenlenebilir'); 
             window.saveState(); window.setupLayers(); window.updateEditorUI(selectedEl); window.renderEditor(); 
-        } catch(err) { alert('Hata: Lütfen geçerli bir SVG kodu girin.'); }
+            window.showToast("Özel Kod Uygulandı!");
+        } catch(err) { window.showToast('Lütfen geçerli bir SVG kodu girin.', 'error'); }
     };
 </script>
 </body>
