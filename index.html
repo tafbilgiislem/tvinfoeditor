@@ -935,6 +935,30 @@
 
     window.autoFitText = function(el) { 
         if (el.tagName !== 'text') return; 
+        
+        // --- YENİ EKLENEN: Kutuya Sabitleme (Bounding Box) Mantığı ---
+        const boundRectId = window.getD(el, 'bound-rect');
+        if (boundRectId) {
+            const rect = document.getElementById(boundRectId);
+            if (rect && (rect.tagName === 'rect' || rect.tagName === 'image')) {
+                // Kutunun (Rect) merkezini ve genişliğini al
+                const rx = parseFloat(rect.getAttribute('x')) || 0;
+                const ry = parseFloat(rect.getAttribute('y')) || 0;
+                const rw = parseFloat(rect.getAttribute('width')) || 0;
+                const rh = parseFloat(rect.getAttribute('height')) || 0;
+                
+                // Metni tam olarak kutunun merkezine mühürle
+                el.setAttribute('x', rx + rw / 2);
+                el.setAttribute('y', ry + rh / 2);
+                el.setAttribute('text-anchor', 'middle');
+                el.setAttribute('dominant-baseline', 'central');
+                
+                // Max-width'i otomatik olarak kutu genişliği yap (kenarlardan 20px boşluk bırakarak)
+                window.setD(el, 'max-width', Math.max(10, rw - 40)); 
+            }
+        }
+        // -------------------------------------------------------------
+
         const mw = parseFloat(window.getD(el, 'max-width')) || 0; 
         const baseFs = parseFloat(window.getD(el, 'base-font-size')) || 60; 
         el.style.fontSize = baseFs + "px"; el.setAttribute("font-size", baseFs); 
@@ -1077,7 +1101,11 @@
                 else if (resizingEl.tagName === "image" || resizingEl.tagName === "rect" || resizingEl.tagName === "svg" || resizingEl.tagName === "g") { 
                     if (w > 10 && h > 10) { resizingEl.setAttribute("x", x); resizingEl.setAttribute("y", y); resizingEl.setAttribute("width", w); resizingEl.setAttribute("height", h); if(resizingEl.tagName !== "svg" && resizingEl.tagName !== "g" && window.getD(resizingEl, 'mask-shape') && window.getD(resizingEl, 'mask-shape') !== "none") window.applyShapeMask(resizingEl); } 
                 }
+                
                 window.updateUI(resizingEl);
+                if(resizingEl.tagName === 'rect' || resizingEl.tagName === 'image') {
+                    document.querySelectorAll(`text[data-bound-rect="${resizingEl.id}"]`).forEach(txt => { window.autoFitText(txt); });
+                }
             } 
             else if (rotatingEl) {
                 isModified = true; let bbox = {x:0, y:0, width:0, height:0}; try{ bbox = rotatingEl.getBBox(); }catch(e){}
@@ -1120,7 +1148,11 @@
                 selectedEl.setAttribute("x", newX); selectedEl.setAttribute("y", newY);
                 if((selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') && window.getD(selectedEl, 'mask-shape') && window.getD(selectedEl, 'mask-shape') !== "none") window.applyShapeMask(selectedEl); 
                 if(selectedEl.tagName === 'text' && window.getD(selectedEl, 'curve')) window.applyTextCurve(selectedEl);
+                
                 window.updateUI(selectedEl, snapX, snapY);
+                if(selectedEl.tagName === 'rect' || selectedEl.tagName === 'image') {
+                    document.querySelectorAll(`text[data-bound-rect="${selectedEl.id}"]`).forEach(txt => { window.autoFitText(txt); });
+                }
             }
         };
 
@@ -1253,19 +1285,33 @@
             if (isText) {
                 const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
                 const varName = window.getD(el, 'var-name') || "";
+                
+                let rectOptions = `<option value="">-- Serbest Bırak (Sabitleme Yok) --</option>`;
+                document.querySelectorAll('#canvas-inner svg rect.duzenlenebilir, #canvas-inner svg image.duzenlenebilir').forEach(r => {
+                    const isSelected = window.getD(el, 'bound-rect') === r.id ? 'selected' : '';
+                    rectOptions += `<option value="${r.id}" ${isSelected}>Şekil: ${r.id}</option>`;
+                });
+
                 let contentHtml = `
                     <div style="margin-bottom:10px;">
                         <div class="label-text" style="margin-bottom:5px;">METİN İÇERİĞİ</div>
                         <input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value); window.refreshAutoTextFields();" onchange="window.saveState()" placeholder="Metni girin..." style="margin-bottom:10px;">
                     </div>
-                    <div>
+                    <div style="margin-bottom:10px;">
                         <div class="label-text" style="color:#f472b6; margin-bottom:5px;">OTOMATİK DEĞİŞKEN ADI (Örn: FIYAT)</div>
                         <input type="text" value="${varName}" placeholder="Boş bırakırsanız listede görünmez" 
                                oninput="this.value = this.value.toUpperCase(); window.setD(document.getElementById('${id}'), 'var-name', this.value); window.refreshAutoTextFields();" 
                                onchange="window.saveState()" style="border-color:#f472b6;">
                     </div>
+                    <div style="padding:10px; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; margin-top:10px;">
+                        <div class="label-text" style="color:#10b981; margin-bottom:5px;">BİR KUTUYA SABİTLE (ORTALA & SIĞDIR)</div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:8px; font-style:italic;">Seçilen kutunun tam ortasına yapışır ve taşmayı önler.</div>
+                        <select class="font-select" style="border-color:#10b981; background:#0f172a;" onchange="window.changeSetting('${id}', 'bound-rect', this.value); window.autoFitText(document.getElementById('${id}')); window.updateEditorUI(document.getElementById('${id}')); window.saveState();">
+                            ${rectOptions}
+                        </select>
+                    </div>
                 `;
-                sections.push(window.createPropertySection("Metin İçeriği", contentHtml));
+                sections.push(window.createPropertySection("Metin İçeriği ve Sabitleme", contentHtml));
             }
 
             if (!isPath) {
