@@ -292,6 +292,17 @@
                 </div>
             </details>
 
+            <details style="margin-bottom: 10px;" open id="auto-text-panel">
+                <summary style="font-size:11px; font-weight:bold; color:#f472b6; cursor:pointer; margin-bottom:5px;">📝 OTOMATİK METİN YERLEŞTİRME</summary>
+                <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 12px; border: 1px solid var(--border);">
+                    <div id="auto-fields-list">
+                        </div>
+                    <div style="font-size:10px; color:#94a3b8; margin-top:10px; font-style:italic;">
+                        * Bir metni değişken yapmak için sağ panelden 'Değişken Adı' tanımlayın.
+                    </div>
+                </div>
+            </details>
+
             <details style="margin-bottom: 5px;" open>
                 <summary style="font-size:11px; font-weight:bold; color:#06b6d4; cursor:pointer; margin-bottom:5px;">📑 KATMANLAR</summary>
                 <div class="group-box" style="margin-top:5px; margin-bottom:5px; padding: 0; overflow: hidden; border: 1px solid var(--border);">
@@ -358,6 +369,49 @@
     document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.login(); });
     document.getElementById('file-selector').addEventListener('change', async () => { await window.loadSlide(); window.updateSettingsUI(); });
 
+    // --- Otomatik Metin Yerleştirme Modülü ---
+    window.refreshAutoTextFields = function() {
+        const list = document.getElementById('auto-fields-list');
+        const svg = document.querySelector('#canvas-inner svg');
+        if(!svg || !list) return;
+
+        const varElements = svg.querySelectorAll('[data-var-name]');
+        list.innerHTML = "";
+
+        let hasVars = false;
+        varElements.forEach(el => {
+            const varName = el.getAttribute('data-var-name');
+            if(!varName || varName.trim() === "") return;
+            hasVars = true;
+            const currentVal = window.getD(el, 'raw-text') || el.textContent;
+            
+            const row = document.createElement('div');
+            row.style.marginBottom = "8px";
+            row.innerHTML = `
+                <div class="label-row"><span class="label-text" style="color:#f472b6;">${varName}</span></div>
+                <input type="text" value="${currentVal.replace(/"/g, '&quot;')}" 
+                       oninput="window.updateVarValue('${el.id}', this.value)" 
+                       onchange="window.saveState()" 
+                       style="border-color:rgba(244,114,182,0.3);">
+            `;
+            list.appendChild(row);
+        });
+
+        if(!hasVars) {
+            list.innerHTML = `<div style="font-size:11px; color:#64748b; text-align:center;">Henüz değişken tanımlanmadı.</div>`;
+        }
+    };
+
+    window.updateVarValue = function(id, val) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        window.changeSetting(id, 'raw-text', val);
+        if(selectedEl && selectedEl.id === id) {
+            const inputs = document.querySelectorAll('input[oninput*="raw-text"]');
+            inputs.forEach(input => { if(!input.getAttribute('oninput').includes('updateVarValue')) input.value = val; });
+        }
+    };
+
     // --- JSON Ayarları Modülü ---
     window.loadSettings = async function() {
         try {
@@ -408,7 +462,7 @@
         } catch (e) { alert("Ayarlar kaydedilemedi."); st.style.display="none"; }
     };
 
-    // --- Index HTML (Efekt) Modülü DÜZELTİLDİ ---
+    // --- Index HTML (Efekt) Modülü ---
     window.loadIndexHtml = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
@@ -427,12 +481,10 @@
         if(!indexHtmlContent) return;
         const effect = document.getElementById('html-effect-select').value;
         
-        // Bu Regex CSS sınıfını güvenli bir şekilde bulur (Örn: .zoom.active { ... })
         const blockRegex = new RegExp(`\\.${effect}\\.active[^\\{]*\\{([^}]*)\\}`, "i");
         const match = indexHtmlContent.match(blockRegex);
         
         if (match && match[1]) {
-            // İçerisindeki transition süresini ayıklar (Örn: transition:1.5s; -> 1.5)
             const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
             if (transMatch && transMatch[1]) {
                 document.getElementById('html-effect-duration').value = transMatch[1];
@@ -452,17 +504,14 @@
             const effect = document.getElementById('html-effect-select').value;
             const duration = document.getElementById('html-effect-duration').value;
 
-            // Bloğu tam olarak yakalıyoruz.
             const blockRegex = new RegExp(`(\\.${effect}\\.active[^\\{]*\\{)([^}]*)(\\})`, "i");
             
             if (blockRegex.test(indexHtmlContent)) {
                 indexHtmlContent = indexHtmlContent.replace(blockRegex, function(fullMatch, p1, p2, p3) {
                     let updatedInner = p2;
-                    // Eğer transition özelliği varsa sadece sayıyı değiştiriyoruz
                     if (/transition:/i.test(p2)) {
                         updatedInner = p2.replace(/(transition:[^;]*?)([\d\.]+)(s|ms)/gi, `$1${duration}$3`);
                     } else {
-                        // Eğer transition özelliği yoksa yeni ekliyoruz
                         updatedInner = p2 + `transition: ${duration}s;`;
                     }
                     return p1 + updatedInner + p3;
@@ -953,7 +1002,7 @@
             if(window.getD(el, 'shadow-blur') || window.getD(el, 'blur') || window.getD(el, 'blend')) window.applyFilters(el);
             if(window.getD(el, 'fill-type')) window.applyFill(el);
         });
-        window.initEngine(mainSvg); window.renderEditor(); window.updateRulers();
+        window.initEngine(mainSvg); window.renderEditor(); window.updateRulers(); window.refreshAutoTextFields();
     };
 
     window.initEngine = function(svg) {
@@ -1125,6 +1174,7 @@
 
     window.renderEditor = function() { 
         window.renderLayers(); 
+        window.refreshAutoTextFields();
         if(selectedEl) window.renderProperties(); 
         else document.getElementById('editor-fields').innerHTML = `<div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.</div>`;
     };
@@ -1202,7 +1252,19 @@
 
             if (isText) {
                 const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
-                let contentHtml = `<input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value);" onchange="window.saveState()" placeholder="Metni girin...">`;
+                const varName = window.getD(el, 'var-name') || "";
+                let contentHtml = `
+                    <div style="margin-bottom:10px;">
+                        <div class="label-text" style="margin-bottom:5px;">METİN İÇERİĞİ</div>
+                        <input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value); window.refreshAutoTextFields();" onchange="window.saveState()" placeholder="Metni girin..." style="margin-bottom:10px;">
+                    </div>
+                    <div>
+                        <div class="label-text" style="color:#f472b6; margin-bottom:5px;">OTOMATİK DEĞİŞKEN ADI (Örn: FIYAT)</div>
+                        <input type="text" value="${varName}" placeholder="Boş bırakırsanız listede görünmez" 
+                               oninput="this.value = this.value.toUpperCase(); window.setD(document.getElementById('${id}'), 'var-name', this.value); window.refreshAutoTextFields();" 
+                               onchange="window.saveState()" style="border-color:#f472b6;">
+                    </div>
+                `;
                 sections.push(window.createPropertySection("Metin İçeriği", contentHtml));
             }
 
