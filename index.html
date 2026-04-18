@@ -653,7 +653,7 @@
         const el = document.getElementById(id); if(!el) return;
         window.setD(el, key, val);
         
-        if(key === 'curve' || key === 'raw-text' || key === 'letter-spacing' || key === 'max-width') { 
+        if(key === 'curve' || key === 'raw-text' || key === 'letter-spacing' || key === 'max-width' || key === 'max-height') { 
             if(key === 'letter-spacing') el.setAttribute('letter-spacing', val); 
             window.applyTextCurve(el); 
         }
@@ -936,36 +936,49 @@
     window.autoFitText = function(el) { 
         if (el.tagName !== 'text') return; 
         
-        // --- YENİ EKLENEN: Kutuya Sabitleme (Bounding Box) Mantığı ---
+        // --- Kutuya Sabitleme (Bounding Box) Mantığı ---
         const boundRectId = window.getD(el, 'bound-rect');
         if (boundRectId) {
             const rect = document.getElementById(boundRectId);
             if (rect && (rect.tagName === 'rect' || rect.tagName === 'image')) {
-                // Kutunun (Rect) merkezini ve genişliğini al
                 const rx = parseFloat(rect.getAttribute('x')) || 0;
                 const ry = parseFloat(rect.getAttribute('y')) || 0;
                 const rw = parseFloat(rect.getAttribute('width')) || 0;
                 const rh = parseFloat(rect.getAttribute('height')) || 0;
                 
-                // Metni tam olarak kutunun merkezine mühürle
                 el.setAttribute('x', rx + rw / 2);
                 el.setAttribute('y', ry + rh / 2);
                 el.setAttribute('text-anchor', 'middle');
                 el.setAttribute('dominant-baseline', 'central');
                 
-                // Max-width'i otomatik olarak kutu genişliği yap (kenarlardan 20px boşluk bırakarak)
                 window.setD(el, 'max-width', Math.max(10, rw - 40)); 
+                window.setD(el, 'max-height', Math.max(10, rh - 40)); // Yükseklik de otomatik ayarlanıyor
             }
         }
-        // -------------------------------------------------------------
 
         const mw = parseFloat(window.getD(el, 'max-width')) || 0; 
+        const mh = parseFloat(window.getD(el, 'max-height')) || 0; 
         const baseFs = parseFloat(window.getD(el, 'base-font-size')) || 60; 
         el.style.fontSize = baseFs + "px"; el.setAttribute("font-size", baseFs); 
         
-        if (mw > 0) { 
-            let bbox = {width:0}; try { bbox = el.getBBox(); } catch(e){} 
-            if (bbox.width > mw && bbox.width > 0) { const scale = mw / bbox.width; const newFs = baseFs * scale; el.style.fontSize = newFs + "px"; el.setAttribute("font-size", newFs); } 
+        if (mw > 0 || mh > 0) { 
+            let bbox = {width:0, height:0}; try { bbox = el.getBBox(); } catch(e){} 
+            let scaleW = 1;
+            let scaleH = 1;
+            
+            if (mw > 0 && bbox.width > mw && bbox.width > 0) { 
+                scaleW = mw / bbox.width;
+            }
+            if (mh > 0 && bbox.height > mh && bbox.height > 0) {
+                scaleH = mh / bbox.height;
+            }
+            
+            // Genişlik veya yükseklikten hangisi daha dar ise ona göre küçültüyoruz
+            const finalScale = Math.min(scaleW, scaleH);
+            if(finalScale < 1) {
+                const newFs = baseFs * finalScale; 
+                el.style.fontSize = newFs + "px"; el.setAttribute("font-size", newFs); 
+            }
         }
     };
     
@@ -1184,9 +1197,23 @@
         if (snapX !== null) { const lX = document.createElementNS("http://www.w3.org/2000/svg", "line"); lX.setAttribute("x1", snapX); lX.setAttribute("y1", 0); lX.setAttribute("x2", snapX); lX.setAttribute("y2", h); lX.classList.add("snap-line"); ctrl.appendChild(lX); }
         if (snapY !== null) { const lY = document.createElementNS("http://www.w3.org/2000/svg", "line"); lY.setAttribute("x1", 0); lY.setAttribute("y1", snapY); lY.setAttribute("x2", w); lY.setAttribute("y2", snapY); lY.classList.add("snap-line"); ctrl.appendChild(lY); }
 
-        if (el.tagName === 'text' && (parseFloat(window.getD(el, 'max-width')) || 0) > 0 && !isLocked) {
-            const mw = parseFloat(window.getD(el, 'max-width')); const cx = parseFloat(el.getAttribute("x")) || 0; const mwRect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); mwRect.setAttribute("x", cx - mw/2); mwRect.setAttribute("y", b.y); mwRect.setAttribute("width", mw); mwRect.setAttribute("height", b.height); mwRect.setAttribute("fill", "rgba(16, 185, 129, 0.05)"); mwRect.setAttribute("stroke", "var(--accent)"); mwRect.setAttribute("stroke-dasharray", "4,4"); g.appendChild(mwRect);
+        if (el.tagName === 'text' && ((parseFloat(window.getD(el, 'max-width')) || 0) > 0 || (parseFloat(window.getD(el, 'max-height')) || 0) > 0) && !isLocked) {
+            const mw = parseFloat(window.getD(el, 'max-width')) || b.width; 
+            const mh = parseFloat(window.getD(el, 'max-height')) || b.height;
+            const cx = parseFloat(el.getAttribute("x")) || 0; 
+            const cy = parseFloat(el.getAttribute("y")) || 0; 
+            
+            const mwRect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); 
+            mwRect.setAttribute("x", cx - mw/2); 
+            mwRect.setAttribute("y", cy - mh/2); 
+            mwRect.setAttribute("width", mw); 
+            mwRect.setAttribute("height", mh); 
+            mwRect.setAttribute("fill", "rgba(16, 185, 129, 0.05)"); 
+            mwRect.setAttribute("stroke", "var(--accent)"); 
+            mwRect.setAttribute("stroke-dasharray", "4,4"); 
+            g.appendChild(mwRect);
         }
+        
         const strokeColor = isLocked ? "var(--error)" : "var(--handle-move)";
         const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("x", b.x); r.setAttribute("y", b.y); r.setAttribute("width", b.width); r.setAttribute("height", b.height); r.setAttribute("fill", "none"); r.setAttribute("stroke", strokeColor); r.setAttribute("stroke-width", "2"); r.setAttribute("stroke-dasharray", "6,4"); g.appendChild(r);
         
@@ -1362,7 +1389,7 @@
             }
 
             if (isText) {
-                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0;
+                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0; const mh = parseFloat(window.getD(el, 'max-height')) || 0;
                 const isB = el.getAttribute('font-weight') === 'bold'; const isI = el.getAttribute('font-style') === 'italic'; const isU = el.getAttribute('text-decoration') === 'underline';
                 const tAlign = el.getAttribute('text-anchor') || 'middle';
                 let fontOptions = googleFonts.map(font => `<option value="${font.val}" style="font-family: ${font.val}" ${currentFont.includes(font.name) ? "selected" : ""}>${font.name}</option>`).join('');
@@ -1389,10 +1416,15 @@
                         <input type="range" min="-20" max="100" value="${ls}" style="flex:1;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${ls}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
                     </div>
-                    <div class="label-row"><span class="label-text">SIĞDIRMA (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
-                    <div style="display:flex; gap:10px; align-items:center;">
+                    <div class="label-row"><span class="label-text">SIĞDIRMA GENİŞLİK (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
                         <input type="range" min="0" max="2000" value="${mw}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
                         <input type="number" value="${mw}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA YÜKSEKLİK (MAX-H)</span><span class="value-badge" id="val-max-height-${id}">${mh === 0 ? 'KAPALI' : mh+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="2000" value="${mh}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mh}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
                     </div>`;
                 sections.push(window.createPropertySection("Yazı Tipi & Biçimlendirme", fontHtml));
             }
