@@ -11,6 +11,7 @@
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         html,body{margin:0;padding:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);color:#fff;font-family:'Inter', 'Roboto', sans-serif;overscroll-behavior-y:none}
         
+        /* ÖZEL KAYDIRMA ÇUBUKLARI (Custom Scrollbar) */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
@@ -89,6 +90,7 @@
         .prop-group{margin-bottom:20px;}
         .prop-group-title{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:6px; display:flex; align-items:center; gap:6px;}
         
+        /* SEKME YAZILIMI (TABS) */
         .tabs-header { display: flex; gap: 4px; margin-bottom: 15px; background: #0f172a; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
         .tab-btn { flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 11px; font-weight: 700; padding: 10px 4px; cursor: pointer; border-radius: 6px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .tab-btn i { font-size: 16px; }
@@ -106,10 +108,12 @@
         .ctx-item{padding:10px 15px;font-size:13px;cursor:pointer;color:#e2e8f0;border-radius:4px;display:flex;justify-content:space-between;align-items:center; gap:10px;}
         .ctx-item i {font-size: 16px; color:#94a3b8;}
         .ctx-item:hover{background:var(--accent);color:#fff}
+        .ctx-item:hover i{color:#fff;}
         .ctx-item.danger:hover{background:#ef4444}
         
         #status-bar{position:absolute;bottom:0;left:0;width:100%;height:25px;background:#0f172a;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:11px;color:#94a3b8;z-index:400;font-family:monospace}
         
+        /* TOAST BİLDİRİM SİSTEMİ (MODERN) */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events:none;}
         .toast { background: var(--panel); border: 1px solid var(--border); color: #fff; padding: 14px 24px; border-radius: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); transform: translateX(120%); animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; font-size: 13px; font-weight: 700; transition: all 0.3s ease;}
         .toast.success i { color: var(--accent); font-size: 22px; }
@@ -118,6 +122,7 @@
 
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:30000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
         .modal-content{background:#1e293b;border:1px solid var(--border);padding:30px;border-radius:16px;width:450px;box-shadow:0 25px 50px rgba(0,0,0,.5);position:relative;max-height:90vh;display:flex;flex-direction:column}
+        
         .close-modal{position:absolute;top:15px;right:15px;cursor:pointer;color:#94a3b8;font-size:24px;font-weight:700;line-height:1}
         .close-modal:hover{color:#fff}
         .shortcut-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px; align-items:center;}
@@ -127,9 +132,6 @@
         .color-swatch{width:26px;height:26px;border-radius:6px;cursor:pointer;border:1px solid var(--border);transition:transform .1s}
         .color-swatch:hover{transform:scale(1.2);border-color:#fff; z-index:2;}
         
-        .mini-screen-dummy { stroke-dasharray: 10,5; animation: dash 2s linear infinite; }
-        @keyframes dash { to { stroke-dashoffset: -30; } }
-
         @media (max-width:1023px){#app-container{flex-direction:column}#sidebar{width:100%;height:50%;border-top:1px solid var(--border);border-left:none;order:2}#main-view{width:100%;height:50%;order:1;padding-left:0;padding-top:0;}#zoom-container{margin:0;width:100%;height:100%;}.floating-tools{bottom:auto;top:10px;left:50%;transform:translateX(-50%)}}
     </style>
 </head>
@@ -226,6 +228,7 @@
             <div id="status-time">Son Kayıt: Bekleniyor...</div>
         </div>
     </div>
+    
     <div id="sidebar">
         <div class="sidebar-scroll-area">
             <div style="display:flex; gap:5px; margin-bottom: 10px;">
@@ -239,67 +242,7 @@
                 <option value="kampanya.svg">Kampanya (kampanya.svg)</option>
                 <option value="duyuru.svg">Duyuru (duyuru.svg)</option>
             </select>
-
-            <details style="margin-bottom: 10px;" open>
-                <summary style="font-size:11px; font-weight:bold; color:#3b82f6; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-television" style="font-size:14px;"></i> MİNİ EKRAN VE YAYIN KONTROLÜ</summary>
-                <div class="group-box" style="margin-top:5px; border-color:#3b82f6;">
-                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Mini ekranları Göster dediğinizde tuval üzerinde beliren kutuları fareyle sürükleyip boyutlandırabilirsiniz.</div>
-                    
-                    <div class="label-text" style="color:#60a5fa;">SOL EKRAN (CANLI YAYIN - M3U8)</div>
-                    <input type="text" id="m38u-url" placeholder="m3u8 Linki Yapıştırın" onchange="window.updateMiniScreenSetting('left')" style="margin-bottom:5px;">
-                    <div style="display:flex; gap:5px; margin-bottom:5px;">
-                        <input type="number" id="m38u-x" placeholder="X" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('left')">
-                        <input type="number" id="m38u-y" placeholder="Y" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('left')">
-                    </div>
-                    <div style="display:flex; gap:5px; margin-bottom:15px;">
-                        <button id="btn-m38u-toggle" onclick="window.toggleMiniScreen('left')" class="action-btn" style="flex:1.5;">GÖSTER/GİZLE</button>
-                        <input type="number" id="m38u-w" placeholder="Genişlik" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('left')">
-                        <input type="number" id="m38u-h" placeholder="Yükseklik" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('left')">
-                    </div>
-
-                    <div class="label-text" style="color:#f59e0b;">SAĞ EKRAN (RESİM LİSTESİ)</div>
-                    <textarea id="right-images" placeholder="Resim dosyalarını virgülle ayırın (örn: r1.jpg, r2.jpg)" style="height:60px; margin-bottom:5px;" onchange="window.updateMiniScreenSetting('right')"></textarea>
-                    <div style="display:flex; gap:5px; margin-bottom:5px;">
-                        <input type="number" id="right-x" placeholder="X" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('right')">
-                        <input type="number" id="right-y" placeholder="Y" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('right')">
-                    </div>
-                    <div style="display:flex; gap:5px; margin-bottom:10px;">
-                        <button id="btn-right-toggle" onclick="window.toggleMiniScreen('right')" class="action-btn" style="flex:1.5;">GÖSTER/GİZLE</button>
-                        <input type="number" id="right-w" placeholder="Genişlik" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('right')">
-                        <input type="number" id="right-h" placeholder="Yükseklik" style="flex:1; margin:0;" onchange="window.updateMiniScreenSetting('right')">
-                    </div>
-
-                    <button class="action-btn active" style="width:100%; background:#3b82f6;" onclick="window.saveAllSettingsToCloud()"><i class="ph ph-cloud-arrow-up"></i> YAYIN AYARLARINI KAYDET (JSON)</button>
-                </div>
-            </details>
             
-            <details style="margin-bottom: 10px;" open>
-                <summary style="font-size:11px; font-weight:bold; color:#ec4899; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-article" style="font-size:14px;"></i> KAYAN YAZI VE SAAT</summary>
-                <div class="group-box" style="margin-top:5px; border-color:#ec4899;">
-                    <div style="font-size:10px; color:#94a3b8; margin-bottom:10px; font-style:italic;">Gösterildiğinde tuvalde beliren pembe kutuyu sürükleyip boyutlandırın.</div>
-                    
-                    <div style="display:flex; gap:5px; margin-bottom:10px;">
-                        <button id="btn-ticker-toggle" onclick="window.toggleTicker()" class="action-btn" style="flex:1;">GÖSTER/GİZLE</button>
-                        <button id="btn-clock-toggle" onclick="window.toggleClock()" class="action-btn" style="flex:1; background:#8b5cf6;">SAAT AÇIK</button>
-                    </div>
-                    
-                    <div class="label-text" style="color:#ec4899;">KAYAN YAZI METNİ</div>
-                    <input type="text" id="ticker-text" placeholder="Ekranda kayacak metni buraya yazın..." onchange="window.updateTickerSetting()">
-                    
-                    <div class="label-text" style="color:#ec4899; margin-top:10px;">POZİSYON VE BOYUT</div>
-                    <div style="display:flex; gap:5px; margin-bottom:5px;">
-                        <input type="number" id="ticker-x" placeholder="X" style="flex:1; margin:0;" onchange="window.updateTickerSetting()">
-                        <input type="number" id="ticker-y" placeholder="Y" style="flex:1; margin:0;" onchange="window.updateTickerSetting()">
-                    </div>
-                    <div style="display:flex; gap:5px; margin-bottom:10px;">
-                        <input type="number" id="ticker-w" placeholder="Genişlik" style="flex:1; margin:0;" onchange="window.updateTickerSetting()">
-                        <input type="number" id="ticker-h" placeholder="Yükseklik" style="flex:1; margin:0;" onchange="window.updateTickerSetting()">
-                    </div>
-                    
-                    <div class="label-text" style="color:#ec4899;">GÖRÜNÜM AYARLARI (Panelde Tıklayınca Açılır)</div>
-                </div>
-            </details>
-
             <details style="margin-bottom: 10px;">
                 <summary style="font-size:11px; font-weight:bold; color:#f59e0b; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:6px;"><i class="ph ph-film-script" style="font-size:14px;"></i> SEÇİLİ SLAYT AYARLARI (JSON)</summary>
                 <div class="group-box" style="margin-top:5px;">
@@ -320,7 +263,7 @@
                             <option value="none">Efektsiz</option>
                         </select>
                     </div>
-                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveAllSettingsToCloud()"><i class="ph ph-database"></i> AYARLARI KAYDET (JSON)</button>
+                    <button class="action-btn" style="width:100%; background:#f59e0b; color:black;" onclick="window.saveSlideSettings()"><i class="ph ph-database"></i> AYARLARI KAYDET (JSON)</button>
                 </div>
             </details>
 
@@ -408,10 +351,10 @@
 <script>
     const WORKER_URL = "https://tvinfoeditor.tafbilgiislem.workers.dev"; 
     
-    let SHA_KEY = "", SESSION_PASS = "", settingsData = {}, settingsSha = "";
+    let SHA_KEY = "", SESSION_PASS = "", settingsData = [], settingsSha = "";
     let indexHtmlContent = "", indexHtmlSha = "";
-    let currentActiveTab = 'tab-layout';
 
+    // MODERN TOAST BİLDİRİM SİSTEMİ
     window.showToast = function(msg, type = 'success') {
         const container = document.getElementById('toast-container');
         if(!container) return;
@@ -447,13 +390,20 @@
 
     window.updateEditorUI = null;
 
+    // GENİŞLETİLMİŞ FONT KÜTÜPHANESİ
     const googleFonts = [
-        { name: "Varsayılan", val: "sans-serif" }, { name: "Roboto", val: "'Roboto', sans-serif" },
-        { name: "Montserrat", val: "'Montserrat', sans-serif" }, { name: "Poppins", val: "'Poppins', sans-serif" },
-        { name: "Open Sans", val: "'Open Sans', sans-serif" }, { name: "Lato", val: "'Lato', sans-serif" },
-        { name: "Merriweather", val: "'Merriweather', serif" }, { name: "Nunito", val: "'Nunito', sans-serif" },
-        { name: "Oswald", val: "'Oswald', sans-serif" }, { name: "Pacifico", val: "'Pacifico', cursive" },
-        { name: "Playfair Display", val: "'Playfair Display', serif" }, { name: "Raleway", val: "'Raleway', sans-serif" },
+        { name: "Varsayılan", val: "sans-serif" },
+        { name: "Roboto", val: "'Roboto', sans-serif" },
+        { name: "Montserrat", val: "'Montserrat', sans-serif" },
+        { name: "Poppins", val: "'Poppins', sans-serif" },
+        { name: "Open Sans", val: "'Open Sans', sans-serif" },
+        { name: "Lato", val: "'Lato', sans-serif" },
+        { name: "Merriweather", val: "'Merriweather', serif" },
+        { name: "Nunito", val: "'Nunito', sans-serif" },
+        { name: "Oswald", val: "'Oswald', sans-serif" },
+        { name: "Pacifico", val: "'Pacifico', cursive" },
+        { name: "Playfair Display", val: "'Playfair Display', serif" },
+        { name: "Raleway", val: "'Raleway', sans-serif" },
         { name: "Ubuntu", val: "'Ubuntu', sans-serif" }
     ];
 
@@ -478,6 +428,7 @@
     document.getElementById('passInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') window.login(); });
     document.getElementById('file-selector').addEventListener('change', async () => { await window.loadSlide(); window.updateSettingsUI(); });
 
+    // --- Otomatik Metin Yerleştirme Modülü ---
     window.refreshAutoTextFields = function() {
         const list = document.getElementById('auto-fields-list');
         const svg = document.querySelector('#canvas-inner svg');
@@ -485,8 +436,8 @@
 
         const varElements = svg.querySelectorAll('[data-var-name]');
         list.innerHTML = "";
-        let hasVars = false;
 
+        let hasVars = false;
         varElements.forEach(el => {
             const varName = el.getAttribute('data-var-name');
             if(!varName || varName.trim() === "") return;
@@ -520,236 +471,27 @@
         }
     };
 
+    // --- JSON Ayarları Modülü ---
     window.loadSettings = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json"} });
             if (res.ok) {
                 const data = await res.json();
                 settingsSha = data.sha || (data.content && data.content.sha) || "";
-                let parsedData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                
-                if (Array.isArray(parsedData)) {
-                    settingsData = { slides: parsedData, mini_screens: { left: {visible:true, x:50, y:800, w:400, h:250, url:""}, right: {visible:true, x:1470, y:800, w:400, h:250, images:[]} } };
-                } else {
-                    settingsData = parsedData;
-                    if(!settingsData.slides) settingsData.slides = [];
-                    if(!settingsData.mini_screens) settingsData.mini_screens = { left: {visible:true, x:50, y:800, w:400, h:250, url:""}, right: {visible:true, x:1470, y:800, w:400, h:250, images:[]} };
-                }
-            } else { 
-                settingsData = { slides: [ {file: "slayt.svg", effect: "fade", duration: 5000} ], mini_screens: { left: {visible:true, x:50, y:800, w:400, h:250, url:""}, right: {visible:true, x:1470, y:800, w:400, h:250, images:[]} } };
-            }
+                settingsData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+            } else { settingsData = [ {file: "slayt.svg", effect: "fade", duration: 5000} ]; }
             window.updateSettingsUI();
-        } catch (e) { 
-            settingsData = { slides: [], mini_screens: { left: {visible:true, x:50, y:800, w:400, h:250, url:""}, right: {visible:true, x:1470, y:800, w:400, h:250, images:[]} } };
-            window.updateSettingsUI(); 
-        }
+        } catch (e) { settingsData = []; window.updateSettingsUI(); }
     };
 
     window.updateSettingsUI = function() {
         const currentFile = document.getElementById('file-selector').value;
-        const slides = settingsData.slides || [];
-        const slideConfig = slides.find(s => s.file === currentFile);
-        
-        if (slideConfig) { 
-            document.getElementById('slide-time').value = slideConfig.duration || 3000; 
-            document.getElementById('slide-effect').value = slideConfig.effect || 'fade'; 
-        } else { 
-            document.getElementById('slide-time').value = 3000; 
-            document.getElementById('slide-effect').value = 'fade'; 
-        }
-
-        if(settingsData.mini_screens) {
-            const ms = settingsData.mini_screens;
-            if(ms.left) {
-                document.getElementById('m38u-url').value = ms.left.url || "";
-                document.getElementById('m38u-x').value = ms.left.x || 50;
-                document.getElementById('m38u-y').value = ms.left.y || 800;
-                document.getElementById('m38u-w').value = ms.left.w || 400;
-                document.getElementById('m38u-h').value = ms.left.h || 250;
-                document.getElementById('btn-m38u-toggle').style.background = ms.left.visible ? "#10b981" : "#991b1b";
-            }
-            if(ms.right) {
-                document.getElementById('right-images').value = (ms.right.images || []).join(", ");
-                document.getElementById('right-x').value = ms.right.x || 1470;
-                document.getElementById('right-y').value = ms.right.y || 800;
-                document.getElementById('right-w').value = ms.right.w || 400;
-                document.getElementById('right-h').value = ms.right.h || 250;
-                document.getElementById('btn-right-toggle').style.background = ms.right.visible ? "#10b981" : "#991b1b";
-            }
-        }
-
-        if (!settingsData.ticker) {
-            settingsData.ticker = { visible: false, showClock: true, text: "Yayın sistemine hoş geldiniz...", speed: 20, x: 0, y: 1000, w: 1920, h: 80, font: "sans-serif", color: "#ffffff", opacity: 0.8, fontSize: 26 };
-        }
-        document.getElementById('ticker-x').value = settingsData.ticker.x;
-        document.getElementById('ticker-y').value = settingsData.ticker.y;
-        document.getElementById('ticker-w').value = settingsData.ticker.w;
-        document.getElementById('ticker-h').value = settingsData.ticker.h;
-        
-        document.getElementById('ticker-text').value = settingsData.ticker.text;
-        document.getElementById('ticker-speed').value = settingsData.ticker.speed;
-        document.getElementById('btn-ticker-toggle').style.background = settingsData.ticker.visible ? "#10b981" : "#991b1b";
-        document.getElementById('btn-clock-toggle').style.background = settingsData.ticker.showClock ? "#10b981" : "#991b1b";
-        document.getElementById('btn-clock-toggle').innerText = settingsData.ticker.showClock ? "SAAT AÇIK" : "SAAT KAPALI";
-        
-        window.syncDummyElement('left');
-        window.syncDummyElement('right');
-        window.syncDummyElement('ticker');
+        const slideConfig = settingsData.find(s => s.file === currentFile);
+        if (slideConfig) { document.getElementById('slide-time').value = slideConfig.duration || 3000; document.getElementById('slide-effect').value = slideConfig.effect || 'fade'; } 
+        else { document.getElementById('slide-time').value = 3000; document.getElementById('slide-effect').value = 'fade'; }
     };
 
-    // TICKER İÇİN ÖZEL SVG ÖNİZLEME OLUŞTURUCU
-    window.syncDummyElement = function(side) {
-        const id = side === 'left' ? 'mini_left' : (side === 'right' ? 'mini_right' : 'mini_ticker');
-        if(!settingsData) return;
-        const ms = side === 'ticker' ? settingsData.ticker : settingsData.mini_screens[side];
-        if(!ms) return;
-        let el = document.getElementById(id);
-        const svg = document.querySelector('#canvas-inner svg');
-        if(!svg) return;
-
-        if(ms.visible) {
-            if(!el) {
-                if (side === 'ticker') {
-                    el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                    el.id = id;
-                    el.setAttribute("class", "duzenlenebilir mini-screen-dummy");
-                    el.style.overflow = "hidden";
-                    
-                    const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    bg.setAttribute("class", "ticker-bg");
-                    bg.setAttribute("width", "100%");
-                    bg.setAttribute("height", "100%");
-                    
-                    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                    txt.setAttribute("class", "ticker-txt");
-                    txt.setAttribute("y", "50%");
-                    txt.setAttribute("x", "20");
-                    txt.setAttribute("dominant-baseline", "middle");
-                    
-                    el.appendChild(bg);
-                    el.appendChild(txt);
-                    window.setD(el, "locked", "false");
-                    svg.appendChild(el);
-                } else {
-                    el = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    el.id = id;
-                    el.setAttribute("class", "duzenlenebilir mini-screen-dummy");
-                    if(side === 'left') { el.setAttribute("fill", "rgba(59, 130, 246, 0.4)"); el.setAttribute("stroke", "#3b82f6"); }
-                    else if (side === 'right') { el.setAttribute("fill", "rgba(245, 158, 11, 0.4)"); el.setAttribute("stroke", "#f59e0b"); }
-                    el.setAttribute("stroke-width", "6");
-                    window.setD(el, "locked", "false");
-                    svg.appendChild(el);
-                }
-            }
-            
-            el.setAttribute("x", ms.x || 0);
-            el.setAttribute("y", ms.y || 0);
-            el.setAttribute("width", ms.w || 100);
-            el.setAttribute("height", ms.h || 100);
-            
-            if (side === 'ticker') {
-                const bg = el.querySelector('.ticker-bg');
-                if(bg) {
-                    bg.setAttribute("fill", "#000000");
-                    bg.setAttribute("fill-opacity", ms.opacity !== undefined ? ms.opacity : 0.8);
-                }
-                const txt = el.querySelector('.ticker-txt');
-                if(txt) {
-                    txt.textContent = ms.text || "Kayan Yazı Önizleme...";
-                    txt.setAttribute("fill", ms.color || "#ffffff");
-                    txt.setAttribute("font-family", ms.font || "sans-serif");
-                    txt.setAttribute("font-size", ms.fontSize || 26);
-                }
-            }
-        } else {
-            if(el) {
-                el.remove();
-                if(selectedEl && selectedEl.id === id) { selectedEl = null; document.getElementById('control-layer').innerHTML = ""; window.renderProperties(); }
-            }
-        }
-    };
-
-    window.toggleMiniScreen = function(side) {
-        if(!settingsData.mini_screens) return;
-        settingsData.mini_screens[side].visible = !settingsData.mini_screens[side].visible;
-        window.updateSettingsUI();
-        window.saveAllSettingsToCloud(true);
-    };
-
-    window.updateMiniScreenSetting = function(side) {
-        if(!settingsData.mini_screens) return;
-        if(side === 'left') {
-            settingsData.mini_screens.left.url = document.getElementById('m38u-url').value;
-            settingsData.mini_screens.left.x = parseInt(document.getElementById('m38u-x').value) || 50;
-            settingsData.mini_screens.left.y = parseInt(document.getElementById('m38u-y').value) || 800;
-            settingsData.mini_screens.left.w = parseInt(document.getElementById('m38u-w').value) || 400;
-            settingsData.mini_screens.left.h = parseInt(document.getElementById('m38u-h').value) || 250;
-        } else {
-            let imgs = document.getElementById('right-images').value;
-            settingsData.mini_screens.right.images = imgs.split(',').map(s => s.trim()).filter(s => s !== "");
-            settingsData.mini_screens.right.x = parseInt(document.getElementById('right-x').value) || 1470;
-            settingsData.mini_screens.right.y = parseInt(document.getElementById('right-y').value) || 800;
-            settingsData.mini_screens.right.w = parseInt(document.getElementById('right-w').value) || 400;
-            settingsData.mini_screens.right.h = parseInt(document.getElementById('right-h').value) || 250;
-        }
-        window.syncDummyElement(side);
-        window.saveAllSettingsToCloud(true);
-    };
-
-    window.toggleTicker = function() {
-        if(!settingsData.ticker) return;
-        settingsData.ticker.visible = !settingsData.ticker.visible;
-        window.updateSettingsUI();
-        window.saveAllSettingsToCloud(true);
-    };
-
-    window.toggleClock = function() {
-        if(!settingsData.ticker) return;
-        settingsData.ticker.showClock = !settingsData.ticker.showClock;
-        window.updateSettingsUI();
-        window.saveAllSettingsToCloud(true);
-    };
-
-    window.updateTickerSetting = function() {
-        if(!settingsData.ticker) return;
-        settingsData.ticker.text = document.getElementById('ticker-text').value;
-        settingsData.ticker.speed = parseInt(document.getElementById('ticker-speed').value) || 20;
-        settingsData.ticker.x = parseInt(document.getElementById('ticker-x').value) || 0;
-        settingsData.ticker.y = parseInt(document.getElementById('ticker-y').value) || 1000;
-        settingsData.ticker.w = parseInt(document.getElementById('ticker-w').value) || 1920;
-        settingsData.ticker.h = parseInt(document.getElementById('ticker-h').value) || 80;
-
-        window.syncDummyElement('ticker');
-        window.saveAllSettingsToCloud(true);
-    };
-
-    // YENİ: TICKER ÖZELLİKLERİ PANELİNDEN GELEN GÜNCELLEME
-    window.updateTickerFromProp = function() {
-        if(!settingsData.ticker) return;
-        settingsData.ticker.text = document.getElementById('prop-ticker-text').value;
-        settingsData.ticker.x = parseInt(document.getElementById('prop-ticker-x').value) || 0;
-        settingsData.ticker.y = parseInt(document.getElementById('prop-ticker-y').value) || 0;
-        settingsData.ticker.w = parseInt(document.getElementById('prop-ticker-w').value) || 1920;
-        settingsData.ticker.h = parseInt(document.getElementById('prop-ticker-h').value) || 80;
-        settingsData.ticker.font = document.getElementById('prop-ticker-font').value;
-        settingsData.ticker.color = document.getElementById('prop-ticker-color').value;
-        settingsData.ticker.fontSize = parseInt(document.getElementById('prop-ticker-fontsize').value) || 26;
-        settingsData.ticker.opacity = parseFloat(document.getElementById('prop-ticker-opacity').value);
-        settingsData.ticker.speed = parseInt(document.getElementById('prop-ticker-speed').value) || 20;
-        
-        document.getElementById('ticker-text').value = settingsData.ticker.text;
-        document.getElementById('ticker-x').value = settingsData.ticker.x;
-        document.getElementById('ticker-y').value = settingsData.ticker.y;
-        document.getElementById('ticker-w').value = settingsData.ticker.w;
-        document.getElementById('ticker-h').value = settingsData.ticker.h;
-        document.getElementById('ticker-speed').value = settingsData.ticker.speed;
-        
-        window.syncDummyElement('ticker');
-        window.saveAllSettingsToCloud(true);
-        window.updateUI(document.getElementById('mini_ticker')); 
-    };
-
-    window.saveAllSettingsToCloud = async function(silent = false) {
+    window.saveSlideSettings = async function() {
         if (!WORKER_URL || WORKER_URL === "") { window.showToast("Worker URL eksik!", "error"); return; }
         
         try {
@@ -757,28 +499,28 @@
             const timeVal = parseInt(document.getElementById('slide-time').value) || 3000;
             const effectVal = document.getElementById('slide-effect').value;
 
-            if(!settingsData.slides) settingsData.slides = [];
             let found = false;
-            settingsData.slides.forEach(s => {
+            settingsData.forEach(s => {
                 if (s.file === currentFile) {
                     s.duration = timeVal;
                     s.effect = effectVal;
                     found = true;
                 }
             });
-            if (!found) { settingsData.slides.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
+            if (!found) { settingsData.push({ file: currentFile, effect: effectVal, duration: timeVal }); }
 
             const newContent = JSON.stringify(settingsData, null, 2);
             const b64 = btoa(unescape(encodeURIComponent(newContent)));
 
-            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Sistem Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
+            const putRes = await fetch(WORKER_URL, { method: "PUT", headers: { "X-Auth-Key": SESSION_PASS, "X-File-Name": "settings.json" }, body: JSON.stringify({message: "Slayt Ayarı Senkronizasyonu", content: b64, sha: settingsSha}) });
             if(putRes.ok) { 
                 try { const data = await putRes.json(); settingsSha = data.content?.sha || data.sha || settingsSha; } catch(e) {}
-                if(!silent) window.showToast("Tüm Yayın Ayarları Başarıyla Kaydedildi!");
+                window.showToast("Ayar JSON Başarıyla Kaydedildi!");
             } else { window.showToast("Ayar Kayıt Hatası!", "error"); }
-        } catch (e) { if(!silent) window.showToast("Ayarlar kaydedilemedi.", "error"); }
+        } catch (e) { window.showToast("Ayarlar kaydedilemedi.", "error"); }
     };
 
+    // --- Index HTML (Efekt) Modülü ---
     window.loadIndexHtml = async function() {
         try {
             const res = await fetch(WORKER_URL, { headers: {"X-Auth-Key": SESSION_PASS, "X-File-Name": "index.html"} });
@@ -787,8 +529,8 @@
                 indexHtmlSha = data.sha || (data.content && data.content.sha) || "";
                 indexHtmlContent = decodeURIComponent(escape(atob(data.content)));
                 window.updateHtmlEffectUI();
-            }
-        } catch (e) {}
+            } else { console.error("index.html yüklenemedi."); }
+        } catch (e) { console.error("index.html bağlantı hatası", e); }
     };
 
     window.updateHtmlEffectUI = function() {
@@ -799,13 +541,15 @@
         
         if (match && match[1]) {
             const transMatch = match[1].match(/transition:[^;]*?([\d\.]+)(s|ms)/i);
-            if (transMatch && transMatch[1]) { document.getElementById('html-effect-duration').value = transMatch[1]; } 
-            else { document.getElementById('html-effect-duration').value = "1.5"; }
+            if (transMatch && transMatch[1]) {
+                document.getElementById('html-effect-duration').value = transMatch[1];
+            } else { document.getElementById('html-effect-duration').value = "1.5"; }
         } else { document.getElementById('html-effect-duration').value = "1.5"; }
     };
 
     window.saveHtmlSettings = async function() {
         if(!indexHtmlContent) { window.showToast("index.html içeriği okunamadı. Sayfayı yenileyin.", "error"); return; }
+        
         try {
             const effect = document.getElementById('html-effect-select').value;
             const duration = document.getElementById('html-effect-duration').value;
@@ -834,6 +578,7 @@
         } catch(e) { window.showToast("index.html kaydedilirken hata oluştu.", "error"); }
     };
 
+    // --- Slayt ve Çizim Modülleri ---
     window.loadSlide = async function() {
         const file = document.getElementById('file-selector').value;
         try {
@@ -847,7 +592,7 @@
                 document.getElementById('canvas-inner').innerHTML = decodeURIComponent(escape(atob(data.content)));
             }
             historyStack = []; historyIndex = -1;
-            setTimeout(() => { window.setupLayers(); window.initCanvasSettings(); window.resetZoom(); window.saveState(); window.updateSettingsUI(); }, 200);
+            setTimeout(() => { window.setupLayers(); window.initCanvasSettings(); window.resetZoom(); window.saveState(); }, 200);
             window.showToast("Slayt Yüklendi!");
         } catch(e) { window.showToast("Sunucuya Bağlanılamadı!", "error"); document.getElementById('login-screen').style.display = "flex"; document.getElementById('app-container').style.display = "none"; }
     };
@@ -857,13 +602,7 @@
         
         try {
             document.getElementById('control-layer').innerHTML = ""; window.hideGuides(true);
-            
-            const svg = document.querySelector('#canvas-inner svg').cloneNode(true);
-            const dl = svg.querySelector('#mini_left'); if(dl) dl.remove();
-            const dr = svg.querySelector('#mini_right'); if(dr) dr.remove();
-            const dt = svg.querySelector('#mini_ticker'); if(dt) dt.remove();
-
-            const svgText = new XMLSerializer().serializeToString(svg); 
+            const svgText = new XMLSerializer().serializeToString(document.querySelector('#canvas-inner svg')); 
             const b64 = btoa(unescape(encodeURIComponent(svgText)));
             window.hideGuides(false);
             
@@ -885,6 +624,7 @@
             if(selectedEl && window.updateEditorUI) window.updateEditorUI(selectedEl);
         } catch(e) { window.showToast("Bağlantı Hatası!", "error"); }
     };
+
     window.addNewText = function() {
         const svg = document.querySelector('#canvas-inner svg'); if(!svg) return; 
         const center = window.getCanvasCenter();
@@ -941,28 +681,6 @@
         if(el.tagName === 'text') window.applyTextCurve(el);
         if(el.tagName === 'image' || el.tagName === 'rect') window.applyShapeMask(el);
         if(window.updateEditorUI) window.updateEditorUI(el);
-
-        if (id === 'mini_left' || id === 'mini_right' || id === 'mini_ticker') {
-            const side = id === 'mini_left' ? 'left' : (id === 'mini_right' ? 'right' : 'ticker');
-            const targetData = side === 'ticker' ? settingsData.ticker : settingsData.mini_screens[side];
-            targetData.x = Math.round(parseFloat(el.getAttribute('x')));
-            targetData.y = Math.round(parseFloat(el.getAttribute('y')));
-            targetData.w = Math.round(parseFloat(el.getAttribute('width')));
-            targetData.h = Math.round(parseFloat(el.getAttribute('height')));
-            
-            if(side === 'ticker') {
-                document.getElementById('ticker-x').value = targetData.x;
-                document.getElementById('ticker-y').value = targetData.y;
-                document.getElementById('ticker-w').value = targetData.w;
-                document.getElementById('ticker-h').value = targetData.h;
-            } else {
-                document.getElementById(side==='left'?'m38u-x':'right-x').value = targetData.x;
-                document.getElementById(side==='left'?'m38u-y':'right-y').value = targetData.y;
-                document.getElementById(side==='left'?'m38u-w':'right-w').value = targetData.w;
-                document.getElementById(side==='left'?'m38u-h':'right-h').value = targetData.h;
-            }
-            window.saveAllSettingsToCloud(true);
-        }
     };
 
     window.changeSetting = function(id, key, val, elUI) {
@@ -981,12 +699,6 @@
         }
         if(key === 'rx' || key === 'mask-shape') window.applyShapeMask(el);
         if(key === 'angle') window.applyTransforms(el);
-        
-        // FİX: İÇ RENK ANLIK UYGULAMA
-        if (key === 'solid-color' || key === 'color1' || key === 'color2' || key === 'fill-type') {
-            window.applyFill(el);
-            if (el.tagName === 'text') window.applyTextCurve(el);
-        }
         
         if (elUI) {
             const badge = document.getElementById('val-' + key + '-' + id);
@@ -1125,15 +837,7 @@
         line.ondblclick = function() { this.remove(); window.saveState(); }; gg.appendChild(line); window.saveState();
     };
 
-    // FİX: ÇİZİM MODU İYİLEŞTİRMESİ
-    window.toggleDrawMode = function() { 
-        isDrawingMode = !isDrawingMode; 
-        document.getElementById('btn-draw').classList.toggle('active', isDrawingMode); 
-        document.getElementById('svg-wrapper').classList.toggle('draw-mode', isDrawingMode); 
-        selectedEl = null; 
-        document.getElementById('control-layer').innerHTML = ""; 
-        window.renderEditor(); 
-    };
+    window.toggleDrawMode = function() { isDrawingMode = !isDrawingMode; document.getElementById('btn-draw').classList.toggle('active', isDrawingMode); document.getElementById('svg-wrapper').classList.toggle('draw-mode', isDrawingMode); selectedEl = null; document.getElementById('control-layer').innerHTML = ""; window.renderEditor(); };
 
     window.applyTextStyle = function(id, style, val) {
         const el = document.getElementById(id); if(!el || el.tagName !== 'text') return;
@@ -1183,15 +887,7 @@
             const step = e.shiftKey ? 10 : 1; let moved = false; let x = parseFloat(selectedEl.getAttribute("x")) || 0, y = parseFloat(selectedEl.getAttribute("y")) || 0;
             if (e.key === 'ArrowUp') { y -= step; moved = true; } if (e.key === 'ArrowDown') { y += step; moved = true; } if (e.key === 'ArrowLeft') { x -= step; moved = true; } if (e.key === 'ArrowRight') { x += step; moved = true; }
             if (moved) { e.preventDefault(); selectedEl.setAttribute("x", x); selectedEl.setAttribute("y", y); if(selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') window.applyShapeMask(selectedEl); if(selectedEl.tagName === 'text') window.applyTextCurve(selectedEl); if(window.updateEditorUI) window.updateEditorUI(selectedEl); isModified = true; }
-            if (e.key === 'Delete' || e.key === 'Backspace') { 
-                e.preventDefault(); 
-                if(selectedEl.id === 'mini_left' || selectedEl.id === 'mini_right' || selectedEl.id === 'mini_ticker') {
-                    const side = selectedEl.id === 'mini_left' ? 'left' : (selectedEl.id === 'mini_right' ? 'right' : 'ticker');
-                    if(side === 'ticker') window.toggleTicker(); else window.toggleMiniScreen(side);
-                } else {
-                    selectedEl.remove(); document.getElementById('control-layer').innerHTML = ''; selectedEl = null; window.saveState(); window.renderEditor(); 
-                }
-            }
+            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); selectedEl.remove(); document.getElementById('control-layer').innerHTML = ''; selectedEl = null; window.saveState(); window.renderEditor(); }
             if (e.ctrlKey && e.key === 'c') { e.preventDefault(); clipboard = selectedEl.cloneNode(true); }
         }
         if (e.ctrlKey && e.key === 'v' && clipboard) { e.preventDefault(); const clone = clipboard.cloneNode(true); clone.id = "el_" + Date.now(); clone.setAttribute("x", (parseFloat(clone.getAttribute("x")) || 0) + 30); clone.setAttribute("y", (parseFloat(clone.getAttribute("y")) || 0) + 30); document.querySelector('#canvas-inner svg').appendChild(clone); selectedEl = clone; window.saveState(); window.setupLayers(); window.updateEditorUI(clone); window.renderEditor(); }
@@ -1281,6 +977,7 @@
     window.autoFitText = function(el) { 
         if (el.tagName !== 'text') return; 
         
+        // --- Kutuya Sabitleme (Bounding Box) Mantığı ---
         const boundRectId = window.getD(el, 'bound-rect');
         if (boundRectId) {
             const rect = document.getElementById(boundRectId);
@@ -1384,9 +1081,9 @@
         if (mainSvg.hasAttribute('viewBox')) { const vb = mainSvg.getAttribute('viewBox').split(/\s+|,/); if(vb.length >= 4) { w = parseFloat(vb[2]); h = parseFloat(vb[3]); } }
         ctrl.setAttribute("viewBox", `0 0 ${w} ${h}`);
         
-        let editables = mainSvg.querySelectorAll('.duzenlenebilir:not(.mini-screen-dummy)');
-        if (editables.length === 0) { mainSvg.querySelectorAll('text, image, rect, g:not(#guides-group), svg:not(#control-layer), path:not(svg path):not(g path)').forEach(el => { if(el.id !== 'control-layer' && el.id !== 'canvas-background' && !el.closest('#control-layer') && !el.classList.contains('guide-line') && !el.classList.contains('mini-screen-dummy')) { el.classList.add('duzenlenebilir'); } }); }
-        mainSvg.querySelectorAll('.duzenlenebilir:not(.mini-screen-dummy)').forEach(el => {
+        let editables = mainSvg.querySelectorAll('.duzenlenebilir');
+        if (editables.length === 0) { mainSvg.querySelectorAll('text, image, rect, g:not(#guides-group), svg:not(#control-layer), path:not(svg path):not(g path)').forEach(el => { if(el.id !== 'control-layer' && el.id !== 'canvas-background' && !el.closest('#control-layer') && !el.classList.contains('guide-line')) { el.classList.add('duzenlenebilir'); } }); }
+        mainSvg.querySelectorAll('.duzenlenebilir').forEach(el => {
             if(!el.id) el.id = "el_" + Math.random().toString(36).substr(2,9);
             if(window.getD(el, 'locked') === "true") el.classList.add('locked');
             if(el.tagName === 'text' && window.getD(el, 'curve')) window.applyTextCurve(el);
@@ -1406,15 +1103,8 @@
             if (isSpacePressed) { isPanning = true; panStart = {x: e.clientX, y: e.clientY}; panOffsetStart = {x: panX, y: panY}; document.getElementById('svg-wrapper').classList.add('panning'); return; }
             const p = getCoords(e); const target = e.target; isModified = false;
 
-            // FİX: ÇİZİM MODU BAŞLATMA
             if (isDrawingMode) {
-                isDrawing = true; currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path"); currentPath.id = "pth_" + Date.now(); currentPath.setAttribute("class", "duzenlenebilir"); currentPath.setAttribute("fill", "none"); 
-                currentPath.setAttribute("stroke", recentColors[0] || "#10b981"); 
-                window.setD(currentPath, 'solid-color', recentColors[0] || "#10b981");
-                currentPath.setAttribute("stroke-width", "5"); currentPath.setAttribute("stroke-linecap", "round"); currentPath.setAttribute("stroke-linejoin", "round"); 
-                currentPath.setAttribute("pointer-events", "visibleStroke");
-                pathData = `M ${p.x} ${p.y} L ${p.x+0.1} ${p.y+0.1}`; 
-                currentPath.setAttribute("d", pathData);
+                isDrawing = true; currentPath = document.createElementNS("http://www.w3.org/2000/svg", "path"); currentPath.id = "pth_" + Date.now(); currentPath.setAttribute("class", "duzenlenebilir"); currentPath.setAttribute("fill", "none"); currentPath.setAttribute("stroke", "#10b981"); currentPath.setAttribute("stroke-width", "5"); currentPath.setAttribute("stroke-linecap", "round"); currentPath.setAttribute("stroke-linejoin", "round"); pathData = `M ${p.x} ${p.y}`; currentPath.setAttribute("d", pathData);
                 const guidesGroup = document.getElementById('guides-group'); if(guidesGroup) svg.insertBefore(currentPath, guidesGroup); else svg.appendChild(currentPath);
                 try { wrapper.setPointerCapture(e.pointerId); } catch(err){} return;
             }
@@ -1434,7 +1124,7 @@
             
             const el = target.closest('.duzenlenebilir');
             if (el) {
-                if (e.altKey && window.getD(el, 'locked') !== "true" && !el.classList.contains('mini-screen-dummy')) { const clone = el.cloneNode(true); clone.id = "el_" + Date.now(); clone.classList.add("duzenlenebilir"); el.parentNode.insertBefore(clone, el.nextSibling); selectedEl = clone; } else { selectedEl = el; }
+                if (e.altKey && window.getD(el, 'locked') !== "true") { const clone = el.cloneNode(true); clone.id = "el_" + Date.now(); clone.classList.add("duzenlenebilir"); el.parentNode.insertBefore(clone, el.nextSibling); selectedEl = clone; } else { selectedEl = el; }
                 isDraggingElement = true; offset.x = p.x - (parseFloat(selectedEl.getAttribute("x")) || 0); offset.y = p.y - (parseFloat(selectedEl.getAttribute("y")) || 0); 
                 window.updateUI(selectedEl); window.renderEditor();
                 if(window.getD(selectedEl, 'locked') !== "true") { try { wrapper.setPointerCapture(e.pointerId); } catch(err){} }
@@ -1446,10 +1136,7 @@
         window.onpointermove = (e) => {
             if (isPanning) { panX = panOffsetStart.x + ((e.clientX - panStart.x) / currentZoom); panY = panOffsetStart.y + ((e.clientY - panStart.y) / currentZoom); window.applyZoom(); window.syncRulerTransform(); return; }
             const p = getCoords(e);
-            
-            // FİX: ÇİZİM YAPARKEN SÜREKLİLİK
             if (isDrawing && currentPath) { pathData += ` L ${p.x} ${p.y}`; currentPath.setAttribute("d", pathData); return; }
-            
             if (isDraggingGuide && currentGuide) { if(window.getD(currentGuide, 'type') === 'h') { currentGuide.setAttribute('y1', p.y); currentGuide.setAttribute('y2', p.y); } else { currentGuide.setAttribute('x1', p.x); currentGuide.setAttribute('x2', p.x); } return; }
             if (!selectedEl && !resizingEl && !rotatingEl && !radiusingEl) return;
             if (selectedEl && window.getD(selectedEl, 'locked') === "true" && !resizingEl && !rotatingEl && !radiusingEl) return; 
@@ -1477,8 +1164,8 @@
                     if(activeHandle.includes('t')) resizingEl.setAttribute('y', y);
                     window.applyTextCurve(resizingEl);
                 } 
-                else if (resizingEl.tagName === "image" || resizingEl.tagName === "rect" || resizingEl.tagName === "svg" || resizingEl.tagName === "g" || resizingEl.tagName === "path") { 
-                    if (w > 10 && h > 10 && resizingEl.tagName !== 'path') { resizingEl.setAttribute("x", x); resizingEl.setAttribute("y", y); resizingEl.setAttribute("width", w); resizingEl.setAttribute("height", h); if(resizingEl.tagName !== "svg" && resizingEl.tagName !== "g" && window.getD(resizingEl, 'mask-shape') && window.getD(resizingEl, 'mask-shape') !== "none") window.applyShapeMask(resizingEl); } 
+                else if (resizingEl.tagName === "image" || resizingEl.tagName === "rect" || resizingEl.tagName === "svg" || resizingEl.tagName === "g") { 
+                    if (w > 10 && h > 10) { resizingEl.setAttribute("x", x); resizingEl.setAttribute("y", y); resizingEl.setAttribute("width", w); resizingEl.setAttribute("height", h); if(resizingEl.tagName !== "svg" && resizingEl.tagName !== "g" && window.getD(resizingEl, 'mask-shape') && window.getD(resizingEl, 'mask-shape') !== "none") window.applyShapeMask(resizingEl); } 
                 }
                 
                 window.updateUI(resizingEl);
@@ -1524,10 +1211,7 @@
                     else if (Math.abs(elBottom - oBottom) < snapTolerance) { snapY = oBottom; newY = isTxt ? oBottom - bbox.height/2 : oBottom - bbox.height; }
                 });
 
-                if(selectedEl.tagName !== 'path') {
-                    selectedEl.setAttribute("x", newX); selectedEl.setAttribute("y", newY);
-                }
-                
+                selectedEl.setAttribute("x", newX); selectedEl.setAttribute("y", newY);
                 if((selectedEl.tagName === 'image' || selectedEl.tagName === 'rect') && window.getD(selectedEl, 'mask-shape') && window.getD(selectedEl, 'mask-shape') !== "none") window.applyShapeMask(selectedEl); 
                 if(selectedEl.tagName === 'text' && window.getD(selectedEl, 'curve')) window.applyTextCurve(selectedEl);
                 
@@ -1542,33 +1226,9 @@
             try { wrapper.releasePointerCapture(e.pointerId); } catch(err){} 
             isDraggingElement = false; 
             if (isPanning) { isPanning = false; document.getElementById('svg-wrapper').classList.remove('panning'); return; }
-            if (isDrawing) { isDrawing = false; selectedEl = currentPath; currentPath = null; isDrawingMode = false; document.getElementById('btn-draw').classList.remove('active'); document.getElementById('svg-wrapper').classList.remove('draw-mode'); window.saveState(); window.setupLayers(); window.renderEditor(); window.updateUI(selectedEl); return; }
+            if (isDrawing) { isDrawing = false; selectedEl = currentPath; currentPath = null; isDrawingMode = false; document.getElementById('btn-draw').classList.remove('active'); document.getElementById('svg-wrapper').classList.remove('draw-mode'); window.saveState(); window.renderEditor(); window.updateUI(selectedEl); return; }
             if (isDraggingGuide) { isDraggingGuide = false; currentGuide = null; window.saveState(); return; }
             
-            if (isModified && selectedEl && selectedEl.classList.contains('mini-screen-dummy')) {
-                const side = selectedEl.id === 'mini_left' ? 'left' : (selectedEl.id === 'mini_right' ? 'right' : 'ticker');
-                const targetData = side === 'ticker' ? settingsData.ticker : settingsData.mini_screens[side];
-                
-                targetData.x = Math.round(parseFloat(selectedEl.getAttribute('x')));
-                targetData.y = Math.round(parseFloat(selectedEl.getAttribute('y')));
-                targetData.w = Math.round(parseFloat(selectedEl.getAttribute('width')));
-                targetData.h = Math.round(parseFloat(selectedEl.getAttribute('height')));
-                
-                if(side === 'ticker') {
-                    document.getElementById('ticker-x').value = targetData.x;
-                    document.getElementById('ticker-y').value = targetData.y;
-                    document.getElementById('ticker-w').value = targetData.w;
-                    document.getElementById('ticker-h').value = targetData.h;
-                } else {
-                    document.getElementById(side==='left'?'m38u-x':'right-x').value = targetData.x;
-                    document.getElementById(side==='left'?'m38u-y':'right-y').value = targetData.y;
-                    document.getElementById(side==='left'?'m38u-w':'right-w').value = targetData.w;
-                    document.getElementById(side==='left'?'m38u-h':'right-h').value = targetData.h;
-                }
-                
-                window.saveAllSettingsToCloud(true);
-            }
-
             if (isModified) { window.saveState(); if(selectedEl) window.renderProperties(); }
             resizingEl = null; rotatingEl = null; radiusingEl = null; activeHandle = null; isModified = false; 
             document.querySelectorAll('.snap-line').forEach(l=>l.remove()); 
@@ -1614,14 +1274,385 @@
         const s = 24; const corners = [{ id: 'tl', x: b.x, y: b.y, cur: 'nwse-resize' }, { id: 'tr', x: b.x + b.width, y: b.y, cur: 'nesw-resize' }, { id: 'bl', x: b.x, y: b.y + b.height, cur: 'nesw-resize' }, { id: 'br', x: b.x + b.width, y: b.y + b.height, cur: 'nwse-resize' }];
         corners.forEach(c => { const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect"); rect.setAttribute("x", c.x - s/2); rect.setAttribute("y", c.y - s/2); rect.setAttribute("width", s); rect.setAttribute("height", s); rect.setAttribute("class", "handle handle-resize"); rect.dataset.id = el.id; rect.dataset.handle = c.id; rect.style.cursor = c.cur; g.appendChild(rect); });
         
-        if(!el.classList.contains('mini-screen-dummy')) {
-            const rotY = b.y - 40; const line = document.createElementNS("http://www.w3.org/2000/svg", "line"); line.setAttribute("x1", b.x + b.width/2); line.setAttribute("y1", b.y); line.setAttribute("x2", b.x + b.width/2); line.setAttribute("y2", rotY); line.setAttribute("stroke", "var(--handle-rotate)"); line.setAttribute("stroke-width", "2"); g.appendChild(line);
-            const rotH = document.createElementNS("http://www.w3.org/2000/svg", "circle"); rotH.setAttribute("cx", b.x + b.width/2); rotH.setAttribute("cy", rotY); rotH.setAttribute("r", s/2.5); rotH.setAttribute("class", "handle handle-rotate"); rotH.dataset.id = el.id; g.appendChild(rotH);
-        }
+        const rotY = b.y - 40; const line = document.createElementNS("http://www.w3.org/2000/svg", "line"); line.setAttribute("x1", b.x + b.width/2); line.setAttribute("y1", b.y); line.setAttribute("x2", b.x + b.width/2); line.setAttribute("y2", rotY); line.setAttribute("stroke", "var(--handle-rotate)"); line.setAttribute("stroke-width", "2"); g.appendChild(line);
+        const rotH = document.createElementNS("http://www.w3.org/2000/svg", "circle"); rotH.setAttribute("cx", b.x + b.width/2); rotH.setAttribute("cy", rotY); rotH.setAttribute("r", s/2.5); rotH.setAttribute("class", "handle handle-rotate"); rotH.dataset.id = el.id; g.appendChild(rotH);
 
         if ((el.tagName === "image" || el.tagName === "rect") && window.getD(el, 'mask-shape') && window.getD(el, 'mask-shape') === 'squircle') {
             const radH = document.createElementNS("http://www.w3.org/2000/svg", "circle"); radH.setAttribute("cx", b.x + b.width); radH.setAttribute("cy", b.y + (parseFloat(window.getD(el, 'rx')) || 0)); radH.setAttribute("r", s/2.5); radH.setAttribute("class", "handle handle-radius"); radH.dataset.id = el.id; g.appendChild(radH);
         }
+    };
+    
+    window.updateEditorUI = window.updateUI; 
+
+    // YENİ: SEKMELİ YAPI KONTROLCÜSÜ
+    window.switchTab = function(btn, tabId) {
+        const wrapper = btn.closest('#editor-fields');
+        if (!wrapper) return;
+        wrapper.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        wrapper.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        wrapper.querySelector('#' + tabId).classList.add('active');
+    };
+
+    window.renderEditor = function() { 
+        window.renderLayers(); 
+        window.refreshAutoTextFields();
+        if(selectedEl) window.renderProperties(); 
+        else document.getElementById('editor-fields').innerHTML = `
+            <div style="text-align:center; color:#64748b; margin-top:50px; font-style:italic; font-size:13px;">
+                <i class="ph ph-cursor-click" style="font-size:32px; display:block; margin-bottom:15px; color:var(--accent); opacity:0.5;"></i>
+                👆 Düzenlemek için sahneden veya katmanlardan bir nesne seçin.
+            </div>`;
+    };
+
+    window.renderLayers = function() {
+        const list = document.getElementById('layers-list'); list.innerHTML = "";
+        const elements = Array.from(document.querySelectorAll('.duzenlenebilir')).reverse();
+        document.getElementById('status-count').innerText = `Nesne Sayısı: ${elements.length}`;
+        
+        elements.forEach((el) => {
+            const isLocked = window.getD(el, 'locked') === "true"; const isActive = selectedEl === el;
+            const isHidden = el.getAttribute('visibility') === 'hidden';
+            let typeName = el.tagName.toUpperCase(); 
+            let icon = 'ph-square';
+            if (typeName === 'RECT') { typeName = 'ŞEKİL'; icon = 'ph-square'; } 
+            if (typeName === 'G' || typeName === 'SVG') { typeName = 'İKON'; icon = 'ph-shapes'; } 
+            if (typeName === 'PATH') { typeName = 'ÇİZİM'; icon = 'ph-scribble-loop'; } 
+            if (typeName === 'IMAGE') { typeName = 'RESİM'; icon = 'ph-image'; }
+            if (el.tagName === 'text') { let txt = window.getD(el, 'raw-text') || el.textContent; typeName = `T: ${txt.substring(0,10)}${txt.length>10?'...':''}`; icon = 'ph-text-t'; }
+
+            const item = document.createElement('div'); item.className = `layer-item ${isActive ? 'active' : ''}`;
+            item.onclick = (e) => { 
+                if(e.target.closest('.layer-btn')) return; 
+                selectedEl = el; isDraggingElement = false; 
+                if(window.updateEditorUI) window.updateEditorUI(el); window.renderEditor(); 
+            };
+            item.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px; flex:1; overflow:hidden;">
+                <i class="ph ${icon}" style="color:var(--accent);"></i>
+                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${isLocked ? 'text-decoration:line-through; opacity:0.5;' : ''} ${isHidden ? 'opacity:0.3;' : ''}">${typeName}</span>
+            </div>
+            <div class="layer-actions">
+                <button class="layer-btn" onclick="window.toggleVisibility('${el.id}')" title="Göster/Gizle"><i class="ph ${isHidden ? 'ph-eye-closed' : 'ph-eye'}"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'top')" title="En Üste"><i class="ph ph-caret-double-up"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 1)" title="Yukarı"><i class="ph ph-caret-up"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', -1)" title="Aşağı"><i class="ph ph-caret-down"></i></button>
+                <button class="layer-btn" onclick="window.moveLayer('${el.id}', 'bottom')" title="En Alta"><i class="ph ph-caret-double-down"></i></button>
+                <button class="layer-btn" onclick="window.toggleLock('${el.id}')" title="Kilit"><i class="ph ${isLocked ? 'ph-lock-key' : 'ph-lock-key-open'}"></i></button>
+                <button class="layer-btn" style="color:#ef4444;" onclick="if(confirm('Silinecek?')){ const delId='${el.id}'; if(selectedEl && selectedEl.id===delId) selectedEl=null; document.getElementById(delId).remove(); window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; event.stopPropagation(); }"><i class="ph ph-trash"></i></button>
+            </div>`;
+            list.appendChild(item);
+        });
+    };
+
+    function createPropGroup(title, content) {
+        return `<div class="prop-group"><div class="prop-group-title">${title}</div>${content}</div>`;
+    }
+
+    // ÖZELLİKLER PANELİ (YENİ SEKMELİ YAPI)
+    window.renderProperties = function() {
+        const f = document.getElementById('editor-fields');
+        if (!selectedEl || !selectedEl.tagName) { window.renderEditor(); return; }
+        
+        try {
+            const el = selectedEl; const id = el.id; const tag = el.tagName.toLowerCase();
+            const isLocked = window.getD(el, 'locked') === "true"; const isPath = tag === 'path'; const isText = tag === 'text'; const isShape = tag === 'rect'; const isImage = tag === 'image'; const isIcon = tag === 'svg' || tag === 'g';
+            
+            let typeName = tag.toUpperCase(); let headerIcon = 'ph-square';
+            if (isShape) { typeName = 'ŞEKİL'; headerIcon = 'ph-square'; } 
+            if (isIcon) { typeName = 'İKON'; headerIcon = 'ph-shapes'; } 
+            if (isPath) { typeName = 'ÇİZİM'; headerIcon = 'ph-scribble-loop'; } 
+            if (isImage) { typeName = 'RESİM'; headerIcon = 'ph-image'; } 
+            if (isText) { typeName = 'METİN'; headerIcon = 'ph-text-t'; }
+
+            let layoutHtml = "";
+            let styleHtml = "";
+            let textHtml = "";
+            let codeHtml = "";
+
+            let headerHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+                    <div style="font-size:14px; color:white; font-weight:bold; letter-spacing:1px; display:flex; align-items:center; gap:8px;">
+                        <i class="ph ${headerIcon}" style="color:var(--accent);"></i> ${typeName} AYARLARI ${isLocked ? '<i class="ph ph-lock-key" style="color:#ef4444;"></i>' : ''}
+                    </div>
+                    <div class="delete-btn" style="cursor:pointer; color:#94a3b8; font-size:20px; transition:0.2s;" title="Sil" onclick="if(confirm('Silinecek?')){ document.getElementById('${id}').remove(); selectedEl=null; window.saveState(); window.renderEditor(); document.getElementById('control-layer').innerHTML=''; }"><i class="ph ph-x-circle"></i></div>
+                </div>
+                <div class="action-row" style="margin-bottom:20px;">
+                    <button class="action-btn" onclick="window.toggleLock('${id}')" style="background:${isLocked?'var(--error)':'#334155'}"><i class="ph ${isLocked?'ph-lock-key-open':'ph-lock-key'}"></i> ${isLocked ? 'KİLİDİ AÇ' : 'KİLİTLE'}</button>
+                    <button class="action-btn special" onclick="window.cloneElement('${id}')" ${isLocked ? 'disabled':''}><i class="ph ph-copy"></i> KOPYALA</button>
+                </div>
+            `;
+
+            if (isLocked) { 
+                f.innerHTML = headerHtml + `<div style="text-align:center; color:#ef4444; font-size:12px; margin-top:30px;"><i class="ph ph-lock-key" style="font-size:40px; display:block; margin-bottom:10px; opacity:0.5;"></i> Bu öğe kilitli. Düzenlemek için kilidini açın.</div>`; 
+                return; 
+            }
+
+            let tabsNav = `
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="window.switchTab(this, 'tab-layout')"><i class="ph ph-bounding-box"></i> Düzen</button>
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-style')"><i class="ph ph-palette"></i> Stil</button>
+                    ${isText ? `<button class="tab-btn" onclick="window.switchTab(this, 'tab-text')"><i class="ph ph-text-t"></i> Metin</button>` : ''}
+                    <button class="tab-btn" onclick="window.switchTab(this, 'tab-code')"><i class="ph ph-code"></i> Kod</button>
+                </div>
+            `;
+
+            // --- 1. DÜZEN (LAYOUT) SEKMESİ ---
+            if(!isPath) {
+                let alignHtml = `
+                <div class="action-row" style="margin-bottom:8px;">
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'left')"><i class="ph ph-align-left"></i> SOL</button>
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'center-h')"><i class="ph ph-align-center-horizontal"></i> ORTA</button>
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'right')"><i class="ph ph-align-right"></i> SAĞ</button>
+                </div>
+                <div class="action-row" style="margin-bottom:10px;">
+                    <button class="action-btn" onclick="window.alignElement('${id}', 'center-v')"><i class="ph ph-align-center-vertical"></i> DİKEY ORTA</button>
+                    <button class="action-btn" onclick="window.toggleFlip('${id}', 'x')"><i class="ph ph-arrows-left-right"></i> YATAY ÇEVİR</button>
+                    <button class="action-btn" onclick="window.toggleFlip('${id}', 'y')"><i class="ph ph-arrows-down-up"></i> DİKEY ÇEVİR</button>
+                </div>`;
+                layoutHtml += createPropGroup("<i class='ph ph-intersect'></i> Hizalama & Çevirme", alignHtml);
+            }
+
+            if (!isPath) {
+                let bbox = {x:0, y:0, width:0, height:0}; try { bbox = el.getBBox(); } catch(e){}
+                const x = Math.round(parseFloat(el.getAttribute("x")) || bbox.x || 0); const y = Math.round(parseFloat(el.getAttribute("y")) || bbox.y || 0);
+                let w = 0, h = 0;
+                
+                if(isText) { 
+                    w = Math.round(parseFloat(el.getAttribute("textLength")) || bbox.width || 0); 
+                    h = Math.round(parseFloat(window.getD(el, "base-font-size")) || 60); 
+                } else { 
+                    w = Math.round(parseFloat(el.getAttribute("width")) || bbox.width || 0); 
+                    h = Math.round(parseFloat(el.getAttribute("height")) || bbox.height || 0); 
+                }
+                
+                let posHtml = `
+                    <div class="label-row"><span class="label-text">X KONUMU</span><span class="value-badge" id="val-x-${id}">${x}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="-1000" max="3000" value="${x}" style="flex:1;" oninput="window.changeProp('${id}', 'x', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${x}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'x', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">Y KONUMU</span><span class="value-badge" id="val-y-${id}">${y}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="-1000" max="3000" value="${y}" style="flex:1;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${y}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'y', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">${isText ? 'GENİŞLİK (ESNETME W)' : 'GENİŞLİK (W)'}</span><span class="value-badge" id="val-w-${id}">${w}px</span></div>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="range" min="1" max="2500" value="${w}" style="flex:1;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${w}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'w', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">${isText ? 'YAZI PUNTO (H)' : 'YÜKSEKLİK (H)'}</span><span class="value-badge" id="val-h-${id}">${h}px</span></div>
+                    <div style="display:flex; gap:10px;">
+                        <input type="range" min="1" max="2500" value="${h}" style="flex:1;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${h}" style="width:70px; padding:8px;" oninput="window.changeProp('${id}', 'h', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                layoutHtml += createPropGroup("<i class='ph ph-arrows-out'></i> Konum ve Boyut", posHtml);
+                
+                const angle = parseFloat(window.getD(el, 'angle')) || 0;
+                let transHtml = `
+                    <div class="label-row" style="margin-top:0;"><span class="label-text">DÖNDÜRME AÇISI</span><span class="value-badge" id="val-angle-${id}">${angle}°</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="360" value="${angle}" style="flex:1;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${angle}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'angle', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                layoutHtml += createPropGroup("<i class='ph ph-arrows-clockwise'></i> Dönüştürme", transHtml);
+            }
+
+            if (isShape || isImage) {
+                const rx = parseFloat(window.getD(el, 'rx')) || 0; const maskShape = window.getD(el, 'mask-shape') || 'none';
+                let bbox = {width:0, height:0}; try { bbox = el.getBBox(); }catch(e){} const maxR = Math.min(bbox.width, bbox.height) / 2;
+                let formHtml = `<div class="label-text" style="margin-bottom:5px;">MASKELEME ŞEKLİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'mask-shape', this.value); window.saveState();"><option value="none" ${maskShape === 'none' ? 'selected' : ''}>Yok (Düz)</option><option value="squircle" ${maskShape === 'squircle' ? 'selected' : ''}>Oval Kare (Squircle)</option><option value="circle" ${maskShape === 'circle' ? 'selected' : ''}>Daire</option><option value="triangle" ${maskShape === 'triangle' ? 'selected' : ''}>Üçgen</option><option value="star" ${maskShape === 'star' ? 'selected' : ''}>Yıldız</option></select>
+                <div class="label-row"><span class="label-text">KÖŞE YARIÇAPI (SQUIRCLE)</span><span class="value-badge" id="val-rx-${id}">${Math.round(rx)}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="range" min="0" max="${maxR}" value="${rx}" style="flex:1;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${rx}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'rx', this.value, this);" onchange="window.saveState()">
+                </div>`;
+                layoutHtml += createPropGroup("<i class='ph ph-scissors'></i> Form & Maskeleme", formHtml);
+            }
+
+
+            // --- 2. STİL SEKMESİ ---
+            if (!isImage) {
+                const fillType = window.getD(el, 'fill-type') || 'solid'; const col1 = window.getD(el, 'color1') || '#10b981'; const col2 = window.getD(el, 'color2') || '#3b82f6'; const solidCol = window.getD(el, 'solid-color') || (el.getAttribute('fill') === 'none' ? el.getAttribute('stroke') : el.getAttribute('fill')) || "#ffffff";
+                let swatchHtml = `<div class="label-text" style="margin-top:15px; margin-bottom:8px;">PROJE RENKLERİ</div><div class="swatch-container">` + recentColors.map(c => `<div class="color-swatch" style="background:${c}" onclick="window.applyRecentColor('${id}', '${c}')" title="${c}"></div>`).join('') + `</div>`;
+                let fillHtml = `<div class="label-text" style="margin-bottom:5px;">DOLGU TİPİ</div><select class="font-select" style="margin-bottom:15px;" onchange="window.changeSetting('${id}', 'fill-type', this.value); window.renderProperties(); window.saveState();"><option value="solid" ${fillType === 'solid' ? 'selected' : ''}>Düz Renk</option><option value="gradient" ${fillType === 'gradient' ? 'selected' : ''}>Renk Geçişi (Gradient)</option></select>`;
+                if (fillType === 'solid') { fillHtml += `<div class="label-text" style="margin-bottom:5px;">${isPath?'ÇİZGİ':'İÇ'} RENK</div><div style="display:flex; gap:10px; align-items:center;"><input type="color" value="${safeColor(solidCol)}" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:18px;" onclick="window.pickColor('${id}', 'solidColor', 'fill')" title="Göz Damlası"><i class="ph ph-drop"></i></button><input type="text" value="${safeColor(solidCol)}" style="flex:1;" oninput="window.changeSetting('${id}', 'solid-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>`; } 
+                else { fillHtml += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div class="input-group"><span class="label-text">RENK 1</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col1)}" oninput="window.changeSetting('${id}', 'color1', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'color1', '')"><i class="ph ph-drop"></i></button></div></div><div class="input-group"><span class="label-text">RENK 2</span><div style="display:flex; gap:5px; align-items:center;"><input type="color" value="${safeColor(col2)}" oninput="window.changeSetting('${id}', 'color2', this.value);" onchange="window.addRecentColor(this.value); window.saveState();" style="width:35px; height:35px; cursor:pointer; border:none; background:none;"><button class="action-btn" style="padding:8px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'color2', '')"><i class="ph ph-drop"></i></button></div></div></div>`; }
+                fillHtml += swatchHtml;
+                styleHtml += createPropGroup("<i class='ph ph-paint-bucket'></i> Dolgu & Renk", fillHtml);
+            }
+
+            const strokeCol = el.getAttribute('stroke') || '#000000'; const strokeW = parseFloat(el.getAttribute('stroke-width')) || 0; const dash = el.getAttribute('stroke-dasharray') || 'none';
+            let strokeHtml = `<div class="label-text" style="margin-bottom:5px;">ÇİZGİ RENGİ</div><div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;"><input type="color" value="${safeColor(strokeCol)}" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:45px; height:45px; cursor:pointer; border:none; background:none; border-radius:8px;"><button class="action-btn" style="flex:0 0 45px; padding:12px; background:#334155; font-size:18px;" onclick="window.pickColor('${id}', '', 'stroke')" title="Göz Damlası"><i class="ph ph-drop"></i></button><input type="text" value="${safeColor(strokeCol)}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke', this.value); t.setAttribute('paint-order', 'stroke fill'); t.setAttribute('stroke-linejoin', 'round'); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();"></div>
+            <div class="label-row"><span class="label-text">KALINLIK</span><span class="value-badge" id="val-sw-${id}">${strokeW}px</span></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                <input type="range" min="0" max="50" value="${strokeW}" style="flex:1;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke-width', this.value); t.setAttribute('paint-order', 'stroke fill'); document.getElementById('val-sw-${id}').innerText=this.value+'px'; this.nextElementSibling.value=this.value;" onchange="window.saveState()">
+                <input type="number" value="${strokeW}" style="width:70px; padding:8px;" oninput="const t=document.getElementById('${id}'); t.setAttribute('stroke-width', this.value); t.setAttribute('paint-order', 'stroke fill'); document.getElementById('val-sw-${id}').innerText=this.value+'px'; this.previousElementSibling.value=this.value;" onchange="window.saveState()">
+            </div>
+            <div class="label-text" style="margin-bottom:5px;">ÇİZGİ TİPİ</div>
+            <select class="font-select" onchange="document.getElementById('${id}').setAttribute('stroke-dasharray', this.value); window.saveState();"><option value="none" ${dash === 'none' ? 'selected' : ''}>Düz</option><option value="5,5" ${dash === '5,5' ? 'selected' : ''}>Kesikli</option><option value="2,2" ${dash === '2,2' ? 'selected' : ''}>Noktalı</option></select>`;
+            styleHtml += createPropGroup("<i class='ph ph-square-logo'></i> Kenarlık & Çizgi", strokeHtml);
+
+            let opacityVal = parseFloat(el.getAttribute('opacity')); if (isNaN(opacityVal)) opacityVal = 1;
+            const sX = parseFloat(window.getD(el, 'shadow-x')) || 0, sY = parseFloat(window.getD(el, 'shadow-y')) || 0, sB = parseFloat(window.getD(el, 'shadow-blur')) || 0, sC = window.getD(el, 'shadow-color') || '#000000', bl = parseFloat(window.getD(el, 'blur')) || 0; const blend = window.getD(el, 'blend') || 'normal';
+            
+            let fxHtml = `
+            <div class="label-row"><span class="label-text">SAYDAMLIK (OPACITY)</span><span class="value-badge" id="val-opacity-${id}">${Math.round(opacityVal*100)}%</span></div>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                <input type="range" min="0" max="1" step="0.05" value="${opacityVal}" style="flex:1;" oninput="window.changeFilter('${id}', 'opacity', this.value, this);" onchange="window.saveState()">
+                <input type="number" min="0" max="1" step="0.05" value="${opacityVal}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'opacity', this.value, this);" onchange="window.saveState()">
+            </div>
+            <div class="label-text" style="margin-bottom:5px;">KARIŞIM MODU (BLEND)</div>
+            <select class="font-select" style="margin-bottom:15px;" onchange="window.changeFilter('${id}', 'blend', this.value); window.saveState();">
+                <option value="normal" ${blend === 'normal' ? 'selected' : ''}>Normal</option><option value="multiply" ${blend === 'multiply' ? 'selected' : ''}>Çoğalt (Multiply)</option><option value="screen" ${blend === 'screen' ? 'selected' : ''}>Ekran (Screen)</option><option value="overlay" ${blend === 'overlay' ? 'selected' : ''}>Kaplama (Overlay)</option>
+            </select>
+            <div class="group-box">
+                <div class="label-text" style="color:white; margin-bottom:10px;"><i class="ph ph-drop-half-bottom"></i> GÖLGE VE BLUR</div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="color" value="${sC}" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.nextElementSibling.nextElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();" style="width:40px; height:40px; cursor:pointer; border-radius:8px; border:none; background:none;">
+                    <button class="action-btn" style="padding:10px; background:#334155; font-size:16px;" onclick="window.pickColor('${id}', 'shadow-color', '')"><i class="ph ph-drop"></i></button>
+                    <input type="text" value="${sC}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-color', this.value); this.previousElementSibling.previousElementSibling.value=this.value;" onchange="window.addRecentColor(this.value); window.saveState();">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE X</span><span class="value-badge" id="val-shadow-x-${id}">${sX}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="-100" max="100" value="${sX}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-x', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sX}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-x', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE Y</span><span class="value-badge" id="val-shadow-y-${id}">${sY}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="-100" max="100" value="${sY}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-y', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sY}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-y', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">GÖLGE YAYILMASI</span><span class="value-badge" id="val-shadow-blur-${id}">${sB}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                    <input type="range" min="0" max="100" value="${sB}" style="flex:1;" oninput="window.changeFilter('${id}', 'shadow-blur', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${sB}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'shadow-blur', this.value, this);" onchange="window.saveState()">
+                </div>
+                <div class="label-row"><span class="label-text">NESNE BULANIKLIĞI</span><span class="value-badge" id="val-blur-${id}">${bl}px</span></div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="range" min="0" max="100" value="${bl}" style="flex:1;" oninput="window.changeFilter('${id}', 'blur', this.value, this);" onchange="window.saveState()">
+                    <input type="number" value="${bl}" style="width:70px; padding:8px;" oninput="window.changeFilter('${id}', 'blur', this.value, this);" onchange="window.saveState()">
+                </div>
+            </div>`;
+            styleHtml += createPropGroup("<i class='ph ph-magic-wand'></i> Efektler & Görünüm", fxHtml);
+
+            // --- 3. METİN SEKMESİ ---
+            if (isText) {
+                const rawText = (window.getD(el, 'raw-text') || el.textContent).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                const varName = window.getD(el, 'var-name') || "";
+                
+                let rectOptions = `<option value="">-- Serbest Bırak (Sabitleme Yok) --</option>`;
+                document.querySelectorAll('#canvas-inner svg rect.duzenlenebilir, #canvas-inner svg image.duzenlenebilir').forEach(r => {
+                    const isSelected = window.getD(el, 'bound-rect') === r.id ? 'selected' : '';
+                    rectOptions += `<option value="${r.id}" ${isSelected}>Şekil: ${r.id}</option>`;
+                });
+
+                let contentHtml = `
+                    <div style="margin-bottom:10px;">
+                        <div class="label-text" style="margin-bottom:5px;">METİN İÇERİĞİ</div>
+                        <input type="text" value="${rawText}" oninput="window.changeSetting('${id}', 'raw-text', this.value); window.refreshAutoTextFields();" onchange="window.saveState()" placeholder="Metni girin..." style="margin-bottom:10px;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <div class="label-text" style="color:#f472b6; margin-bottom:5px;">OTOMATİK DEĞİŞKEN ADI (Örn: FIYAT)</div>
+                        <input type="text" value="${varName}" placeholder="Boş bırakırsanız listede görünmez" 
+                               oninput="this.value = this.value.toUpperCase(); window.setD(document.getElementById('${id}'), 'var-name', this.value); window.refreshAutoTextFields();" 
+                               onchange="window.saveState()" style="border-color:#f472b6;">
+                    </div>
+                    <div style="padding:10px; background:rgba(16, 185, 129, 0.1); border:1px solid #10b981; border-radius:8px; margin-top:10px;">
+                        <div class="label-text" style="color:#10b981; margin-bottom:5px;"><i class="ph ph-intersect"></i> BİR KUTUYA SABİTLE (ORTALA & SIĞDIR)</div>
+                        <div style="font-size:10px; color:#94a3b8; margin-bottom:8px; font-style:italic;">Seçilen kutunun tam ortasına yapışır ve taşmayı önler.</div>
+                        <select class="font-select" style="border-color:#10b981; background:#0f172a;" onchange="window.changeSetting('${id}', 'bound-rect', this.value); window.autoFitText(document.getElementById('${id}')); window.updateEditorUI(document.getElementById('${id}')); window.saveState();">
+                            ${rectOptions}
+                        </select>
+                    </div>
+                `;
+                textHtml += createPropGroup("<i class='ph ph-text-t'></i> Metin ve Sabitleme", contentHtml);
+
+                const ls = parseFloat(el.getAttribute("letter-spacing")) || 0; const currentFont = el.getAttribute("font-family") || "sans-serif"; const curve = parseFloat(window.getD(el, 'curve')) || 0; const mw = parseFloat(window.getD(el, 'max-width')) || 0; const mh = parseFloat(window.getD(el, 'max-height')) || 0;
+                const isB = el.getAttribute('font-weight') === 'bold'; const isI = el.getAttribute('font-style') === 'italic'; const isU = el.getAttribute('text-decoration') === 'underline';
+                const tAlign = el.getAttribute('text-anchor') || 'middle';
+                let fontOptionsHtml = googleFonts.map(font => `<option value="${font.val}" style="font-family: ${font.val}" ${currentFont.includes(font.name) ? "selected" : ""}>${font.name}</option>`).join('');
+                
+                let fontHtml = `<select class="font-select" style="margin-bottom:15px;" onchange="const t=document.getElementById('${id}'); t.setAttribute('font-family', this.value); t.style.fontFamily=this.value; window.applyTextCurve(t); if(window.updateEditorUI) window.updateEditorUI(t); window.saveState();">${fontOptionsHtml}</select>
+                    <div style="display:flex; gap:5px; margin-bottom:15px;">
+                        <button class="action-btn ${isB?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'bold')"><i class="ph ph-text-b"></i></button>
+                        <button class="action-btn ${isI?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'italic')"><i class="ph ph-text-italic"></i></button>
+                        <button class="action-btn ${isU?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'underline')"><i class="ph ph-text-underline"></i></button>
+                        <div style="width:1px; background:var(--border); margin:0 5px;"></div>
+                        <button class="action-btn ${tAlign==='start'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'start')"><i class="ph ph-text-align-left"></i></button>
+                        <button class="action-btn ${tAlign==='middle'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'middle')"><i class="ph ph-text-align-center"></i></button>
+                        <button class="action-btn ${tAlign==='end'?'active':''}" style="flex:1; font-size:16px;" onclick="window.applyTextStyle('${id}', 'align', 'end')"><i class="ph ph-text-align-right"></i></button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;">
+                        <button class="action-btn" onclick="window.applyTextStyle('${id}', 'normal')">Stil Temizle</button>
+                        <button class="action-btn special" onclick="document.getElementById('${id}').removeAttribute('textLength'); document.getElementById('${id}').removeAttribute('lengthAdjust'); window.autoFitText(document.getElementById('${id}')); window.saveState(); window.renderProperties();"><i class="ph ph-arrows-out-line-horizontal"></i> ESNETMEYİ SIFIRLA</button>
+                    </div>
+                    <div class="action-row" style="margin-bottom:15px;"><button class="action-btn" onclick="window.applyTextStyle('${id}', 'neon')">Neon</button><button class="action-btn" onclick="window.applyTextStyle('${id}', '3d')">3D</button><button class="action-btn" onclick="window.applyTextStyle('${id}', 'hollow')">Hollow</button></div>
+                    
+                    <div class="label-row"><span class="label-text">EĞRİLİK (KAVİS)</span><span class="value-badge" id="val-curve-${id}">${curve}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-100" max="100" value="${curve}" style="flex:1;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${curve}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'curve', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">HARF ARALIĞI</span><span class="value-badge" id="val-letter-spacing-${id}">${ls}px</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="-20" max="100" value="${ls}" style="flex:1;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${ls}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'letter-spacing', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA GENİŞLİK (MAX-W)</span><span class="value-badge" id="val-max-width-${id}">${mw === 0 ? 'KAPALI' : mw+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="range" min="0" max="2000" value="${mw}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mw}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-width', this.value, this);" onchange="window.saveState()">
+                    </div>
+                    <div class="label-row"><span class="label-text">SIĞDIRMA YÜKSEKLİK (MAX-H)</span><span class="value-badge" id="val-max-height-${id}">${mh === 0 ? 'KAPALI' : mh+'px'}</span></div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <input type="range" min="0" max="2000" value="${mh}" style="flex:1;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
+                        <input type="number" value="${mh}" style="width:70px; padding:8px;" oninput="window.changeSetting('${id}', 'max-height', this.value, this);" onchange="window.saveState()">
+                    </div>`;
+                textHtml += createPropGroup("<i class='ph ph-text-aa'></i> Yazı Tipi & Biçimlendirme", fontHtml);
+            }
+
+            // --- 4. KOD SEKMESİ ---
+            const rawSvgCode = el.outerHTML.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            let editorCodeHtml = `<textarea id="raw-svg-code" style="width:100%; height:250px; background:#000; color:var(--accent); font-family:monospace; font-size:11px; padding:10px; border-radius:8px; border:1px solid var(--border); resize:vertical;" onchange="window.saveState()">${rawSvgCode}</textarea>
+            <button class="action-btn active" style="width:100%; margin-top:10px; padding:12px;" onclick="window.applyRawCode('${id}')"><i class="ph ph-terminal-window"></i> KODU UYGULA</button>`;
+            codeHtml += createPropGroup("<i class='ph ph-file-code'></i> Canlı SVG Kodu", editorCodeHtml);
+
+            // TÜM SEKMELERİ BİRLEŞTİR
+            f.innerHTML = headerHtml + tabsNav + 
+                `<div id="tab-layout" class="tab-content active">${layoutHtml}</div>` +
+                `<div id="tab-style" class="tab-content">${styleHtml}</div>` +
+                (isText ? `<div id="tab-text" class="tab-content">${textHtml}</div>` : '') +
+                `<div id="tab-code" class="tab-content">${codeHtml}</div>`;
+
+        } catch(err) {
+            console.error("Özellik Paneli Hatası:", err);
+            f.innerHTML = `<div style="color:#ef4444; padding:20px; font-size:12px; text-align:center;"><i class="ph ph-warning-circle" style="font-size:32px; display:block; margin-bottom:10px;"></i> Özellikler yüklenemedi. Lütfen nesneyi tekrar seçin.</div>`;
+        }
+    };
+
+    window.applyRawCode = function(id) {
+        try {
+            let p = new DOMParser(); 
+            let code = document.getElementById('raw-svg-code').value.trim();
+            let n;
+            if (!code.toLowerCase().startsWith('<svg')) {
+                let d = p.parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + code + '</svg>', 'image/svg+xml');
+                if(d.documentElement.tagName === 'parsererror') throw new Error('Hatalı Kod');
+                n = d.documentElement.firstElementChild;
+            } else {
+                let d = p.parseFromString(code, 'image/svg+xml'); 
+                n = d.documentElement; 
+                if(n.tagName==='parsererror') throw new Error('Hatalı Kod');
+            }
+            if(!n) throw new Error('Geçersiz SVG');
+            let o = document.getElementById(id); o.replaceWith(n); selectedEl = n; 
+            if(!selectedEl.id) selectedEl.id='el_'+Date.now(); 
+            if(!selectedEl.classList.contains('duzenlenebilir')) selectedEl.classList.add('duzenlenebilir'); 
+            window.saveState(); window.setupLayers(); window.updateEditorUI(selectedEl); window.renderEditor(); 
+            window.showToast("Özel Kod Uygulandı!");
+        } catch(err) { window.showToast('Lütfen geçerli bir SVG kodu girin.', 'error'); }
     };
 </script>
 </body>
